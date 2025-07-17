@@ -15,6 +15,7 @@ local tpAmt = 150
 local MAX_DISTANCE_OK = 60
 local TELEPORT_ITERATIONS = 110
 
+-- main
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "ethzStealGUI"
 gui.ResetOnSpawn = false
@@ -101,6 +102,80 @@ local function createButton(text, index)
     return btn
 end
 
+-- server stuff
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ethzKickHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Main Frame
+local Frame = Instance.new("Frame")
+Frame.Name = "MainFrame"
+Frame.Size = UDim2.new(0, 245, 0, 140)
+Frame.Position = UDim2.new(0.5, -122, 0.5, -70)
+Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
+
+-- UICorner for rounding
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = Frame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Text = "ethz Kick Hub"
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 18
+Title.Font = Enum.Font.GothamBold
+Title.Parent = Frame
+
+-- Kick Button
+local KickBtn = Instance.new("TextButton")
+KickBtn.Name = "KickButton"
+KickBtn.Text = "Kick"
+KickBtn.Size = UDim2.new(0.8, 0, 0, 40)
+KickBtn.Position = UDim2.new(0.1, 0, 0, 40)
+KickBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+KickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+KickBtn.TextSize = 16
+KickBtn.Font = Enum.Font.Gotham
+KickBtn.Parent = Frame
+
+local UICornerKick = Instance.new("UICorner")
+UICornerKick.CornerRadius = UDim.new(0, 6)
+UICornerKick.Parent = KickBtn
+
+KickBtn.MouseButton1Click:Connect(function()
+	player:Kick("You Have Successfully Been Kicked By ethz Script")
+end)
+
+-- Rejoin Button
+local RejoinBtn = Instance.new("TextButton")
+RejoinBtn.Name = "RejoinButton"
+RejoinBtn.Text = "Rejoin"
+RejoinBtn.Size = UDim2.new(0.8, 0, 0, 40)
+RejoinBtn.Position = UDim2.new(0.1, 0, 0, 90)
+RejoinBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+RejoinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+RejoinBtn.TextSize = 16
+RejoinBtn.Font = Enum.Font.Gotham
+RejoinBtn.Parent = Frame
+
+local UICornerRejoin = Instance.new("UICorner")
+UICornerRejoin.CornerRadius = UDim.new(0, 6)
+UICornerRejoin.Parent = RejoinBtn
+
+RejoinBtn.MouseButton1Click:Connect(function()
+	local placeId = game.PlaceId
+	local instanceId = game.JobId
+	TeleportService:TeleportToPlaceInstance(placeId, instanceId)
+end)
+
 -- TP to Base
 local function DeliverBrainrot()
     for _, plot in ipairs(workspace.Plots:GetChildren()) do
@@ -170,19 +245,6 @@ b2.MouseButton1Click:Connect(TweenSteal)
 
 createButton("ESP Player", 3)
 createButton("ESP Brainrots (Soon)", 4)
-
-local b5 = createButton("Kick", 5)
-b5.MouseButton1Click:Connect(function()
-    player:Kick("You Have Successfully Been Kicked By ethz Script")
-end)
-
-local b6 = createButton("Rejoin", 6)
-b6.MouseButton1Click:Connect(function()
-    local TeleportService = game:GetService("TeleportService")
-    local placeId = game.PlaceId
-    local instanceId = game.JobId
-    TeleportService:TeleportToPlaceInstance(placeId, instanceId)
-end)
 
 -- Minimize/Kapat
 local minimized = false
