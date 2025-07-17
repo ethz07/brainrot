@@ -352,6 +352,7 @@ local function SafeInstantSteal2s()
             math.random(-1,1) * 0.05
         )
 
+        -- Işınlan
         hrp.Anchored = true
         hrp.CFrame = cframe + jitter
         hrp.Velocity = Vector3.zero
@@ -359,27 +360,26 @@ local function SafeInstantSteal2s()
         hrp.Anchored = false
 
         if isDelivery then
-            -- Düşme efekti sonrası biraz bekle
-            task.wait(0.4)
-
-            -- Kendi base'inin hitbox'unu bul
+            -- HEMEN yürümeye başla
             local hitbox = getOwnPlotHitbox()
             if not hitbox then
                 warn("❌ Hitbox bulunamadı")
                 return
             end
 
-            -- Hareket başlat
-            moving = true
-            if moveConnection then moveConnection:Disconnect() end
+            if moveConnection then
+                moveConnection:Disconnect()
+                moveConnection = nil
+            end
 
+            moving = true
             moveConnection = RunService.Heartbeat:Connect(function()
                 if not moving then return end
                 local direction = (hitbox.Position - hrp.Position).Unit
-                hrp.CFrame = hrp.CFrame + direction * 0.6 -- ileri adım
+                hrp.CFrame = hrp.CFrame + direction * 0.6
             end)
         else
-            -- uzak konuma gidince durdur
+            -- Uzak noktaya geçildiğinde hareket durdurulur
             moving = false
             if moveConnection then
                 moveConnection:Disconnect()
@@ -388,14 +388,17 @@ local function SafeInstantSteal2s()
         end
     end
 
-    -- 2 saniyelik sekans
-    safeTP(target, true)                      -- teslim → düş → yürü
-    safeTP(CFrame.new(0, -3e38, 0), false)    -- uzak → dur
+    -- 2 saniyelik sekans (her tur)
+    safeTP(target, true)                       -- target’a ışınla → yürüme başlasın
+    task.wait(0.6)                             -- ışınlanmadan ÖNCE 0.6s bekle → yürüsün biraz
+    safeTP(CFrame.new(0, -3e38, 0), false)     -- sonra uzak noktaya geç → yürüme dur
     safeTP(target, true)
+    task.wait(0.6)
     safeTP(CFrame.new(0, -3e38, 0), false)
     safeTP(target, true)
+    task.wait(0.6)
 
-    -- Kontrol
+    -- Mesafe kontrol
     local dist = (hrp.Position - delivery.Position).Magnitude
     print(dist <= MAX_DISTANCE_OK and "[SafeInstant2s]: ✅ Başarılı" or "[SafeInstant2s]: ❌ Uzakta ("..math.floor(dist)..")")
 end
