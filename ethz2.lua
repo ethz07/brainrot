@@ -390,13 +390,20 @@ local function SafeInstantSteal2s()
 
     -- 2 saniyelik sekans (her tur)
     safeTP(target, true)                       -- target’a ışınla → yürüme başlasın
-    task.wait(0.6)                             -- ışınlanmadan ÖNCE 0.6s bekle → yürüsün biraz
+    task.wait(0.9)                             -- ışınlanmadan ÖNCE 0.6s bekle → yürüsün biraz
     safeTP(CFrame.new(0, -3e38, 0), false)     -- sonra uzak noktaya geç → yürüme dur
     safeTP(target, true)
-    task.wait(0.6)
+    task.wait(0.8)
     safeTP(CFrame.new(0, -3e38, 0), false)
     safeTP(target, true)
-    task.wait(0.6)
+    task.wait(0.8)
+
+	-- Tüm ışınlamalar bitti → yürümeyi durdur
+moving = false
+if moveConnection then
+    moveConnection:Disconnect()
+    moveConnection = nil
+	end
 
     -- Mesafe kontrol
     local dist = (hrp.Position - delivery.Position).Magnitude
