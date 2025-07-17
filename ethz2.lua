@@ -168,8 +168,8 @@ b1.MouseButton1Click:Connect(DeliverBrainrot)
 local b2 = createButton("Tween Steal", 2)
 b2.MouseButton1Click:Connect(TweenSteal)
 
-createButton("ESP Player (yakında)", 3)
-createButton("ESP Brainrots (yakında)", 4)
+createButton("ESP Player", 3)
+createButton("ESP Brainrots (Soon)", 4)
 
 -- Minimize/Kapat
 local minimized = false
@@ -181,6 +181,99 @@ end)
 
 closeButton.MouseButton1Click:Connect(function()
     gui:Destroy()
+end)
+
+-- ESP Toggle
+local espEnabled = false
+local highlights = {}
+local nameTags = {}
+local updateConnection
+
+local function clearESP()
+    for _, h in pairs(highlights) do
+        h:Destroy()
+    end
+    highlights = {}
+    for _, t in pairs(nameTags) do
+        t:Destroy()
+    end
+    nameTags = {}
+end
+
+local function createESP(player)
+    if player == Players.LocalPlayer then return end
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+    -- Highlight
+    local hl = Instance.new("Highlight")
+    hl.Name = "ethzESP"
+    hl.FillColor = Color3.fromRGB(0, 32, 96)
+    hl.FillTransparency = 0.6
+    hl.OutlineColor = Color3.new(1, 1, 1)
+    hl.OutlineTransparency = 0
+    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    hl.Adornee = character
+    hl.Parent = character
+    highlights[player] = hl
+
+    -- NameTag
+    local head = character:FindFirstChild("Head")
+    if head then
+        local tag = Instance.new("BillboardGui")
+        tag.Name = "ethzNameTag"
+        tag.Adornee = head
+        tag.Size = UDim2.new(0, 100, 0, 20)
+        tag.StudsOffset = Vector3.new(0, 2.5, 0)
+        tag.AlwaysOnTop = true
+
+        local nameLabel = Instance.new("TextLabel", tag)
+        nameLabel.Size = UDim2.new(1, 0, 1, 0)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Text = player.DisplayName
+        nameLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        nameLabel.TextSize = 12
+        nameLabel.Font = Enum.Font.FredokaOne
+        nameLabel.TextScaled = true
+
+        tag.Parent = head
+        nameTags[player] = tag
+    end
+end
+
+local function updateESP()
+    clearESP()
+    for _, player in pairs(Players:GetPlayers()) do
+        createESP(player)
+    end
+end
+
+local espButton = content:GetChildren()[3] -- 3. buton (ESP Player)
+espButton.MouseButton1Click:Connect(function()
+    espEnabled = not espEnabled
+    if espEnabled then
+        updateESP()
+        updateConnection = RunService.Heartbeat:Connect(function(dt)
+            if tick() % 1 < dt then
+                updateESP()
+            end
+        end)
+        espButton.BackgroundColor3 = Color3.fromRGB(0, 150, 96) -- aktif renk
+    else
+        if updateConnection then updateConnection:Disconnect() end
+        clearESP()
+        espButton.BackgroundColor3 = Color3.fromRGB(0, 32, 96) -- orijinal renk
+    end
+end)
+
+-- Yeni oyuncular geldiğinde otomatik ekleme (ölü doğdu vs.)
+Players.PlayerAdded:Connect(function(p)
+    p.CharacterAdded:Connect(function()
+        if espEnabled then
+            task.wait(1)
+            createESP(p)
+        end
+    end)
 end)
 
 print("👁️")
