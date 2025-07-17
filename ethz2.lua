@@ -309,8 +309,8 @@ local function SafeInstantSteal2s()
 
     local target = delivery.CFrame * CFrame.new(0, -3, 0)
 
-    -- Güvenli ışınlanma fonksiyonu (Anchored + jitter ile)
-    local function safeTP(cframe)
+    -- Güvenli ışınlanma fonksiyonu (Anchored + jitter ile + ileri adım)
+    local function safeTP(cframe, doForwardStep)
         local jitter = Vector3.new(
             math.random(-1,1) * 0.05,
             math.random(-1,1) * 0.05,
@@ -322,14 +322,25 @@ local function SafeInstantSteal2s()
         hrp.Velocity = Vector3.zero
         task.wait(random:NextNumber(0.15, 0.3))
         hrp.Anchored = false
+
+        -- Eğer ileri adım istiyorsak:
+        if doForwardStep then
+            local lookVec = hrp.CFrame.LookVector.Unit
+            local stepPos = hrp.Position + lookVec * 2
+            hrp.Anchored = true
+            hrp.CFrame = CFrame.new(stepPos)
+            hrp.Velocity = Vector3.zero
+            task.wait(0.1)
+            hrp.Anchored = false
+        end
     end
 
     -- 2 saniyelik sekans
-    safeTP(target)
-    safeTP(CFrame.new(0, -3e38, 0))
-    safeTP(target)
-    safeTP(CFrame.new(0, -3e38, 0))
-    safeTP(target)
+    safeTP(target, true)                      -- teslim + ileri adım
+    safeTP(CFrame.new(0, -3e38, 0), false)
+    safeTP(target, true)                      -- tekrar teslim + ileri adım
+    safeTP(CFrame.new(0, -3e38, 0), false)
+    safeTP(target, true)                      -- tekrar teslim + ileri adım
 
     -- Mesafe kontrolü
     local dist = (hrp.Position - delivery.Position).Magnitude
