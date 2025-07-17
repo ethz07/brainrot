@@ -249,17 +249,24 @@ local function DeliverBrainrot()
 end
 
 -- Tween Steal
+-- Yeni TweenSteal Fonksiyonu
 local function TweenSteal()
     local JITTER = 0.0002
     local delivery
     for _, v in ipairs(workspace.Plots:GetDescendants()) do
-        if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") and v.Parent.PlotSign:FindFirstChild("YourBase") and v.Parent.PlotSign.YourBase.Enabled then
-            delivery = v
-            break
+        if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") then
+            if v.Parent.PlotSign:FindFirstChild("YourBase") and v.Parent.PlotSign.YourBase.Enabled then
+                delivery = v
+                break
+            end
         end
     end
     if not delivery then return end
+    
+    -- Target position for delivery hitbox
     local target = delivery.CFrame * CFrame.new(0, random:NextInteger(-3, -1), 0)
+    
+    -- Smooth teleport algorithm (based on Arbix's approach)
     local start = hrp.Position
     for i = 1, TELEPORT_ITERATIONS do
         local progress = i / TELEPORT_ITERATIONS
@@ -272,25 +279,75 @@ local function TweenSteal()
         hrp.CFrame = CFrame.new(newPos) * (hrp.CFrame - hrp.Position)
         RunService.Heartbeat:Wait()
     end
+
+    -- Final correction of position
     for _ = 1, 3 do
         hrp.CFrame = CFrame.new(0, -3e38, 0)
         RunService.Heartbeat:Wait()
         hrp.CFrame = target
         RunService.Heartbeat:Wait()
     end
+    
     local dist = (hrp.Position - target.Position).Magnitude
     print(dist <= MAX_DISTANCE_OK and "[Tween]: ✅ Başarılı" or "[Tween]: ❌ Uzakta ("..math.floor(dist)..")")
+end
+
+local function SafeInstantSteal2s()
+    local delivery
+    for _, v in ipairs(workspace.Plots:GetDescendants()) do
+        if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") then
+            if v.Parent.PlotSign:FindFirstChild("YourBase") and v.Parent.PlotSign.YourBase.Enabled then
+                delivery = v
+                break
+            end
+        end
+    end
+    if not delivery then
+        print("[SafeInstant2s]: ❌ Teslim kutusu bulunamadı")
+        return
+    end
+
+    local target = delivery.CFrame * CFrame.new(0, -3, 0)
+
+    -- Güvenli ışınlanma fonksiyonu (Anchored + jitter ile)
+    local function safeTP(cframe)
+        local jitter = Vector3.new(
+            math.random(-1,1) * 0.05,
+            math.random(-1,1) * 0.05,
+            math.random(-1,1) * 0.05
+        )
+
+        hrp.Anchored = true
+        hrp.CFrame = cframe + jitter
+        hrp.Velocity = Vector3.zero
+        task.wait(random:NextNumber(0.15, 0.3))
+        hrp.Anchored = false
+    end
+
+    -- 2 saniyelik sekans
+    safeTP(target)
+    safeTP(CFrame.new(0, -3e38, 0))
+    safeTP(target)
+    safeTP(CFrame.new(0, -3e38, 0))
+    safeTP(target)
+
+    -- Mesafe kontrolü
+    local dist = (hrp.Position - delivery.Position).Magnitude
+    print(dist <= MAX_DISTANCE_OK and "[SafeInstant2s]: ✅ Başarılı" or "[SafeInstant2s]: ❌ Uzakta ("..math.floor(dist)..")")
 end
 
 -- Butonlar
 local b1 = createButton("TP to Base", 1)
 b1.MouseButton1Click:Connect(DeliverBrainrot)
 
-local b2 = createButton("Tween Steal", 2)
+local b2 = createButton("Instant Steal", 2)
+b7.MouseButton1Click:Connect(SafeInstantSteal2s)
+
+local b3 = createButton("Tween Steal", 3)
 b2.MouseButton1Click:Connect(TweenSteal)
 
-createButton("ESP Player", 3)
-createButton("ESP Brainrots (Soon)", 4)
+createButton("ESP Player", 4)
+-- createButton("ESP Brainrots (Soon)", 5)
 
 -- Minimize/Kapat
 local minimized = false
