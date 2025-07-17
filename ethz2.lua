@@ -22,7 +22,7 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 230, 0, 210)
+frame.Size = UDim2.new(0, 230, 0, 300)
 frame.Position = UDim2.new(0.5, -115, 0.45, 0) -- ortalanmış
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
@@ -41,6 +41,7 @@ titleBar.Size = UDim2.new(1, 0, 0, 35)
 titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 titleBar.BorderSizePixel = 0
 titleBar.Active = true
+titleBar.Draggable = true
 titleBar.Parent = frame
 local titleCorner = Instance.new("UICorner", titleBar)
 titleCorner.CornerRadius = UDim.new(0, 10)
@@ -170,6 +171,19 @@ b2.MouseButton1Click:Connect(TweenSteal)
 
 createButton("ESP Player", 3)
 createButton("ESP Brainrots (Soon)", 4)
+
+local b5 = createButton("Kick", 5)
+b5.MouseButton1Click:Connect(function()
+    player:Kick("You Have Successfully Been Kicked By ethz Script")
+end)
+
+local b6 = createButton("Rejoin", 6)
+b6.MouseButton1Click:Connect(function()
+    local TeleportService = game:GetService("TeleportService")
+    local placeId = game.PlaceId
+    local instanceId = game.JobId
+    TeleportService:TeleportToPlaceInstance(placeId, instanceId)
+end)
 
 -- Minimize/Kapat
 local minimized = false
