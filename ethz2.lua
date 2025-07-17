@@ -26,6 +26,7 @@ frame.Size = UDim2.new(0, 230, 0, 210)
 frame.Position = UDim2.new(0.5, -115, 0.45, 0) -- ortalanmış
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
+frame.Draggable = true
 frame.Parent = gui
 
 local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
