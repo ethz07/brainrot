@@ -235,6 +235,26 @@ closeButton2.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
 end)
 
+-- Kendi base'inin Purchases.PlotBlock.Hitbox'unu bulur
+local function getOwnPlotHitbox()
+    for _, plot in ipairs(workspace.Plots:GetChildren()) do
+        local plotSign = plot:FindFirstChild("PlotSign")
+        if plotSign and plotSign:FindFirstChild("YourBase") and plotSign.YourBase.Enabled then
+            local parentPlot = plotSign.Parent
+            local grandParent = parentPlot and parentPlot.Parent
+            local correctPlot = grandParent and grandParent:FindFirstChild(parentPlot.Name)
+
+            if correctPlot and correctPlot:FindFirstChild("Purchases") then
+                local block = correctPlot.Purchases:FindFirstChild("PlotBlock")
+                if block and block:FindFirstChild("Hitbox") then
+                    return block.Hitbox
+                end
+            end
+        end
+    end
+    return nil
+end
+
 -- TP to Base
 local function DeliverBrainrot()
     for _, plot in ipairs(workspace.Plots:GetChildren()) do
@@ -339,20 +359,13 @@ local function SafeInstantSteal2s()
         hrp.Anchored = false
 
         if isDelivery then
-            -- Düşme efekti
+            -- Düşme efekti sonrası biraz bekle
             task.wait(0.4)
 
-            -- Kendi base’ini bul
-            local plotBlock
-            for _, v in ipairs(workspace:GetDescendants()) do
-                if v.Name == "Hitbox" and v:IsDescendantOf(workspace.Plots.Purchases) then
-                    plotBlock = v
-                    break
-                end
-            end
-
-            if not plotBlock then
-                warn("PlotBlock.Hitbox bulunamadı")
+            -- Kendi base'inin hitbox'unu bul
+            local hitbox = getOwnPlotHitbox()
+            if not hitbox then
+                warn("❌ Hitbox bulunamadı")
                 return
             end
 
@@ -362,11 +375,11 @@ local function SafeInstantSteal2s()
 
             moveConnection = RunService.Heartbeat:Connect(function()
                 if not moving then return end
-                local direction = (plotBlock.Position - hrp.Position).Unit
-                hrp.CFrame = hrp.CFrame + direction * 0.6 -- her adımda küçük ilerleme
+                local direction = (hitbox.Position - hrp.Position).Unit
+                hrp.CFrame = hrp.CFrame + direction * 0.6 -- ileri adım
             end)
         else
-            -- Uzak noktaya gidince dur
+            -- uzak konuma gidince durdur
             moving = false
             if moveConnection then
                 moveConnection:Disconnect()
@@ -376,13 +389,13 @@ local function SafeInstantSteal2s()
     end
 
     -- 2 saniyelik sekans
-    safeTP(target, true)                      -- teslim + düş + hareket başla
-    safeTP(CFrame.new(0, -3e38, 0), false)    -- uzaklaşınca hareketi durdur
+    safeTP(target, true)                      -- teslim → düş → yürü
+    safeTP(CFrame.new(0, -3e38, 0), false)    -- uzak → dur
     safeTP(target, true)
     safeTP(CFrame.new(0, -3e38, 0), false)
     safeTP(target, true)
 
-    -- Mesafe kontrolü
+    -- Kontrol
     local dist = (hrp.Position - delivery.Position).Magnitude
     print(dist <= MAX_DISTANCE_OK and "[SafeInstant2s]: ✅ Başarılı" or "[SafeInstant2s]: ❌ Uzakta ("..math.floor(dist)..")")
 end
