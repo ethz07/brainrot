@@ -33,6 +33,19 @@ frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
 
+-- Footer
+local footer = Instance.new("TextLabel", frame)
+footer.Text = "made by _ethz on discord"
+footer.Font = Enum.Font.FredokaOne
+footer.TextColor3 = Color3.fromRGB(180, 180, 180)
+footer.TextSize = 12
+footer.BackgroundTransparency = 1
+footer.Size = UDim2.new(1, 0, 0, 20)
+footer.Position = UDim2.new(0, 0, 1, -20)
+footer.TextStrokeTransparency = 0.8
+footer.TextYAlignment = Enum.TextYAlignment.Center
+footer.TextXAlignment = Enum.TextXAlignment.Center
+
 local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
 
 local corner = Instance.new("UICorner", frame)
