@@ -22,7 +22,7 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 230, 0, 300)
+frame.Size = UDim2.new(0, 245, 0, 300)
 frame.Position = UDim2.new(0.5, -115, 0.45, 0) -- ortalanmış
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
@@ -41,7 +41,6 @@ titleBar.Size = UDim2.new(1, 0, 0, 35)
 titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 titleBar.BorderSizePixel = 0
 titleBar.Active = true
-titleBar.Draggable = true
 titleBar.Parent = frame
 local titleCorner = Instance.new("UICorner", titleBar)
 titleCorner.CornerRadius = UDim.new(0, 10)
@@ -190,14 +189,14 @@ local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
     content.Visible = not minimized
-    frame.Size = minimized and UDim2.new(0, 230, 0, 35) or UDim2.new(0, 230, 0, 300)
+    frame.Size = minimized and UDim2.new(0, 245, 0, 35) or UDim2.new(0, 245, 0, 300)
 end)
 
 closeButton.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- ESP Toggle
+-- ESP lolalalaalalala
 local espEnabled = false
 local highlights = {}
 local nameTags = {}
