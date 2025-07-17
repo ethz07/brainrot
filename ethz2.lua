@@ -1,4 +1,4 @@
--- ethz Steal Script - Final Enhanced Version (Arbix Style GUI)
+-- ethz Steal Script
 -- by _ethz
 
 local TweenService = game:GetService("TweenService")
@@ -132,6 +132,31 @@ titleBar2.Active = true
 local titleCorner2 = Instance.new("UICorner", titleBar2)
 titleCorner2.CornerRadius = UDim.new(0, 10)
 
+-- Minimize / Close Buttons (Server Stuff)
+local buttonFrame2 = Instance.new("Frame", titleBar2)
+buttonFrame2.Size = UDim2.new(0, 60, 1, 0)
+buttonFrame2.Position = UDim2.new(1, -60, 0, 0)
+buttonFrame2.BackgroundTransparency = 1
+
+-- Minimize Button
+local minimizeButton2 = Instance.new("TextButton", buttonFrame2)
+minimizeButton2.Text = "-"
+minimizeButton2.Font = Enum.Font.GothamBold
+minimizeButton2.TextSize = 18
+minimizeButton2.TextColor3 = Color3.new(1, 1, 0)
+minimizeButton2.Size = UDim2.new(0.5, 0, 1, 0)
+minimizeButton2.BackgroundTransparency = 1
+
+-- Close Button
+local closeButton2 = Instance.new("TextButton", buttonFrame2)
+closeButton2.Text = "×"
+closeButton2.Font = Enum.Font.GothamBold
+closeButton2.TextSize = 18
+closeButton2.TextColor3 = Color3.new(1, 0.2, 0.2)
+closeButton2.Size = UDim2.new(0.5, 0, 1, 0)
+closeButton2.Position = UDim2.new(0.5, 0, 0, 0)
+closeButton2.BackgroundTransparency = 1
+
 local Title = Instance.new("TextLabel", titleBar2)
 Title.Name = "Title"
 Title.Text = "Server Stuff"
@@ -183,6 +208,18 @@ RejoinBtn.MouseButton1Click:Connect(function()
 	local placeId = game.PlaceId
 	local instanceId = game.JobId
 	TeleportService:TeleportToPlaceInstance(placeId, instanceId)
+end)
+
+-- İşlevler
+local minimized2 = false
+minimizeButton2.MouseButton1Click:Connect(function()
+	minimized2 = not minimized2
+	content2.Visible = not minimized2
+	Frame.Size = minimized2 and UDim2.new(0, 245, 0, 35) or UDim2.new(0, 245, 0, 140)
+end)
+
+closeButton2.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
 end)
 
 -- TP to Base
