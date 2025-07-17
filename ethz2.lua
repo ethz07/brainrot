@@ -38,12 +38,13 @@ local titleBar = Instance.new("Frame", frame)
 titleBar.Size = UDim2.new(1, 0, 0, 35)
 titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 titleBar.BorderSizePixel = 0
+titleBar.Active = true
 local titleCorner = Instance.new("UICorner", titleBar)
 titleCorner.CornerRadius = UDim.new(0, 10)
 
 -- Title
 local title = Instance.new("TextLabel", titleBar)
-title.Text = "ethz Steal Enhanced"
+title.Text = "ethz Script"
 title.Font = Enum.Font.FredokaOne
 title.TextColor3 = Color3.new(1, 1, 1)
 title.TextSize = 18
@@ -88,7 +89,7 @@ local function createButton(text, index)
     btn.Font = Enum.Font.FredokaOne
     btn.TextColor3 = Color3.new(1, 1, 1)
     btn.BackgroundColor3 = Color3.fromRGB(0, 32, 96)
-    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Size = UDim2.new(0.9, 0, 0, 45)
     btn.Position = UDim2.new(0.05, 0, 0, (index - 1) * 45)
     btn.BorderSizePixel = 0
     local c = Instance.new("UICorner", btn)
