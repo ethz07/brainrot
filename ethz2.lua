@@ -190,7 +190,7 @@ local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
     content.Visible = not minimized
-    frame.Size = minimized and UDim2.new(0, 230, 0, 35) or UDim2.new(0, 230, 0, 210)
+    frame.Size = minimized and UDim2.new(0, 230, 0, 35) or UDim2.new(0, 230, 0, 300)
 end)
 
 closeButton.MouseButton1Click:Connect(function()
@@ -245,7 +245,7 @@ local function createESP(player)
         nameLabel.Size = UDim2.new(1, 0, 1, 0)
         nameLabel.BackgroundTransparency = 1
         nameLabel.Text = player.DisplayName
-        nameLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        nameLabel.TextColor3 = Color3.fromRGB(250, 250, 250)
         nameLabel.TextSize = 12
         nameLabel.Font = Enum.Font.FredokaOne
         nameLabel.TextScaled = true
