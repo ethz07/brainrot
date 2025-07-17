@@ -25,7 +25,7 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 245, 0, 270)
+frame.Size = UDim2.new(0, 245, 0, 250)
 frame.Position = UDim2.new(0.5, -115, 0.45, 0) -- ortalanmış
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
@@ -354,7 +354,7 @@ local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
     content.Visible = not minimized
-    frame.Size = minimized and UDim2.new(0, 245, 0, 35) or UDim2.new(0, 245, 0, 270)
+    frame.Size = minimized and UDim2.new(0, 245, 0, 35) or UDim2.new(0, 245, 0, 250)
 end)
 
 closeButton.MouseButton1Click:Connect(function()
@@ -426,7 +426,7 @@ local function updateESP()
     end
 end
 
-local espButton = content:GetChildren()[3] -- 3. buton (ESP Player)
+local espButton = content:GetChildren()[4] -- 4. buton (ESP Player)
 espButton.MouseButton1Click:Connect(function()
     espEnabled = not espEnabled
     if espEnabled then
