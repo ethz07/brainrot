@@ -25,7 +25,7 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 245, 0, 300)
+frame.Size = UDim2.new(0, 245, 0, 270)
 frame.Position = UDim2.new(0.5, -115, 0.45, 0) -- ortalanmış
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
@@ -341,10 +341,10 @@ local b1 = createButton("TP to Base", 1)
 b1.MouseButton1Click:Connect(DeliverBrainrot)
 
 local b2 = createButton("Instant Steal", 2)
-b7.MouseButton1Click:Connect(SafeInstantSteal2s)
+b2.MouseButton1Click:Connect(SafeInstantSteal2s)
 
 local b3 = createButton("Tween Steal", 3)
-b2.MouseButton1Click:Connect(TweenSteal)
+b3.MouseButton1Click:Connect(TweenSteal)
 
 createButton("ESP Player", 4)
 -- createButton("ESP Brainrots (Soon)", 5)
@@ -354,7 +354,7 @@ local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
     content.Visible = not minimized
-    frame.Size = minimized and UDim2.new(0, 245, 0, 35) or UDim2.new(0, 245, 0, 300)
+    frame.Size = minimized and UDim2.new(0, 245, 0, 35) or UDim2.new(0, 245, 0, 270)
 end)
 
 closeButton.MouseButton1Click:Connect(function()
