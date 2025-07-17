@@ -1,0 +1,211 @@
+
+-- ethz Steal Script - Enhanced GUI (Arbix style)
+-- Features: TP to Base, Tween Steal, Smoother Movement, Minimize/Close GUI
+
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+local random = Random.new()
+
+local tpAmt = 150
+local MAX_DISTANCE_OK = 60
+local TELEPORT_ITERATIONS = 110
+
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "ethzStealEnhanced"
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
+
+-- Main Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 270, 0, 230)
+frame.Position = UDim2.new(0.05, 0, 0.5, -115)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+frame.AnchorPoint = Vector2.new(0, 0.5)
+frame.Parent = gui
+
+-- Rounded corner
+local UICorner = Instance.new("UICorner", frame)
+UICorner.CornerRadius = UDim.new(0, 10)
+
+-- Title Bar
+local titleBar = Instance.new("Frame", frame)
+titleBar.Size = UDim2.new(1, 0, 0, 35)
+titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+titleBar.BorderSizePixel = 0
+local titleCorner = Instance.new("UICorner", titleBar)
+titleCorner.CornerRadius = UDim.new(0, 10)
+
+-- Title
+local title = Instance.new("TextLabel", titleBar)
+title.Text = "ethz Steal Enhanced"
+title.Font = Enum.Font.FredokaOne
+title.TextColor3 = Color3.new(1,1,1)
+title.TextSize = 18
+title.Size = UDim2.new(1, -60, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Minimize and Close Buttons
+local buttonFrame = Instance.new("Frame", titleBar)
+buttonFrame.Size = UDim2.new(0, 60, 1, 0)
+buttonFrame.Position = UDim2.new(1, -60, 0, 0)
+buttonFrame.BackgroundTransparency = 1
+
+local minimizeButton = Instance.new("TextButton", buttonFrame)
+minimizeButton.Text = "-"
+minimizeButton.Font = Enum.Font.GothamBold
+minimizeButton.TextSize = 18
+minimizeButton.TextColor3 = Color3.new(1, 1, 0)
+minimizeButton.Size = UDim2.new(0.5, 0, 1, 0)
+minimizeButton.BackgroundTransparency = 1
+
+local closeButton = Instance.new("TextButton", buttonFrame)
+closeButton.Text = "X"
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 18
+closeButton.TextColor3 = Color3.new(1, 0.2, 0.2)
+closeButton.Size = UDim2.new(0.5, 0, 1, 0)
+closeButton.Position = UDim2.new(0.5, 0, 0, 0)
+closeButton.BackgroundTransparency = 1
+
+-- Content Container
+local content = Instance.new("Frame", frame)
+content.Size = UDim2.new(1, 0, 1, -35)
+content.Position = UDim2.new(0, 0, 0, 35)
+content.BackgroundTransparency = 1
+
+-- Function to create buttons
+local function createButton(name, order)
+    local btn = Instance.new("TextButton", content)
+    btn.Text = name
+    btn.Font = Enum.Font.FredokaOne
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.BackgroundColor3 = Color3.fromRGB(0, 32, 96)
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = UDim2.new(0.05, 0, 0, (order - 1) * 45)
+    btn.BorderSizePixel = 0
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 8)
+    return btn
+end
+
+-- Enhanced TP to Base
+local function DeliverBrainrot()
+    for _, plot in ipairs(workspace.Plots:GetChildren()) do
+        local sign = plot:FindFirstChild("PlotSign")
+        if sign and sign:FindFirstChild("YourBase") and sign.YourBase.Enabled then
+            local hitbox = plot:FindFirstChild("DeliveryHitbox")
+            if hitbox then
+                for i = 1, tpAmt do
+                    hrp.CFrame = hitbox.CFrame * CFrame.new(0, -3, 0)
+                    RunService.Heartbeat:Wait()
+                end
+                for _ = 1, 2 do
+                    hrp.CFrame = CFrame.new(0, -3e38, 0)
+                    RunService.Heartbeat:Wait()
+                end
+                for i = 1, math.floor(tpAmt / 16) do
+                    hrp.CFrame = hitbox.CFrame * CFrame.new(0, -3, 0)
+                    RunService.Heartbeat:Wait()
+                end
+                local distance = (hrp.Position - hitbox.Position).Magnitude
+                print(distance <= MAX_DISTANCE_OK and "[ethz TP]: ✅ Success" or "[ethz TP]: ❌ Too far: " .. math.floor(distance))
+            end
+        end
+    end
+end
+
+-- Enhanced TweenSteal
+local function TweenSteal()
+    local JITTER = 0.0002
+    local delivery
+    for _, v in ipairs(workspace.Plots:GetDescendants()) do
+        if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") and v.Parent.PlotSign:FindFirstChild("YourBase") and v.Parent.PlotSign.YourBase.Enabled then
+            delivery = v
+            break
+        end
+    end
+    if not delivery then return end
+    local target = delivery.CFrame * CFrame.new(0, random:NextInteger(-3, -1), 0)
+    local start = hrp.Position
+    for i = 1, TELEPORT_ITERATIONS do
+        local progress = i / TELEPORT_ITERATIONS
+        local curve = progress * progress * (3 - 2 * progress)
+        local newPos = start:Lerp(target.Position, curve) + Vector3.new(
+            random:NextNumber(-JITTER, JITTER),
+            random:NextNumber(-JITTER, JITTER),
+            random:NextNumber(-JITTER, JITTER)
+        )
+        hrp.CFrame = CFrame.new(newPos) * (hrp.CFrame - hrp.Position)
+        RunService.Heartbeat:Wait()
+    end
+    for _ = 1, 3 do
+        hrp.CFrame = CFrame.new(0, -3e38, 0)
+        RunService.Heartbeat:Wait()
+        hrp.CFrame = target
+        RunService.Heartbeat:Wait()
+    end
+    local distance = (hrp.Position - target.Position).Magnitude
+    print(distance <= MAX_DISTANCE_OK and "[ethz Tween]: ✅ Success" or "[ethz Tween]: ❌ Too far: " .. math.floor(distance))
+end
+
+-- Buttons
+local btn1 = createButton("TP to Base", 1)
+btn1.MouseButton1Click:Connect(DeliverBrainrot)
+
+local btn2 = createButton("Tween Steal", 2)
+btn2.MouseButton1Click:Connect(TweenSteal)
+
+createButton("ESP Player (soon)", 3)
+createButton("ESP Brainrots (soon)", 4)
+
+-- Minimize Function
+local minimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    content.Visible = not minimized
+    frame.Size = minimized and UDim2.new(0, 270, 0, 35) or UDim2.new(0, 270, 0, 230)
+end)
+
+-- Close Function
+closeButton.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+-- Drag Support
+titleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+titleBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                   startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
