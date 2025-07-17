@@ -26,6 +26,8 @@ frame.Size = UDim2.new(0, 230, 0, 210)
 frame.Position = UDim2.new(0.5, -115, 0.45, 0) -- ortalanmış
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
 frame.Parent = gui
 
 local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
@@ -39,7 +41,6 @@ titleBar.Size = UDim2.new(1, 0, 0, 35)
 titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 titleBar.BorderSizePixel = 0
 titleBar.Active = true
-titleBar.Draggable = true
 titleBar.Parent = frame
 local titleCorner = Instance.new("UICorner", titleBar)
 titleCorner.CornerRadius = UDim.new(0, 10)
