@@ -1,6 +1,5 @@
-
--- ethz Steal Script - Enhanced GUI (Arbix style)
--- Features: TP to Base, Tween Steal, Smoother Movement, Minimize/Close GUI
+-- ethz Steal Script - Final Enhanced Version (Arbix Style GUI)
+-- by _ethz
 
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -17,24 +16,22 @@ local MAX_DISTANCE_OK = 60
 local TELEPORT_ITERATIONS = 110
 
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "ethzStealEnhanced"
+gui.Name = "ethzStealGUI"
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
-
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 270, 0, 230)
-frame.Position = UDim2.new(0.05, 0, 0.5, -115)
+frame.Size = UDim2.new(0, 230, 0, 210)
+frame.Position = UDim2.new(0.5, -115, 0.45, 0) -- ortalanmış
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
-frame.AnchorPoint = Vector2.new(0, 0.5)
 frame.Parent = gui
 
--- Rounded corner
-local UICorner = Instance.new("UICorner", frame)
-UICorner.CornerRadius = UDim.new(0, 10)
+local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
+
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 10)
 
 -- Title Bar
 local titleBar = Instance.new("Frame", frame)
@@ -48,14 +45,14 @@ titleCorner.CornerRadius = UDim.new(0, 10)
 local title = Instance.new("TextLabel", titleBar)
 title.Text = "ethz Steal Enhanced"
 title.Font = Enum.Font.FredokaOne
-title.TextColor3 = Color3.new(1,1,1)
+title.TextColor3 = Color3.new(1, 1, 1)
 title.TextSize = 18
 title.Size = UDim2.new(1, -60, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
 title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Minimize and Close Buttons
+-- Buttons
 local buttonFrame = Instance.new("Frame", titleBar)
 buttonFrame.Size = UDim2.new(0, 60, 1, 0)
 buttonFrame.Position = UDim2.new(1, -60, 0, 0)
@@ -78,28 +75,28 @@ closeButton.Size = UDim2.new(0.5, 0, 1, 0)
 closeButton.Position = UDim2.new(0.5, 0, 0, 0)
 closeButton.BackgroundTransparency = 1
 
--- Content Container
+-- Content
 local content = Instance.new("Frame", frame)
 content.Size = UDim2.new(1, 0, 1, -35)
 content.Position = UDim2.new(0, 0, 0, 35)
 content.BackgroundTransparency = 1
 
--- Function to create buttons
-local function createButton(name, order)
+-- Create Button
+local function createButton(text, index)
     local btn = Instance.new("TextButton", content)
-    btn.Text = name
+    btn.Text = text
     btn.Font = Enum.Font.FredokaOne
-    btn.TextColor3 = Color3.new(1,1,1)
+    btn.TextColor3 = Color3.new(1, 1, 1)
     btn.BackgroundColor3 = Color3.fromRGB(0, 32, 96)
     btn.Size = UDim2.new(0.9, 0, 0, 35)
-    btn.Position = UDim2.new(0.05, 0, 0, (order - 1) * 45)
+    btn.Position = UDim2.new(0.05, 0, 0, (index - 1) * 45)
     btn.BorderSizePixel = 0
-    local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 8)
+    local c = Instance.new("UICorner", btn)
+    c.CornerRadius = UDim.new(0, 8)
     return btn
 end
 
--- Enhanced TP to Base
+-- TP to Base
 local function DeliverBrainrot()
     for _, plot in ipairs(workspace.Plots:GetChildren()) do
         local sign = plot:FindFirstChild("PlotSign")
@@ -118,14 +115,14 @@ local function DeliverBrainrot()
                     hrp.CFrame = hitbox.CFrame * CFrame.new(0, -3, 0)
                     RunService.Heartbeat:Wait()
                 end
-                local distance = (hrp.Position - hitbox.Position).Magnitude
-                print(distance <= MAX_DISTANCE_OK and "[ethz TP]: ✅ Success" or "[ethz TP]: ❌ Too far: " .. math.floor(distance))
+                local dist = (hrp.Position - hitbox.Position).Magnitude
+                print(dist <= MAX_DISTANCE_OK and "[TP]: ✅ Başarılı" or "[TP]: ❌ Uzakta ("..math.floor(dist)..")")
             end
         end
     end
 end
 
--- Enhanced TweenSteal
+-- Tween Steal
 local function TweenSteal()
     local JITTER = 0.0002
     local delivery
@@ -155,51 +152,46 @@ local function TweenSteal()
         hrp.CFrame = target
         RunService.Heartbeat:Wait()
     end
-    local distance = (hrp.Position - target.Position).Magnitude
-    print(distance <= MAX_DISTANCE_OK and "[ethz Tween]: ✅ Success" or "[ethz Tween]: ❌ Too far: " .. math.floor(distance))
+    local dist = (hrp.Position - target.Position).Magnitude
+    print(dist <= MAX_DISTANCE_OK and "[Tween]: ✅ Başarılı" or "[Tween]: ❌ Uzakta ("..math.floor(dist)..")")
 end
 
--- Buttons
-local btn1 = createButton("TP to Base", 1)
-btn1.MouseButton1Click:Connect(DeliverBrainrot)
+-- Butonlar
+local b1 = createButton("TP to Base", 1)
+b1.MouseButton1Click:Connect(DeliverBrainrot)
 
-local btn2 = createButton("Tween Steal", 2)
-btn2.MouseButton1Click:Connect(TweenSteal)
+local b2 = createButton("Tween Steal", 2)
+b2.MouseButton1Click:Connect(TweenSteal)
 
-createButton("ESP Player (soon)", 3)
-createButton("ESP Brainrots (soon)", 4)
+createButton("ESP Player (yakında)", 3)
+createButton("ESP Brainrots (yakında)", 4)
 
--- Minimize Function
+-- Minimize/Kapat
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
     content.Visible = not minimized
-    frame.Size = minimized and UDim2.new(0, 270, 0, 35) or UDim2.new(0, 270, 0, 230)
+    frame.Size = minimized and UDim2.new(0, 230, 0, 35) or UDim2.new(0, 230, 0, 210)
 end)
 
--- Close Function
 closeButton.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- Drag Support
+-- Drag
 titleBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
         dragStart = input.Position
         startPos = frame.Position
         input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
         end)
     end
 end)
 
 titleBar.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
+    if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
