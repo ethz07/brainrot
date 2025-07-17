@@ -110,67 +110,74 @@ ScreenGui.Name = "ethzKickHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Main Frame
 local Frame = Instance.new("Frame")
 Frame.Name = "MainFrame"
 Frame.Size = UDim2.new(0, 245, 0, 140)
 Frame.Position = UDim2.new(0.5, -122, 0.5, -70)
 Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
+Frame.Active = true
+Frame.Draggable = true
 
--- UICorner for rounding
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 8)
-UICorner.Parent = Frame
+local FrameCorner = Instance.new("UICorner", Frame)
+FrameCorner.CornerRadius = UDim.new(0, 10)
 
--- Title
-local Title = Instance.new("TextLabel")
+local titleBar2 = Instance.new("Frame", Frame)
+titleBar2.Size = UDim2.new(1, 0, 0, 35)
+titleBar2.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+titleBar2.BorderSizePixel = 0
+titleBar2.Active = true
+local titleCorner2 = Instance.new("UICorner", titleBar2)
+titleCorner2.CornerRadius = UDim.new(0, 10)
+
+local Title = Instance.new("TextLabel", titleBar2)
 Title.Name = "Title"
 Title.Text = "Server Stuff"
-Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Size = UDim2.new(1, -10, 1, 0)
+Title.Position = UDim2.new(0, 10, 0, 0)
 Title.BackgroundTransparency = 1
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 18
-Title.Font = Enum.Font.GothamBold
-Title.Parent = Frame
+Title.Font = Enum.Font.FredokaOne
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Kick Button
-local KickBtn = Instance.new("TextButton")
+local content2 = Instance.new("Frame", Frame)
+content2.Name = "ServerContent"
+content2.Size = UDim2.new(1, 0, 1, -35)
+content2.Position = UDim2.new(0, 0, 0, 35)
+content2.BackgroundTransparency = 1
+
+local KickBtn = Instance.new("TextButton", content2)
 KickBtn.Name = "KickButton"
 KickBtn.Text = "Kick"
-KickBtn.Size = UDim2.new(0.8, 0, 0, 40)
-KickBtn.Position = UDim2.new(0.1, 0, 0, 40)
+KickBtn.Size = UDim2.new(0.9, 0, 0, 40)
+KickBtn.Position = UDim2.new(0.05, 0, 0, 5)
 KickBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 KickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-KickBtn.TextSize = 16
-KickBtn.Font = Enum.Font.Gotham
-KickBtn.Parent = Frame
-
-local UICornerKick = Instance.new("UICorner")
-UICornerKick.CornerRadius = UDim.new(0, 6)
-UICornerKick.Parent = KickBtn
+KickBtn.TextSize = 15
+KickBtn.Font = Enum.Font.FredokaOne
+KickBtn.BorderSizePixel = 0
+local UICornerKick = Instance.new("UICorner", KickBtn)
+UICornerKick.CornerRadius = UDim.new(0, 8)
 
 KickBtn.MouseButton1Click:Connect(function()
 	player:Kick("You Have Successfully Been Kicked By ethz Script")
 end)
 
--- Rejoin Button
-local RejoinBtn = Instance.new("TextButton")
+local RejoinBtn = Instance.new("TextButton", content2)
 RejoinBtn.Name = "RejoinButton"
 RejoinBtn.Text = "Rejoin"
-RejoinBtn.Size = UDim2.new(0.8, 0, 0, 40)
-RejoinBtn.Position = UDim2.new(0.1, 0, 0, 90)
+RejoinBtn.Size = UDim2.new(0.9, 0, 0, 40)
+RejoinBtn.Position = UDim2.new(0.05, 0, 0, 55)
 RejoinBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
 RejoinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-RejoinBtn.TextSize = 16
-RejoinBtn.Font = Enum.Font.Gotham
-RejoinBtn.Parent = Frame
-
-local UICornerRejoin = Instance.new("UICorner")
-UICornerRejoin.CornerRadius = UDim.new(0, 6)
-UICornerRejoin.Parent = RejoinBtn
+RejoinBtn.TextSize = 15
+RejoinBtn.Font = Enum.Font.FredokaOne
+RejoinBtn.BorderSizePixel = 0
+local UICornerRejoin = Instance.new("UICorner", RejoinBtn)
+UICornerRejoin.CornerRadius = UDim.new(0, 8)
 
 RejoinBtn.MouseButton1Click:Connect(function()
 	local placeId = game.PlaceId
