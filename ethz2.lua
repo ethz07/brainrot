@@ -5,6 +5,8 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local TeleportService = game:GetService("TeleportService")
+local player = Players.LocalPlayer
 
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
@@ -126,7 +128,7 @@ UICorner.Parent = Frame
 -- Title
 local Title = Instance.new("TextLabel")
 Title.Name = "Title"
-Title.Text = "ethz Kick Hub"
+Title.Text = "Server Stuff"
 Title.Size = UDim2.new(1, 0, 0, 30)
 Title.BackgroundTransparency = 1
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
