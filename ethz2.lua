@@ -40,6 +40,7 @@ titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 titleBar.BorderSizePixel = 0
 titleBar.Active = true
 titleBar.Draggable = true
+titleBar.Parent = frame
 local titleCorner = Instance.new("UICorner", titleBar)
 titleCorner.CornerRadius = UDim.new(0, 10)
 
