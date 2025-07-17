@@ -18,7 +18,6 @@ local TELEPORT_ITERATIONS = 110
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "ethzStealGUI"
 gui.ResetOnSpawn = false
-gui.Draggable = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
