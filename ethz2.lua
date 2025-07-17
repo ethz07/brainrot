@@ -414,7 +414,7 @@ end
 local b1 = createButton("TP to Base", 1)
 b1.MouseButton1Click:Connect(DeliverBrainrot)
 
-local b2 = createButton("Instant Steal", 2)
+local b2 = createButton("Broken 😡", 2)
 b2.MouseButton1Click:Connect(SafeInstantSteal2s)
 
 local b3 = createButton("Tween Steal", 3)
