@@ -305,6 +305,9 @@ local function TweenSteal()
     print(dist <= MAX_DISTANCE_OK and "[Tween]: ✅ Başarılı" or "[Tween]: ❌ Uzakta ("..math.floor(dist)..")")
 end
 
+local moving = false
+local moveConnection
+
 local function SafeInstantSteal2s()
     local delivery
     for _, v in ipairs(workspace.Plots:GetDescendants()) do
@@ -322,7 +325,6 @@ local function SafeInstantSteal2s()
 
     local target = delivery.CFrame * CFrame.new(0, -3, 0)
 
-    -- Güvenli ışınlanma fonksiyonu (sadece ışınla ve düşsün)
     local function safeTP(cframe, isDelivery)
         local jitter = Vector3.new(
             math.random(-1,1) * 0.05,
@@ -334,18 +336,48 @@ local function SafeInstantSteal2s()
         hrp.CFrame = cframe + jitter
         hrp.Velocity = Vector3.zero
         task.wait(random:NextNumber(0.15, 0.3))
-        hrp.Anchored = false  -- karakteri serbest bırakıyoruz
+        hrp.Anchored = false
 
-        -- Eğer teslim noktasına geldiyse düşsün
         if isDelivery then
-            task.wait(0.1)
-            hrp.Velocity = Vector3.new(0, -50, 0) -- hızlıca aşağı düşmesi için küçük bir itme
+            -- Düşme efekti
+            task.wait(0.4)
+
+            -- Kendi base’ini bul
+            local plotBlock
+            for _, v in ipairs(workspace:GetDescendants()) do
+                if v.Name == "Hitbox" and v:IsDescendantOf(workspace.Plots.Purchases) then
+                    plotBlock = v
+                    break
+                end
+            end
+
+            if not plotBlock then
+                warn("PlotBlock.Hitbox bulunamadı")
+                return
+            end
+
+            -- Hareket başlat
+            moving = true
+            if moveConnection then moveConnection:Disconnect() end
+
+            moveConnection = RunService.Heartbeat:Connect(function()
+                if not moving then return end
+                local direction = (plotBlock.Position - hrp.Position).Unit
+                hrp.CFrame = hrp.CFrame + direction * 0.6 -- her adımda küçük ilerleme
+            end)
+        else
+            -- Uzak noktaya gidince dur
+            moving = false
+            if moveConnection then
+                moveConnection:Disconnect()
+                moveConnection = nil
+            end
         end
     end
 
     -- 2 saniyelik sekans
-    safeTP(target, true)                      -- teslim + düşme
-    safeTP(CFrame.new(0, -3e38, 0), false)
+    safeTP(target, true)                      -- teslim + düş + hareket başla
+    safeTP(CFrame.new(0, -3e38, 0), false)    -- uzaklaşınca hareketi durdur
     safeTP(target, true)
     safeTP(CFrame.new(0, -3e38, 0), false)
     safeTP(target, true)
