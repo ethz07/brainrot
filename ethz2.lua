@@ -341,89 +341,56 @@ local function TweenSteal()
         return
     end
 
-    -- === FPS ölçümü ===
-    local fps
-    do
-        local frameCount = 0
-        local startTime = os.clock()
-        repeat
-            RunService.RenderStepped:Wait()
-            frameCount += 1
-        until os.clock() - startTime >= 1
-        fps = frameCount
+    -- FPS + Ping
+    local fps = 60
+    local ping = 50
+    local stats = game:GetService("Stats")
+    local net = stats:FindFirstChild("Network")
+    if net and net:FindFirstChild("Ping") then
+        ping = net.Ping:GetValue()
     end
 
-    -- === Ping ölçümü ===
-    local ping
-    do
-        local stats = game:GetService("Stats")
-        local net = stats:FindFirstChild("Network")
-        if net and net:FindFirstChild("Ping") then
-            ping = net.Ping:GetValue()
-        else
-            ping = 50 -- varsayılan
-        end
-    end
-
-    -- === Ayarlar ===
-    local baseIterations = 30
-    local baseDelay = 1 / fps
-
-    -- Ping'e göre ayarlama
-    local delayMultiplier = 1
-    if ping >= 200 then
-        delayMultiplier = 1.4
-        baseIterations += 15
-    elseif ping >= 120 then
-        delayMultiplier = 1.2
-        baseIterations += 10
-    elseif ping >= 80 then
-        delayMultiplier = 1.1
-        baseIterations += 5
-    elseif ping <= 40 then
-        delayMultiplier = 0.9
-    end
-
-    local iterations = math.clamp(baseIterations, 20, 60)
-    local stepDelay = baseDelay * delayMultiplier
-
-    local targetCF = delivery.CFrame * CFrame.new(0, -2.5, 0)
     local startPos = hrp.Position
-    local random = Random.new()
+    local endPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
+    local height = 20  -- uçuş yüksekliği
+    local steps = 50 + math.floor(ping / 10) -- daha uzun uçuş
+    local delay = 1 / fps * 1.2
 
-    -- === Tween hareketi ===
-    for i = 1, iterations do
-        local t = i / iterations
-        local curve = t * t * (3 - 2 * t)
-        local jitterAmount = math.clamp(1 / fps, 0.0005, 0.0025)
+    local random = Random.new()
+    for i = 1, steps do
+        local t = i / steps
+        local smooth = t * t * (3 - 2 * t)
+
+        -- Parabolik uçuş yolu
+        local horizontal = startPos:Lerp(endPos, smooth)
+        local verticalOffset = math.sin(math.pi * smooth) * height
         local jitter = Vector3.new(
-            random:NextNumber(-jitterAmount, jitterAmount),
-            random:NextNumber(-jitterAmount, jitterAmount),
-            random:NextNumber(-jitterAmount, jitterAmount)
+            random:NextNumber(-0.002, 0.002),
+            random:NextNumber(-0.002, 0.002),
+            random:NextNumber(-0.002, 0.002)
         )
-        local newPos = startPos:Lerp(targetCF.Position, curve) + jitter
-        hrp.CFrame = CFrame.new(newPos)
-        task.wait(stepDelay)
+
+        local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
+        hrp.CFrame = CFrame.new(finalPos)
+        task.wait(delay)
     end
 
-    -- === Final düzeltme ===
+    -- Son sabitleme
     for _ = 1, 2 do
         hrp.Anchored = true
         hrp.CFrame = CFrame.new(0, -3e38, 0)
         task.wait(0.1)
-        hrp.CFrame = targetCF
+        hrp.CFrame = CFrame.new(endPos)
         hrp.Anchored = false
         task.wait(0.1)
     end
 
-    -- === Mesafe kontrol + başarı bildirimi ===
-    local finalDist = (hrp.Position - targetCF.Position).Magnitude
-    local success = finalDist <= 60 or finalDist <= 65
-    if success then
-        print("[TweenSteal]: ✅ Başarılı (" .. math.floor(finalDist) .. " stud)")
+    local finalDist = (hrp.Position - endPos).Magnitude
+    if finalDist <= 60 then
+        print("[TweenSteal]: ✅ Süzülerek başarılı!")
         showSuccessIcon()
     else
-        warn("[TweenSteal]: ❌ Başarısız (Uzaklık: " .. math.floor(finalDist) .. ")")
+        warn("[TweenSteal]: ❌ Başarısız, mesafe:", math.floor(finalDist))
     end
 end
 
