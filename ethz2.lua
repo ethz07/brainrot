@@ -33,6 +33,50 @@ frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
 
+-- FPS Göstergesi
+local fpsLabel = Instance.new("TextLabel")
+fpsLabel.Size = UDim2.new(0, 80, 0, 25)
+fpsLabel.Position = UDim2.new(1, -90, 0, 10)
+fpsLabel.AnchorPoint = Vector2.new(0, 0)
+fpsLabel.BackgroundTransparency = 0.2
+fpsLabel.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+fpsLabel.TextSize = 14
+fpsLabel.Font = Enum.Font.FredokaOne
+fpsLabel.Text = "FPS: ..."
+fpsLabel.Parent = gui
+
+-- FPS Ölçüm
+task.spawn(function()
+    local lastTime = tick()
+    local frameCount = 0
+    while fpsLabel and fpsLabel.Parent do
+        frameCount += 1
+        if tick() - lastTime >= 1 then
+            fpsLabel.Text = "FPS: " .. frameCount
+            frameCount = 0
+            lastTime = tick()
+        end
+        RunService.RenderStepped:Wait()
+    end
+end)
+
+local function showSuccessIcon()
+    local successIcon = Instance.new("TextLabel")
+    successIcon.Size = UDim2.new(0, 60, 0, 60)
+    successIcon.Position = UDim2.new(0.5, -30, 0, -10)
+    successIcon.BackgroundTransparency = 1
+    successIcon.Text = "✅"
+    successIcon.TextColor3 = Color3.new(0, 1, 0)
+    successIcon.TextSize = 50
+    successIcon.Font = Enum.Font.FredokaOne
+    successIcon.Parent = gui
+
+    task.delay(1.5, function()
+        if successIcon then successIcon:Destroy() end
+    end)
+end
+
 -- Footer
 local footer = Instance.new("TextLabel", frame)
 footer.Text = "made by _ethz on discord"
@@ -281,48 +325,106 @@ local function DeliverBrainrot()
     end
 end
 
--- Tween Steal
--- Yeni TweenSteal Fonksiyonu
 local function TweenSteal()
-    local JITTER = 0.0002
     local delivery
     for _, v in ipairs(workspace.Plots:GetDescendants()) do
         if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") then
-            if v.Parent.PlotSign:FindFirstChild("YourBase") and v.Parent.PlotSign.YourBase.Enabled then
+            local sign = v.Parent:FindFirstChild("PlotSign")
+            if sign and sign:FindFirstChild("YourBase") and sign.YourBase.Enabled then
                 delivery = v
                 break
             end
         end
     end
-    if not delivery then return end
-    
-    -- Target position for delivery hitbox
-    local target = delivery.CFrame * CFrame.new(0, random:NextInteger(-3, -1), 0)
-    
-    -- Smooth teleport algorithm (based on Arbix's approach)
-    local start = hrp.Position
-    for i = 1, TELEPORT_ITERATIONS do
-        local progress = i / TELEPORT_ITERATIONS
-        local curve = progress * progress * (3 - 2 * progress)
-        local newPos = start:Lerp(target.Position, curve) + Vector3.new(
-            random:NextNumber(-JITTER, JITTER),
-            random:NextNumber(-JITTER, JITTER),
-            random:NextNumber(-JITTER, JITTER)
-        )
-        hrp.CFrame = CFrame.new(newPos) * (hrp.CFrame - hrp.Position)
-        RunService.Heartbeat:Wait()
+    if not delivery then
+        warn("[TweenSteal]: ❌ Teslim kutusu bulunamadı.")
+        return
     end
 
-    -- Final correction of position
-    for _ = 1, 3 do
-        hrp.CFrame = CFrame.new(0, -3e38, 0)
-        RunService.Heartbeat:Wait()
-        hrp.CFrame = target
-        RunService.Heartbeat:Wait()
+    -- === FPS ölçümü ===
+    local fps
+    do
+        local frameCount = 0
+        local startTime = os.clock()
+        repeat
+            RunService.RenderStepped:Wait()
+            frameCount += 1
+        until os.clock() - startTime >= 1
+        fps = frameCount
     end
-    
-    local dist = (hrp.Position - target.Position).Magnitude
-    print(dist <= MAX_DISTANCE_OK and "[Tween]: ✅ Başarılı" or "[Tween]: ❌ Uzakta ("..math.floor(dist)..")")
+
+    -- === Ping ölçümü ===
+    local ping
+    do
+        local stats = game:GetService("Stats")
+        local net = stats:FindFirstChild("Network")
+        if net and net:FindFirstChild("Ping") then
+            ping = net.Ping:GetValue()
+        else
+            ping = 50 -- varsayılan
+        end
+    end
+
+    -- === Ayarlar ===
+    local baseIterations = 30
+    local baseDelay = 1 / fps
+
+    -- Ping'e göre ayarlama
+    local delayMultiplier = 1
+    if ping >= 200 then
+        delayMultiplier = 1.4
+        baseIterations += 15
+    elseif ping >= 120 then
+        delayMultiplier = 1.2
+        baseIterations += 10
+    elseif ping >= 80 then
+        delayMultiplier = 1.1
+        baseIterations += 5
+    elseif ping <= 40 then
+        delayMultiplier = 0.9
+    end
+
+    local iterations = math.clamp(baseIterations, 20, 60)
+    local stepDelay = baseDelay * delayMultiplier
+
+    local targetCF = delivery.CFrame * CFrame.new(0, -2.5, 0)
+    local startPos = hrp.Position
+    local random = Random.new()
+
+    -- === Tween hareketi ===
+    for i = 1, iterations do
+        local t = i / iterations
+        local curve = t * t * (3 - 2 * t)
+        local jitterAmount = math.clamp(1 / fps, 0.0005, 0.0025)
+        local jitter = Vector3.new(
+            random:NextNumber(-jitterAmount, jitterAmount),
+            random:NextNumber(-jitterAmount, jitterAmount),
+            random:NextNumber(-jitterAmount, jitterAmount)
+        )
+        local newPos = startPos:Lerp(targetCF.Position, curve) + jitter
+        hrp.CFrame = CFrame.new(newPos)
+        task.wait(stepDelay)
+    end
+
+    -- === Final düzeltme ===
+    for _ = 1, 2 do
+        hrp.Anchored = true
+        hrp.CFrame = CFrame.new(0, -3e38, 0)
+        task.wait(0.1)
+        hrp.CFrame = targetCF
+        hrp.Anchored = false
+        task.wait(0.1)
+    end
+
+    -- === Mesafe kontrol + başarı bildirimi ===
+    local finalDist = (hrp.Position - targetCF.Position).Magnitude
+    local success = finalDist <= 60 or finalDist <= 65
+    if success then
+        print("[TweenSteal]: ✅ Başarılı (" .. math.floor(finalDist) .. " stud)")
+        showSuccessIcon()
+    else
+        warn("[TweenSteal]: ❌ Başarısız (Uzaklık: " .. math.floor(finalDist) .. ")")
+    end
 end
 
 local moving = false
