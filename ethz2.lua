@@ -79,6 +79,22 @@ local function showSuccessIcon()
     end)
 end
 
+local function showFailIcon()
+    local failIcon = Instance.new("TextLabel")
+    failIcon.Size = UDim2.new(0, 60, 0, 60)
+    failIcon.Position = UDim2.new(0.5, -30, 0, -10)
+    failIcon.BackgroundTransparency = 1
+    failIcon.Text = "❌"
+    failIcon.TextColor3 = Color3.new(1, 0, 0)
+    failIcon.TextSize = 50
+    failIcon.Font = Enum.Font.FredokaOne
+    failIcon.Parent = gui
+
+    task.delay(1.5, function()
+        if failIcon then failIcon:Destroy() end
+    end)
+end
+
 -- Footer
 local footer = Instance.new("TextLabel", frame)
 footer.Text = "made by _ethz on discord"
@@ -629,11 +645,21 @@ local function TweenSteal()
     -- ✅ Son kontrol
     local finalDist = (GetHRP().Position - deliveryPos).Magnitude
     if finalDist <= 60 then
-        print("[TweenSteal]: ✅ Başarıyla teslim edildi!")
-        showSuccessIcon()
-    else
-        warn("[TweenSteal]: ❌ Mesafe fazla:", math.floor(finalDist))
-    end
+    -- Steals kontrolü
+    local steals = Players.LocalPlayer:FindFirstChild("leaderstats") and Players.LocalPlayer.leaderstats:FindFirstChild("Steals")
+    if steals then
+        local oldValue = steals.Value
+        steals:GetPropertyChangedSignal("Value"):Once(function()
+            if steals.Value > oldValue then
+						showSuccessIcon()
+					else
+						showFailIcon()
+					end
+				end)
+		end
+	else
+		showFailIcon()
+	end
 	ToggleGod(false)
 end
 
