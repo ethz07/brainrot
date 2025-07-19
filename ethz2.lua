@@ -418,6 +418,22 @@ for i, name in ipairs(highNames) do
  end
 end
 
+local function ToggleGod(state)
+    local h = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if not h then return end
+
+    if state then
+        _G.God = true
+        RunService.Stepped:Connect(function()
+            if _G.God and h.Health < h.MaxHealth then
+                h.Health = h.MaxHealth
+            end
+        end)
+    else
+        _G.God = false
+    end
+end
+
 -- Kendi base'inin Purchases.PlotBlock.Hitbox'unu bulur
 local function getOwnPlotHitbox()
     for _, plot in ipairs(workspace.Plots:GetChildren()) do
@@ -500,9 +516,11 @@ end
 
 -- 🚀 Tween Steal Fonksiyonu
 local function TweenSteal()
+	ToggleGod(true)
     local delivery, baseIndex = getOwnPlotHitboxAndBaseIndex()
     if not delivery or not baseIndex then
         warn("[TweenSteal]: ❌ Teslim kutusu ya da base alanı tespit edilemedi.")
+		ToggleGod(false)
         return
     end
 
@@ -599,6 +617,7 @@ local function TweenSteal()
     else
         warn("[TweenSteal]: ❌ Mesafe fazla:", math.floor(finalDist))
     end
+	ToggleGod(false)
 end
 
 -- Butonlar
