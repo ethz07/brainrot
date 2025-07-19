@@ -296,7 +296,7 @@ local function createFullRectangle(name, cornerA, cornerB, cornerC, cornerD)
  part.Size = Vector3.new(side1, 110, side2)
  part.Anchored = true
  part.CanCollide = false
- part.Transparency = 0.2
+ part.Transparency = 1
  part.Position = center
  part.Name = name
  part.Parent = workspace
@@ -365,7 +365,7 @@ for _, point in pairs(highPoints) do
  local part = Instance.new("Part")
  part.Size = Vector3.new(10, 1, 10)
  part.Position = point.pos
- part.Transparency = 0.3
+ part.Transparency = 1
  part.Anchored = true
  part.CanCollide = true
  part.Name = point.name
@@ -546,9 +546,9 @@ local function TweenSteal()
     end
 
 	local function tweenMove(startPos, endPos)
-    local height = 10 -- Daha alçak uçuş (daha az şüpheli)
-    local steps = 80 -- Daha fazla adım → yavaşlatılmış
-    local delay = 1 / 50 -- sabit FPS'e göre bekleme süresi
+    local height = 10 -- 
+    local steps = 100 -- if up. slow
+    local delay = 1 / 25
     local random = Random.new()
 
     for i = 1, steps do
