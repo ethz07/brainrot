@@ -279,6 +279,143 @@ closeButton2.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
 end)
 
+-- 1) Dört köşeden yüzey (dikdörtgen) oluşturan fonksiyon
+local function createFullRectangle(name, cornerA, cornerB, cornerC, cornerD)
+ local center = (cornerA + cornerB + cornerC + cornerD) / 4
+
+ local side1 = (cornerA - cornerB).Magnitude
+ local side2 = (cornerA - cornerD).Magnitude
+
+ local edge1 = (cornerB - cornerA).Unit
+ local edge2 = (cornerD - cornerA).Unit
+ local normal = edge1:Cross(edge2).Unit
+
+ local part = Instance.new("Part")
+ part.Size = Vector3.new(side1, 5, side2)
+ part.Anchored = true
+ part.CanCollide = false
+ part.Transparency = 0.5
+ part.Position = center
+ part.Name = name
+ part.Parent = workspace
+
+ local right = edge1
+ local up = normal
+ local back = edge2
+ part.CFrame = CFrame.fromMatrix(center, right, up, back)
+
+ return part
+end
+
+-- 2) Dikdörtgen verileri ve oluşturma
+local rectangles = {
+ {
+  name = "Rect_4",
+  corners = {
+   Vector3.new(-525.723633, -4.738947, -78.891960),
+   Vector3.new(-525.712646, -4.738956, -121.874443),
+   Vector3.new(-293.494598, -4.738947, -121.893700),
+   Vector3.new(-293.510406, -4.738955, -78.926765),
+  }
+ },
+ {
+  name = "Rect_3",
+  corners = {
+   Vector3.new(-525.751953, -4.738947, 28.107550),
+   Vector3.new(-525.706848, -4.738956, -14.871658),
+   Vector3.new(-293.483368, -4.738947, -14.873563),
+   Vector3.new(-293.488586, -4.738956, 28.124617),
+  }
+ },
+ {
+  name = "Rect_2",
+  corners = {
+   Vector3.new(-525.713257, -4.738947, 135.095154),
+   Vector3.new(-525.711426, -4.738956, 92.125351),
+   Vector3.new(-293.477264, -4.738947, 92.121010),
+   Vector3.new(-293.484131, -4.738955, 135.086609),
+  }
+ },
+ {
+  name = "Rect_1",
+  corners = {
+   Vector3.new(-525.709351, -4.804743, 242.094635),
+   Vector3.new(-525.713135, -4.804754, 199.123734),
+   Vector3.new(-293.499786, -4.738947, 199.107498),
+   Vector3.new(-293.526947, -4.738956, 242.061844),
+  }
+ }
+}
+
+for _, rect in pairs(rectangles) do
+ createFullRectangle(rect.name, unpack(rect.corners))
+end
+
+-- 3) Yüksekte kare bloklar
+local highPoints = {
+ { name = "High_4", pos = Vector3.new(-410.591339, 20, -99.639153) },
+ { name = "High_3", pos = Vector3.new(-410.946167, 20, 6.816273) },
+ { name = "High_2", pos = Vector3.new(-411.538971, 20, 116.529350) },
+ { name = "High_1", pos = Vector3.new(-410.954254, 20, 220.240616) },
+}
+
+for _, point in pairs(highPoints) do
+ local part = Instance.new("Part")
+ part.Size = Vector3.new(10, 1, 10)
+ part.Position = point.pos
+ part.Transparency = 0.3
+ part.Anchored = true
+ part.CanCollide = true
+ part.Name = point.name
+ part.Parent = workspace
+end
+
+-- 4) Üstlerine yazı ekle (koordinat sırasına göre numara verir)
+
+local rectNames = { "Rect_4", "Rect_3", "Rect_2", "Rect_1" }
+for i, name in ipairs(rectNames) do
+ local part = workspace:FindFirstChild(name)
+ if part then
+  local surfaceGui = Instance.new("SurfaceGui")
+  surfaceGui.Face = Enum.NormalId.Top
+  surfaceGui.AlwaysOnTop = true
+  surfaceGui.Parent = part
+
+  local label = Instance.new("TextLabel")
+  label.Size = UDim2.new(1, 0, 1, 0)
+  label.BackgroundTransparency = 1
+  label.Text = "prt " .. tostring(5 - i)
+  label.TextColor3 = Color3.new(1, 1, 1)
+  label.TextStrokeTransparency = 0.5
+  label.TextStrokeColor3 = Color3.new(0, 0, 0)
+  label.TextScaled = true
+  label.Font = Enum.Font.SourceSansBold
+  label.Parent = surfaceGui
+ end
+end
+
+local highNames = { "High_4", "High_3", "High_2", "High_1" }
+for i, name in ipairs(highNames) do
+ local part = workspace:FindFirstChild(name)
+ if part then
+  local surfaceGui = Instance.new("SurfaceGui")
+  surfaceGui.Face = Enum.NormalId.Top
+  surfaceGui.AlwaysOnTop = true
+  surfaceGui.Parent = part
+
+  local label = Instance.new("TextLabel")
+  label.Size = UDim2.new(1, 0, 1, 0)
+  label.BackgroundTransparency = 1
+  label.Text = "prt " .. tostring(5 - i)
+  label.TextColor3 = Color3.new(1, 1, 1)
+  label.TextStrokeTransparency = 0.5
+  label.TextStrokeColor3 = Color3.new(0, 0, 0)
+  label.TextScaled = true
+  label.Font = Enum.Font.SourceSansBold
+  label.Parent = surfaceGui
+ end
+end
+
 -- Kendi base'inin Purchases.PlotBlock.Hitbox'unu bulur
 local function getOwnPlotHitbox()
     for _, plot in ipairs(workspace.Plots:GetChildren()) do
