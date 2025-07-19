@@ -418,23 +418,40 @@ for i, name in ipairs(highNames) do
  end
 end
 
+local godConn = {}
+
 local function ToggleGod(state)
-    local h = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    local char = player.Character or player.CharacterAdded:Wait()
+    local h = char:FindFirstChildOfClass("Humanoid")
     if not h then return end
+    for _, c in pairs(godConn) do
+        c:Disconnect()
+    end
+    godConn = {}
 
     if state then
         _G.God = true
-        RunService.Stepped:Connect(function()
+        table.insert(godConn, RunService.Stepped:Connect(function()
             if _G.God and h.Health < h.MaxHealth then
                 h.Health = h.MaxHealth
             end
-        end)
+        end))
+        table.insert(godConn, h.HealthChanged:Connect(function(newHealth)
+            if _G.God and newHealth < h.MaxHealth then
+                h.Health = h.MaxHealth
+            end
+        end))
+        table.insert(godConn, h.Died:Connect(function()
+            if _G.God then
+                h.Health = h.MaxHealth
+                h:ChangeState(Enum.HumanoidStateType.Physics)
+            end
+        end))
     else
         _G.God = false
     end
 end
 
--- Kendi base'inin Purchases.PlotBlock.Hitbox'unu bulur
 local function getOwnPlotHitbox()
     for _, plot in ipairs(workspace.Plots:GetChildren()) do
         local plotSign = plot:FindFirstChild("PlotSign")
