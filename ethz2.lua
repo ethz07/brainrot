@@ -9,7 +9,6 @@ local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 
 local player = Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
 local function getHRP()
     local char = player.Character or player.CharacterAdded:Wait()
     return char:WaitForChild("HumanoidRootPart")
