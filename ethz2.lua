@@ -462,25 +462,43 @@ local function DeliverBrainrot()
     end
 end
 
-local function TweenSteal()
-    local delivery
-    for _, v in ipairs(workspace.Plots:GetDescendants()) do
-        if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") then
-            local sign = v.Parent:FindFirstChild("PlotSign")
-            if sign and sign:FindFirstChild("YourBase") and sign.YourBase.Enabled then
-                delivery = v
-                break
+-- BASE BUL + BASE INDEX TESPİTİ
+local function getOwnPlotHitboxAndBaseIndex()
+    local rects = {
+        workspace:FindFirstChild("Rect_1"),
+        workspace:FindFirstChild("Rect_2"),
+        workspace:FindFirstChild("Rect_3"),
+        workspace:FindFirstChild("Rect_4"),
+    }
+
+    for _, plot in ipairs(workspace.Plots:GetChildren()) do
+        local sign = plot:FindFirstChild("PlotSign")
+        if sign and sign:FindFirstChild("YourBase") and sign.YourBase.Enabled then
+            local delivery = plot:FindFirstChild("DeliveryHitbox")
+            if delivery then
+                -- Dikdörtgene göre baseIndex belirle
+                for i, rect in ipairs(rects) do
+                    if rect and (delivery.Position - rect.Position).Magnitude <= (rect.Size.X / 2 + 4) then
+                        return delivery, i
+                    end
+                end
             end
         end
     end
-    if not delivery then
-        warn("[TweenSteal]: ❌ Teslim kutusu bulunamadı.")
+    return nil, nil
+end
+
+-- TWEENSTEAL FONKSİYONU
+local function TweenSteal()
+    local delivery, baseIndex = getOwnPlotHitboxAndBaseIndex()
+    if not delivery or not baseIndex then
+        warn("[TweenSteal]: ❌ Teslim kutusu ya da base alanı tespit edilemedi.")
         return
     end
 
     local deliveryPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
 
-    -- Ping / FPS hesapla
+    -- FPS & Ping hesapla
     local fps = 60
     local ping = 50
     local stats = game:GetService("Stats")
@@ -489,18 +507,6 @@ local function TweenSteal()
         ping = net.Ping:GetValue()
     end
 
-    -- Turuncu part oluştur (base tespiti için)
-    local tempBlock = Instance.new("Part")
-    tempBlock.Size = Vector3.new(5, 5, 5)
-    tempBlock.Position = delivery.Position + Vector3.new(0, 2.5, 0)
-    tempBlock.Anchored = true
-    tempBlock.CanCollide = false
-    tempBlock.Transparency = 0.5
-    tempBlock.BrickColor = BrickColor.new("Bright orange")
-    tempBlock.Name = "TempDeliveryBlock"
-    tempBlock.Parent = workspace
-
-    -- Dikdörtgen ve yüksekteki base bloklarını sıraya göre al
     local rects = {
         workspace:FindFirstChild("Rect_1"),
         workspace:FindFirstChild("Rect_2"),
@@ -515,37 +521,21 @@ local function TweenSteal()
         workspace:FindFirstChild("High_4"),
     }
 
-    -- Hangi base'de olduğunu bul
-    local baseIndex = nil
+    -- Bulunduğun dikdörtgeni tespit et
+    local currentIndex = nil
     for i, rect in ipairs(rects) do
-        if rect and (tempBlock.Position - rect.Position).Magnitude <= (rect.Size.X / 2 + 4) then
-            baseIndex = i
+        if rect and (hrp.Position - rect.Position).Magnitude <= (rect.Size.X / 2 + 4) then
+            currentIndex = i
             break
         end
     end
-    tempBlock:Destroy()
 
-    if not baseIndex then
-        warn("[TweenSteal]: ❌ Base tespit edilemedi.")
-        return
-    end
-
-    -- Şu anki konumun hangi dikdörtgene denk geldiğini bul
-    local function getCurrentIndex()
-        for i, rect in ipairs(rects) do
-            if rect and (hrp.Position - rect.Position).Magnitude <= (rect.Size.X / 2 + 4) then
-                return i
-            end
-        end
-        return nil
-    end
-
-    local currentIndex = getCurrentIndex()
     if not currentIndex then
-        warn("[TweenSteal]: ❌ Oyuncu geçerli bir dikdörtgende değil.")
+        warn("[TweenSteal]: ❌ Oyuncu geçerli bir dikdörtgen üzerinde değil.")
         return
     end
 
+    -- Parabolik Tween Fly
     local function tweenMove(startPos, endPos)
         local height = 20
         local steps = 50 + math.floor(ping / 10)
@@ -570,19 +560,19 @@ local function TweenSteal()
         end
     end
 
-    -- Aradaki tüm geçişler (şu andan baseIndex’e kadar)
+    -- Sıralı geçiş (bulunduğun kareden base'e kadar)
     local step = currentIndex > baseIndex and -1 or 1
     for i = currentIndex, baseIndex, step do
-        local targetHigh = highs[i]
-        if targetHigh then
-            tweenMove(hrp.Position, targetHigh.Position + Vector3.new(0, 2, 0))
+        local high = highs[i]
+        if high then
+            tweenMove(hrp.Position, high.Position + Vector3.new(0, 2, 0))
         end
     end
 
-    -- En son hedefe geç
+    -- Son: Teslim kutusuna tween
     tweenMove(hrp.Position, deliveryPos)
 
-    -- Konum sabitle
+    -- Sabitleme
     for _ = 1, 2 do
         hrp.Anchored = true
         hrp.CFrame = CFrame.new(0, -3e38, 0)
@@ -592,13 +582,12 @@ local function TweenSteal()
         task.wait(0.1)
     end
 
-    -- Son kontrol
     local finalDist = (hrp.Position - deliveryPos).Magnitude
     if finalDist <= 60 then
-        print("[TweenSteal]: ✅ Süzülerek başarılı!")
+        print("[TweenSteal]: ✅ Başarıyla teslim edildi!")
         showSuccessIcon()
     else
-        warn("[TweenSteal]: ❌ Başarısız, mesafe:", math.floor(finalDist))
+        warn("[TweenSteal]: ❌ Mesafe fazla:", math.floor(finalDist))
     end
 end
 
