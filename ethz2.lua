@@ -9,7 +9,7 @@ local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 
 local player = Players.LocalPlayer
-local function getHRP()
+local function GetHRP()
     local char = player.Character or player.CharacterAdded:Wait()
     return char:WaitForChild("HumanoidRootPart")
 end
@@ -446,18 +446,18 @@ local function DeliverBrainrot()
             local hitbox = plot:FindFirstChild("DeliveryHitbox")
             if hitbox then
                 for i = 1, tpAmt do
-                    getHRP().CFrame = CFrame.new(finalPos) = hitbox.CFrame * CFrame.new(0, -3, 0)
+                    GetHRP().CFrame = hitbox.CFrame * CFrame.new(0, -3, 0)
                     RunService.Heartbeat:Wait()
                 end
                 for _ = 1, 2 do
-                    getHRP().CFrame = CFrame.new(finalPos) = CFrame.new(0, -3e38, 0)
+                    GetHRP().CFrame = CFrame.new(0, -3e38, 0)
                     RunService.Heartbeat:Wait()
                 end
                 for i = 1, math.floor(tpAmt / 16) do
-                    getHRP().CFrame = CFrame.new(finalPos) = hitbox.CFrame * CFrame.new(0, -3, 0)
+                    GetHRP().CFrame = hitbox.CFrame * CFrame.new(0, -3, 0)
                     RunService.Heartbeat:Wait()
                 end
-                local dist = (getHRP().Position - hitbox.Position).Magnitude
+                local dist = (GetHRP().Position - hitbox.Position).Magnitude
                 print(dist <= MAX_DISTANCE_OK and "[TP]: ✅ Başarılı" or "[TP]: ❌ Uzakta ("..math.floor(dist)..")")
             end
         end
@@ -534,7 +534,7 @@ local function TweenSteal()
     -- 📍 Şu an hangi dikdörtgendeyiz?
     local currentIndex = nil
     for i, rect in ipairs(rects) do
-        if isPointInRect(hrp.Position, rect) then
+        if isPointInRect(GetHRP().Position, rect) then
             currentIndex = i
             break
         end
@@ -564,7 +564,7 @@ local function TweenSteal()
         )
 
         local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
-        getHRP().CFrame = CFrame.new(finalPos)
+        GetHRP().CFrame = CFrame.new(finalPos)
         task.wait(delay)
     end
 	end
@@ -574,12 +574,12 @@ local function TweenSteal()
     for i = currentIndex, baseIndex, step do
         local high = highs[i]
         if high then
-            tweenMove(getHRP().Position, high.Position + Vector3.new(0, 2, 0))
+            tweenMove(GetHRP().Position, high.Position + Vector3.new(0, 2, 0))
         end
     end
 
     -- 🎯 Hedefe (delivery kutusuna) son geçiş
-    tweenMove(getHRP().Position, deliveryPos)
+    tweenMove(GetHRP().Position, deliveryPos)
 
     -- 📌 Konum sabitleme
     for _ = 1, 2 do
