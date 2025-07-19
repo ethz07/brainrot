@@ -495,7 +495,7 @@ local function TweenSteal()
     tempBlock.Position = delivery.Position + Vector3.new(0, 2.5, 0)
     tempBlock.Anchored = true
     tempBlock.CanCollide = false
-    tempBlock.Transparency = 0.2
+    tempBlock.Transparency = 0.5
     tempBlock.BrickColor = BrickColor.new("Bright orange")
     tempBlock.Name = "TempDeliveryBlock"
     tempBlock.Parent = workspace
