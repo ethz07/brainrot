@@ -341,7 +341,9 @@ local function TweenSteal()
         return
     end
 
-    -- FPS + Ping
+    local deliveryPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
+
+    -- Ping / FPS hesapla
     local fps = 60
     local ping = 50
     local stats = game:GetService("Stats")
@@ -350,42 +352,111 @@ local function TweenSteal()
         ping = net.Ping:GetValue()
     end
 
-    local startPos = hrp.Position
-    local endPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
-    local height = 20  -- uçuş yüksekliği
-    local steps = 50 + math.floor(ping / 10) -- daha uzun uçuş
-    local delay = 1 / fps * 1.2
+    -- Turuncu part oluştur (base tespiti için)
+    local tempBlock = Instance.new("Part")
+    tempBlock.Size = Vector3.new(5, 5, 5)
+    tempBlock.Position = delivery.Position + Vector3.new(0, 2.5, 0)
+    tempBlock.Anchored = true
+    tempBlock.CanCollide = false
+    tempBlock.Transparency = 0.2
+    tempBlock.BrickColor = BrickColor.new("Bright orange")
+    tempBlock.Name = "TempDeliveryBlock"
+    tempBlock.Parent = workspace
 
-    local random = Random.new()
-    for i = 1, steps do
-        local t = i / steps
-        local smooth = t * t * (3 - 2 * t)
+    -- Dikdörtgen ve yüksekteki base bloklarını sıraya göre al
+    local rects = {
+        workspace:FindFirstChild("Rect_1"),
+        workspace:FindFirstChild("Rect_2"),
+        workspace:FindFirstChild("Rect_3"),
+        workspace:FindFirstChild("Rect_4"),
+    }
 
-        -- Parabolik uçuş yolu
-        local horizontal = startPos:Lerp(endPos, smooth)
-        local verticalOffset = math.sin(math.pi * smooth) * height
-        local jitter = Vector3.new(
-            random:NextNumber(-0.002, 0.002),
-            random:NextNumber(-0.002, 0.002),
-            random:NextNumber(-0.002, 0.002)
-        )
+    local highs = {
+        workspace:FindFirstChild("High_1"),
+        workspace:FindFirstChild("High_2"),
+        workspace:FindFirstChild("High_3"),
+        workspace:FindFirstChild("High_4"),
+    }
 
-        local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
-        hrp.CFrame = CFrame.new(finalPos)
-        task.wait(delay)
+    -- Hangi base'de olduğunu bul
+    local baseIndex = nil
+    for i, rect in ipairs(rects) do
+        if rect and (tempBlock.Position - rect.Position).Magnitude <= (rect.Size.X / 2 + 4) then
+            baseIndex = i
+            break
+        end
+    end
+    tempBlock:Destroy()
+
+    if not baseIndex then
+        warn("[TweenSteal]: ❌ Base tespit edilemedi.")
+        return
     end
 
-    -- Son sabitleme
+    -- Şu anki konumun hangi dikdörtgene denk geldiğini bul
+    local function getCurrentIndex()
+        for i, rect in ipairs(rects) do
+            if rect and (hrp.Position - rect.Position).Magnitude <= (rect.Size.X / 2 + 4) then
+                return i
+            end
+        end
+        return nil
+    end
+
+    local currentIndex = getCurrentIndex()
+    if not currentIndex then
+        warn("[TweenSteal]: ❌ Oyuncu geçerli bir dikdörtgende değil.")
+        return
+    end
+
+    local function tweenMove(startPos, endPos)
+        local height = 20
+        local steps = 50 + math.floor(ping / 10)
+        local delay = 1 / fps * 1.2
+        local random = Random.new()
+
+        for i = 1, steps do
+            local t = i / steps
+            local smooth = t * t * (3 - 2 * t)
+
+            local horizontal = startPos:Lerp(endPos, smooth)
+            local verticalOffset = math.sin(math.pi * smooth) * height
+            local jitter = Vector3.new(
+                random:NextNumber(-0.002, 0.002),
+                random:NextNumber(-0.002, 0.002),
+                random:NextNumber(-0.002, 0.002)
+            )
+
+            local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
+            hrp.CFrame = CFrame.new(finalPos)
+            task.wait(delay)
+        end
+    end
+
+    -- Aradaki tüm geçişler (şu andan baseIndex’e kadar)
+    local step = currentIndex > baseIndex and -1 or 1
+    for i = currentIndex, baseIndex, step do
+        local targetHigh = highs[i]
+        if targetHigh then
+            tweenMove(hrp.Position, targetHigh.Position + Vector3.new(0, 2, 0))
+        end
+    end
+
+    -- En son hedefe geç
+    tweenMove(hrp.Position, deliveryPos)
+
+    -- Konum sabitle
     for _ = 1, 2 do
         hrp.Anchored = true
         hrp.CFrame = CFrame.new(0, -3e38, 0)
         task.wait(0.1)
-        hrp.CFrame = CFrame.new(endPos)
+        hrp.CFrame = CFrame.new(deliveryPos)
         hrp.Anchored = false
         task.wait(0.1)
     end
 
-    local finalDist = (hrp.Position - endPos).Magnitude
+    -- Son kontrol
+    local finalDist = (hrp.Position - deliveryPos).Magnitude
     if finalDist <= 60 then
         print("[TweenSteal]: ✅ Süzülerek başarılı!")
         showSuccessIcon()
