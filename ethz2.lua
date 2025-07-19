@@ -549,81 +549,49 @@ local function getOwnPlotHitboxAndBaseIndex()
     return nil, nil
 end
 
-local function tweenMove(startPos, endPos)
-    local fps = 60
-    local ping = 50
-    local stats = game:GetService("Stats")
-    local net = stats:FindFirstChild("Network")
-    if net and net:FindFirstChild("Ping") then
-        ping = net.Ping:GetValue()
-    end
+local function tweenAnchorMove(startPos, endPos)
+	local fps = 60
+	local ping = 50
+	local stats = game:GetService("Stats")
+	local net = stats:FindFirstChild("Network")
+	if net and net:FindFirstChild("Ping") then
+		ping = net.Ping:GetValue()
+	end
 
-    local hrp = GetHRP()
-    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-    if not hrp or not hum then return end
+	local hrp = GetHRP()
+	local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+	if not hrp or not hum then return end
 
-    local steps = 40 + math.floor(ping / 10)
-    local delay = 1 / math.clamp(fps, 20, 120) * 1.2
-    local height = 6 + math.random() * 2
-    local random = Random.new()
+	local steps = 50 + math.floor(ping / 10)
+	local delay = 1 / math.clamp(fps, 20, 120) * 1.2
+	local height = 8 + math.random() * 4
+	local random = Random.new()
 
-    hum.PlatformStand = true
+	hum.PlatformStand = true
 
-    for i = 1, steps do
-        local t = i / steps
-        local smooth = t * t * (3 - 2 * t)
-        local pos = startPos:Lerp(endPos, smooth)
-        local vertical = math.sin(math.pi * smooth) * height
-        local jitter = Vector3.new(
-            random:NextNumber(-0.003, 0.003),
-            random:NextNumber(-0.003, 0.003),
-            random:NextNumber(-0.003, 0.003)
-        )
+	for i = 1, steps do
+		local t = i / steps
+		local smooth = t * t * (3 - 2 * t)
 
-        local finalPos = pos + Vector3.new(0, vertical, 0) + jitter
-        hrp.CFrame = CFrame.new(finalPos)
-        task.wait(delay)
-    end
+		local horizontal = startPos:Lerp(endPos, smooth)
+		local verticalOffset = math.sin(math.pi * smooth) * height
+		local jitter = Vector3.new(
+			random:NextNumber(-0.003, 0.003),
+			random:NextNumber(-0.003, 0.003),
+			random:NextNumber(-0.003, 0.003)
+		)
 
-    hrp.Anchored = true
-    hrp.CFrame = CFrame.new(endPos + Vector3.new(0, 1.5, 0))
-    task.wait(0.5 + random:NextNumber(0.05, 0.2))
-    hrp.Anchored = false
+		local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
+		hrp.Anchored = true
+		hrp.CFrame = CFrame.new(finalPos)
+		task.wait(delay)
+	end
 
-    hum.PlatformStand = false
-end
+	hrp.CFrame = CFrame.new(endPos + Vector3.new(0, 1.5, 0))
+	task.wait(0.5 + random:NextNumber(0.05, 0.2))
+	hrp.Anchored = false
 
-local function tweenToDelivery(startPos, endPos)
-    local fps = 60
-    local ping = 50
-    local stats = game:GetService("Stats")
-    local net = stats:FindFirstChild("Network")
-    if net and net:FindFirstChild("Ping") then
-        ping = net.Ping:GetValue()
-    end
-
-    local hrp = GetHRP()
-    local height = 20
-    local steps = 50 + math.floor(ping / 10)
-    local delay = 1 / math.clamp(fps, 20, 120) * 1.2
-    local random = Random.new()
-
-    for i = 1, steps do
-        local t = i / steps
-        local smooth = t * t * (3 - 2 * t)
-
-        local horizontal = startPos:Lerp(endPos, smooth)
-        local verticalOffset = math.sin(math.pi * smooth) * height
-        local jitter = Vector3.new(
-            random:NextNumber(-0.002, 0.002),
-            random:NextNumber(-0.002, 0.002),
-            random:NextNumber(-0.002, 0.002)
-        )
-
-        local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
-        hrp.CFrame = CFrame.new(finalPos)
-        task.wait(delay)
-    end
+	hum.PlatformStand = false
 end
 
 local function TweenSteal()
@@ -633,7 +601,7 @@ local function TweenSteal()
 	local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
 	if not hrp or not hum then return end
 
-	-- Ufak zıplatma: pozisyon sabitlenmesine yardımcı
+	-- Küçük zıplatma
 	hrp.CFrame = hrp.CFrame + Vector3.new(0, 2, 0)
 	task.wait(0.1)
 
@@ -678,12 +646,14 @@ local function TweenSteal()
 	for i = currentIndex, baseIndex, step do
 		local high = highs[i]
 		if high then
-			tweenMove(hrp.Position, high.Position + Vector3.new(0, 2.5, 0))
+			tweenAnchorMove(hrp.Position, high.Position + Vector3.new(0, 2.5, 0))
 		end
 	end
 
-	tweenToDelivery(hrp.Position, deliveryPos)
+	-- 🧠 Target'a aynı sistemle git
+	tweenAnchorMove(hrp.Position, deliveryPos)
 
+	-- Hedefe sabitleme
 	for _ = 1, 2 do
 		hrp.Anchored = true
 		hrp.CFrame = CFrame.new(0, -3e38, 0)
@@ -693,6 +663,7 @@ local function TweenSteal()
 		task.wait(0.1)
 	end
 
+	-- Başarı kontrolü
 	local finalDist = (hrp.Position - deliveryPos).Magnitude
 	if finalDist <= 60 then
 		local steals = Players.LocalPlayer:FindFirstChild("leaderstats") and Players.LocalPlayer.leaderstats:FindFirstChild("Steals")
