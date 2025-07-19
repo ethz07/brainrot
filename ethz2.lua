@@ -10,7 +10,10 @@ local player = Players.LocalPlayer
 
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
+local function getHRP()
+    local char = player.Character or player.CharacterAdded:Wait()
+    return char:WaitForChild("HumanoidRootPart")
+end
 local random = Random.new()
 
 local tpAmt = 150
@@ -444,18 +447,18 @@ local function DeliverBrainrot()
             local hitbox = plot:FindFirstChild("DeliveryHitbox")
             if hitbox then
                 for i = 1, tpAmt do
-                    hrp.CFrame = hitbox.CFrame * CFrame.new(0, -3, 0)
+                    getHRP().CFrame = CFrame.new(finalPos) = hitbox.CFrame * CFrame.new(0, -3, 0)
                     RunService.Heartbeat:Wait()
                 end
                 for _ = 1, 2 do
-                    hrp.CFrame = CFrame.new(0, -3e38, 0)
+                    getHRP().CFrame = CFrame.new(finalPos) = CFrame.new(0, -3e38, 0)
                     RunService.Heartbeat:Wait()
                 end
                 for i = 1, math.floor(tpAmt / 16) do
-                    hrp.CFrame = hitbox.CFrame * CFrame.new(0, -3, 0)
+                    getHRP().CFrame = CFrame.new(finalPos) = hitbox.CFrame * CFrame.new(0, -3, 0)
                     RunService.Heartbeat:Wait()
                 end
-                local dist = (hrp.Position - hitbox.Position).Magnitude
+                local dist = (getHRP().Position - hitbox.Position).Magnitude
                 print(dist <= MAX_DISTANCE_OK and "[TP]: ✅ Başarılı" or "[TP]: ❌ Uzakta ("..math.floor(dist)..")")
             end
         end
@@ -541,31 +544,6 @@ local function TweenSteal()
     if not currentIndex then
         warn("[TweenSteal]: ❌ Geçerli dikdörtgen üzerinde değilsin.")
         return
-    end
-
-    -- ✈️ Parabolik Tween Hareket
-    local function tweenMove(startPos, endPos)
-        local height = 20
-        local steps = 50 + math.floor(ping / 10)
-        local delay = 1 / fps * 1.2
-        local random = Random.new()
-
-        for i = 1, steps do
-            local t = i / steps
-            local smooth = t * t * (3 - 2 * t)
-
-            local horizontal = startPos:Lerp(endPos, smooth)
-            local verticalOffset = math.sin(math.pi * smooth) * height
-            local jitter = Vector3.new(
-                random:NextNumber(-0.002, 0.002),
-                random:NextNumber(-0.002, 0.002),
-                random:NextNumber(-0.002, 0.002)
-            )
-
-            local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
-            hrp.CFrame = CFrame.new(finalPos)
-            task.wait(delay)
-        end
     end
 
     -- 🔁 Sıralı geçiş: current → base
