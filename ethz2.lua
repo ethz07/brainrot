@@ -462,7 +462,16 @@ local function DeliverBrainrot()
     end
 end
 
--- BASE BUL + BASE INDEX TESPİTİ
+-- 💡 Dikdörtgen içinde mi kontrol eden fonksiyon
+local function isPointInRect(point, rect)
+    if not rect then return false end
+    local cf = rect.CFrame
+    local size = rect.Size
+    local localPos = cf:PointToObjectSpace(point)
+    return math.abs(localPos.X) <= size.X / 2 and math.abs(localPos.Z) <= size.Z / 2
+end
+
+-- 🧠 Teslim kutusunu ve base index’i bulur
 local function getOwnPlotHitboxAndBaseIndex()
     local rects = {
         workspace:FindFirstChild("Rect_1"),
@@ -476,9 +485,8 @@ local function getOwnPlotHitboxAndBaseIndex()
         if sign and sign:FindFirstChild("YourBase") and sign.YourBase.Enabled then
             local delivery = plot:FindFirstChild("DeliveryHitbox")
             if delivery then
-                -- Dikdörtgene göre baseIndex belirle
                 for i, rect in ipairs(rects) do
-                    if rect and (delivery.Position - rect.Position).Magnitude <= (rect.Size.X / 2 + 4) then
+                    if isPointInRect(delivery.Position, rect) then
                         return delivery, i
                     end
                 end
@@ -488,7 +496,7 @@ local function getOwnPlotHitboxAndBaseIndex()
     return nil, nil
 end
 
--- TWEENSTEAL FONKSİYONU
+-- 🚀 Tween Steal Fonksiyonu
 local function TweenSteal()
     local delivery, baseIndex = getOwnPlotHitboxAndBaseIndex()
     if not delivery or not baseIndex then
@@ -498,7 +506,7 @@ local function TweenSteal()
 
     local deliveryPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
 
-    -- FPS & Ping hesapla
+    -- 📶 Ping ve FPS ölç
     local fps = 60
     local ping = 50
     local stats = game:GetService("Stats")
@@ -521,21 +529,21 @@ local function TweenSteal()
         workspace:FindFirstChild("High_4"),
     }
 
-    -- Bulunduğun dikdörtgeni tespit et
+    -- 📍 Şu an hangi dikdörtgendeyiz?
     local currentIndex = nil
     for i, rect in ipairs(rects) do
-        if rect and (hrp.Position - rect.Position).Magnitude <= (rect.Size.X / 2 + 4) then
+        if isPointInRect(hrp.Position, rect) then
             currentIndex = i
             break
         end
     end
 
     if not currentIndex then
-        warn("[TweenSteal]: ❌ Oyuncu geçerli bir dikdörtgen üzerinde değil.")
+        warn("[TweenSteal]: ❌ Geçerli dikdörtgen üzerinde değilsin.")
         return
     end
 
-    -- Parabolik Tween Fly
+    -- ✈️ Parabolik Tween Hareket
     local function tweenMove(startPos, endPos)
         local height = 20
         local steps = 50 + math.floor(ping / 10)
@@ -560,7 +568,7 @@ local function TweenSteal()
         end
     end
 
-    -- Sıralı geçiş (bulunduğun kareden base'e kadar)
+    -- 🔁 Sıralı geçiş: current → base
     local step = currentIndex > baseIndex and -1 or 1
     for i = currentIndex, baseIndex, step do
         local high = highs[i]
@@ -569,10 +577,10 @@ local function TweenSteal()
         end
     end
 
-    -- Son: Teslim kutusuna tween
+    -- 🎯 Hedefe (delivery kutusuna) son geçiş
     tweenMove(hrp.Position, deliveryPos)
 
-    -- Sabitleme
+    -- 📌 Konum sabitleme
     for _ = 1, 2 do
         hrp.Anchored = true
         hrp.CFrame = CFrame.new(0, -3e38, 0)
@@ -582,6 +590,7 @@ local function TweenSteal()
         task.wait(0.1)
     end
 
+    -- ✅ Son kontrol
     local finalDist = (hrp.Position - deliveryPos).Magnitude
     if finalDist <= 60 then
         print("[TweenSteal]: ✅ Başarıyla teslim edildi!")
