@@ -581,9 +581,9 @@ local function TweenSteal()
     end
 
 	local function tweenMove(startPos, endPos)
-    local height = 10 -- 
-    local steps = 100 -- if up. slow
-    local delay = 1 / 25
+    local height = 10 
+    local steps = 60 
+    local delay = 1 / 40
     local random = Random.new()
 
     for i = 1, steps do
