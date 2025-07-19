@@ -547,9 +547,66 @@ local function getOwnPlotHitboxAndBaseIndex()
     return nil, nil
 end
 
--- 🚀 Tween Steal Fonksiyonu
+local function tweenToDelivery(startPos, endPos)
+    local fps = 60
+    local ping = 50
+    local stats = game:GetService("Stats")
+    local net = stats:FindFirstChild("Network")
+    if net and net:FindFirstChild("Ping") then
+        ping = net.Ping:GetValue()
+    end
+
+    local hrp = GetHRP()
+    local height = 20
+    local steps = 50 + math.floor(ping / 10)
+    local delay = 1 / math.clamp(fps, 20, 120) * 1.2
+    local random = Random.new()
+
+    for i = 1, steps do
+        local t = i / steps
+        local smooth = t * t * (3 - 2 * t)
+
+        local horizontal = startPos:Lerp(endPos, smooth)
+        local verticalOffset = math.sin(math.pi * smooth) * height
+        local jitter = Vector3.new(
+            random:NextNumber(-0.002, 0.002),
+            random:NextNumber(-0.002, 0.002),
+            random:NextNumber(-0.002, 0.002)
+        )
+
+        local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
+        hrp.CFrame = CFrame.new(finalPos)
+        task.wait(delay)
+    end
+end
+
+local function tweenMove(startPos, endPos)
+    local fps = 60
+    local ping = 50
+    local stats = game:GetService("Stats")
+    local net = stats:FindFirstChild("Network")
+    if net and net:FindFirstChild("Ping") then
+        ping = net.Ping:GetValue()
+    end
+
+    local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    local steps = 40 + math.floor(ping / 10)
+    local delay = 1 / math.clamp(fps, 20, 120) * 1.2
+
+    for i = 1, steps do
+        local t = i / steps
+        local smooth = t * t * (3 - 2 * t)
+        local position = startPos:Lerp(endPos, smooth)
+        humanoid:MoveTo(position)
+        task.wait(delay)
+    end
+end
+
 local function TweenSteal()
 	ToggleGod(true)
+
     local delivery, baseIndex = getOwnPlotHitboxAndBaseIndex()
     if not delivery or not baseIndex then
         warn("[TweenSteal]: ❌ Teslim kutusu ya da base alanı tespit edilemedi.")
@@ -558,15 +615,6 @@ local function TweenSteal()
     end
 
     local deliveryPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
-
-    -- 📶 Ping ve FPS ölç
-    local fps = 60
-    local ping = 50
-    local stats = game:GetService("Stats")
-    local net = stats:FindFirstChild("Network")
-    if net and net:FindFirstChild("Ping") then
-        ping = net.Ping:GetValue()
-    end
 
     local rects = {
         workspace:FindFirstChild("Rect_1"),
@@ -582,7 +630,6 @@ local function TweenSteal()
         workspace:FindFirstChild("High_4"),
     }
 
-    -- 📍 Şu an hangi dikdörtgendeyiz?
     local currentIndex = nil
     for i, rect in ipairs(rects) do
         if isPointInRect(GetHRP().Position, rect) then
@@ -593,46 +640,21 @@ local function TweenSteal()
 
     if not currentIndex then
         warn("[TweenSteal]: ❌ Geçerli dikdörtgen üzerinde değilsin.")
+        ToggleGod(false)
         return
     end
 
-	local function tweenMove(startPos, endPos)
-    local height = 10 
-    local steps = 60 
-    local delay = 1 / 40
-    local random = Random.new()
-
-    for i = 1, steps do
-        local t = i / steps
-        local smooth = t * t * (3 - 2 * t)
-
-        local horizontal = startPos:Lerp(endPos, smooth)
-        local verticalOffset = math.sin(math.pi * smooth) * height
-        local jitter = Vector3.new(
-            random:NextNumber(-0.001, 0.001),
-            random:NextNumber(-0.001, 0.001),
-            random:NextNumber(-0.001, 0.001)
-        )
-
-        local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
-        GetHRP().CFrame = CFrame.new(finalPos)
-        task.wait(delay)
-    end
-	end
-
-    -- 🔁 Sıralı geçiş: current → base
     local step = currentIndex > baseIndex and -1 or 1
     for i = currentIndex, baseIndex, step do
         local high = highs[i]
         if high then
-            tweenMove(GetHRP().Position, high.Position + Vector3.new(0, 2, 0))
+            tweenMove(GetHRP().Position, high.Position + Vector3.new(0, 2.5, 0))
         end
     end
 
-    -- 🎯 Hedefe (delivery kutusuna) son geçiş
-    tweenMove(GetHRP().Position, deliveryPos)
+    tweenToDelivery(GetHRP().Position, deliveryPos)
 
-    -- 📌 Konum sabitleme
+    -- Konum sabitleme
     for _ = 1, 2 do
         GetHRP().Anchored = true
         GetHRP().CFrame = CFrame.new(0, -3e38, 0)
@@ -642,26 +664,27 @@ local function TweenSteal()
         task.wait(0.1)
     end
 
-    -- ✅ Son kontrol
+    -- Teslim mesafe kontrol + Steal değişimi
     local finalDist = (GetHRP().Position - deliveryPos).Magnitude
     if finalDist <= 60 then
-    -- Steals kontrolü
-    local steals = Players.LocalPlayer:FindFirstChild("leaderstats") and Players.LocalPlayer.leaderstats:FindFirstChild("Steals")
-    if steals then
-        local oldValue = steals.Value
-        steals:GetPropertyChangedSignal("Value"):Once(function()
-            if steals.Value > oldValue then
-						showSuccessIcon()
-					else
-						showFailIcon()
-					end
-				end)
-		end
-	else
-		showFailIcon()
-	end
-	ToggleGod(false)
+        local steals = Players.LocalPlayer:FindFirstChild("leaderstats") and Players.LocalPlayer.leaderstats:FindFirstChild("Steals")
+        if steals then
+            local oldValue = steals.Value
+            steals:GetPropertyChangedSignal("Value"):Once(function()
+                if steals.Value > oldValue then
+                    showSuccessIcon()
+                else
+                    showFailIcon()
+                end
+            end)
+        end
+    else
+        showFailIcon()
+    end
+
+    ToggleGod(false)
 end
+
 
 -- Butonlar
 local b1 = createButton("TP to Base", 1)
