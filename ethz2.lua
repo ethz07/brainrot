@@ -28,7 +28,7 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 245, 0, 250)
+frame.Size = UDim2.new(0, 245, 0, 220)
 frame.Position = UDim2.new(0.5, -115, 0.45, 0) -- ortalanmış
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
@@ -546,30 +546,54 @@ local function TweenSteal()
         return
     end
 
+	local function tweenMove(startPos, endPos)
+    local height = 10 -- Daha alçak uçuş (daha az şüpheli)
+    local steps = 80 -- Daha fazla adım → yavaşlatılmış
+    local delay = 1 / 50 -- sabit FPS'e göre bekleme süresi
+    local random = Random.new()
+
+    for i = 1, steps do
+        local t = i / steps
+        local smooth = t * t * (3 - 2 * t)
+
+        local horizontal = startPos:Lerp(endPos, smooth)
+        local verticalOffset = math.sin(math.pi * smooth) * height
+        local jitter = Vector3.new(
+            random:NextNumber(-0.001, 0.001),
+            random:NextNumber(-0.001, 0.001),
+            random:NextNumber(-0.001, 0.001)
+        )
+
+        local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
+        getHRP().CFrame = CFrame.new(finalPos)
+        task.wait(delay)
+    end
+	end
+
     -- 🔁 Sıralı geçiş: current → base
     local step = currentIndex > baseIndex and -1 or 1
     for i = currentIndex, baseIndex, step do
         local high = highs[i]
         if high then
-            tweenMove(hrp.Position, high.Position + Vector3.new(0, 2, 0))
+            tweenMove(getHRP().Position, high.Position + Vector3.new(0, 2, 0))
         end
     end
 
     -- 🎯 Hedefe (delivery kutusuna) son geçiş
-    tweenMove(hrp.Position, deliveryPos)
+    tweenMove(getHRP().Position, deliveryPos)
 
     -- 📌 Konum sabitleme
     for _ = 1, 2 do
-        hrp.Anchored = true
-        hrp.CFrame = CFrame.new(0, -3e38, 0)
+        GetHRP().Anchored = true
+        GetHRP().CFrame = CFrame.new(0, -3e38, 0)
         task.wait(0.1)
-        hrp.CFrame = CFrame.new(deliveryPos)
-        hrp.Anchored = false
+        GetHRP().CFrame = CFrame.new(deliveryPos)
+        GetHRP().Anchored = false
         task.wait(0.1)
     end
 
     -- ✅ Son kontrol
-    local finalDist = (hrp.Position - deliveryPos).Magnitude
+    local finalDist = (GetHRP().Position - deliveryPos).Magnitude
     if finalDist <= 60 then
         print("[TweenSteal]: ✅ Başarıyla teslim edildi!")
         showSuccessIcon()
@@ -578,110 +602,22 @@ local function TweenSteal()
     end
 end
 
-local moving = false
-local moveConnection
-
-local function SafeInstantSteal2s()
-    local delivery
-    for _, v in ipairs(workspace.Plots:GetDescendants()) do
-        if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") then
-            if v.Parent.PlotSign:FindFirstChild("YourBase") and v.Parent.PlotSign.YourBase.Enabled then
-                delivery = v
-                break
-            end
-        end
-    end
-    if not delivery then
-        print("[SafeInstant2s]: ❌ Teslim kutusu bulunamadı")
-        return
-    end
-
-    local target = delivery.CFrame * CFrame.new(0, -3, 0)
-
-    local function safeTP(cframe, isDelivery)
-        local jitter = Vector3.new(
-            math.random(-1,1) * 0.05,
-            math.random(-1,1) * 0.05,
-            math.random(-1,1) * 0.05
-        )
-
-        -- Işınlan
-        hrp.Anchored = true
-        hrp.CFrame = cframe + jitter
-        hrp.Velocity = Vector3.zero
-        task.wait(random:NextNumber(0.15, 0.3))
-        hrp.Anchored = false
-
-        if isDelivery then
-            -- HEMEN yürümeye başla
-            local hitbox = getOwnPlotHitbox()
-            if not hitbox then
-                warn("❌ Hitbox bulunamadı")
-                return
-            end
-
-            if moveConnection then
-                moveConnection:Disconnect()
-                moveConnection = nil
-            end
-
-            moving = true
-            moveConnection = RunService.Heartbeat:Connect(function()
-                if not moving then return end
-                local direction = (hitbox.Position - hrp.Position).Unit
-                hrp.CFrame = hrp.CFrame + direction * 0.6
-            end)
-        else
-            -- Uzak noktaya geçildiğinde hareket durdurulur
-            moving = false
-            if moveConnection then
-                moveConnection:Disconnect()
-                moveConnection = nil
-            end
-        end
-    end
-
-    -- 2 saniyelik sekans (her tur)
-    safeTP(target, true)                       -- target’a ışınla → yürüme başlasın
-    task.wait(0.9)                             -- ışınlanmadan ÖNCE 0.6s bekle → yürüsün biraz
-    safeTP(CFrame.new(0, -3e38, 0), false)     -- sonra uzak noktaya geç → yürüme dur
-    safeTP(target, true)
-    task.wait(0.8)
-    safeTP(CFrame.new(0, -3e38, 0), false)
-    safeTP(target, true)
-    task.wait(0.8)
-
-	-- Tüm ışınlamalar bitti → yürümeyi durdur
-moving = false
-if moveConnection then
-    moveConnection:Disconnect()
-    moveConnection = nil
-	end
-
-    -- Mesafe kontrol
-    local dist = (hrp.Position - delivery.Position).Magnitude
-    print(dist <= MAX_DISTANCE_OK and "[SafeInstant2s]: ✅ Başarılı" or "[SafeInstant2s]: ❌ Uzakta ("..math.floor(dist)..")")
-end
-
 -- Butonlar
 local b1 = createButton("TP to Base", 1)
 b1.MouseButton1Click:Connect(DeliverBrainrot)
 
-local b2 = createButton("Broken 😡", 2)
-b2.MouseButton1Click:Connect(SafeInstantSteal2s)
+local b2 = createButton("Tween Steal", 2)
+b2.MouseButton1Click:Connect(TweenSteal)
 
-local b3 = createButton("Tween Steal", 3)
-b3.MouseButton1Click:Connect(TweenSteal)
-
-createButton("ESP Player", 4)
--- createButton("ESP Brainrots (Soon)", 5)
+createButton("ESP Player", 3)
+-- createButton("ESP Brainrots (Soon)", 3)
 
 -- Minimize/Kapat
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
     content.Visible = not minimized
-    frame.Size = minimized and UDim2.new(0, 245, 0, 35) or UDim2.new(0, 245, 0, 250)
+    frame.Size = minimized and UDim2.new(0, 245, 0, 35) or UDim2.new(0, 245, 0, 220)
 end)
 
 closeButton.MouseButton1Click:Connect(function()
@@ -753,7 +689,7 @@ local function updateESP()
     end
 end
 
-local espButton = content:GetChildren()[4] -- 4. buton (ESP Player)
+local espButton = content:GetChildren()[3] -- 3. buton (ESP Player)
 espButton.MouseButton1Click:Connect(function()
     espEnabled = not espEnabled
     if espEnabled then
