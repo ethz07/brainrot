@@ -489,6 +489,7 @@ end
 
 -- TP to Base
 local function DeliverBrainrot()
+	ToggleGod(true)
     for _, plot in ipairs(workspace.Plots:GetChildren()) do
         local sign = plot:FindFirstChild("PlotSign")
         if sign and sign:FindFirstChild("YourBase") and sign.YourBase.Enabled then
@@ -508,6 +509,7 @@ local function DeliverBrainrot()
                 end
                 local dist = (GetHRP().Position - hitbox.Position).Magnitude
                 print(dist <= MAX_DISTANCE_OK and "[TP]: ✅ Başarılı" or "[TP]: ❌ Uzakta ("..math.floor(dist)..")")
+				ToggleGod(false)
             end
         end
     end
@@ -547,6 +549,50 @@ local function getOwnPlotHitboxAndBaseIndex()
     return nil, nil
 end
 
+local function tweenMove(startPos, endPos)
+    local fps = 60
+    local ping = 50
+    local stats = game:GetService("Stats")
+    local net = stats:FindFirstChild("Network")
+    if net and net:FindFirstChild("Ping") then
+        ping = net.Ping:GetValue()
+    end
+
+    local hrp = GetHRP()
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if not hrp or not hum then return end
+
+    local steps = 40 + math.floor(ping / 10)
+    local delay = 1 / math.clamp(fps, 20, 120) * 1.2
+    local height = 6 + math.random() * 2
+    local random = Random.new()
+
+    hum.PlatformStand = true
+
+    for i = 1, steps do
+        local t = i / steps
+        local smooth = t * t * (3 - 2 * t)
+        local pos = startPos:Lerp(endPos, smooth)
+        local vertical = math.sin(math.pi * smooth) * height
+        local jitter = Vector3.new(
+            random:NextNumber(-0.003, 0.003),
+            random:NextNumber(-0.003, 0.003),
+            random:NextNumber(-0.003, 0.003)
+        )
+
+        local finalPos = pos + Vector3.new(0, vertical, 0) + jitter
+        hrp.CFrame = CFrame.new(finalPos)
+        task.wait(delay)
+    end
+
+    hrp.Anchored = true
+    hrp.CFrame = CFrame.new(endPos + Vector3.new(0, 1.5, 0))
+    task.wait(0.5 + random:NextNumber(0.05, 0.2))
+    hrp.Anchored = false
+
+    hum.PlatformStand = false
+end
+
 local function tweenToDelivery(startPos, endPos)
     local fps = 60
     local ping = 50
@@ -580,119 +626,92 @@ local function tweenToDelivery(startPos, endPos)
     end
 end
 
-local function tweenMove(startPos, endPos)
-    local fps = 60
-    local ping = 50
-    local stats = game:GetService("Stats")
-    local net = stats:FindFirstChild("Network")
-    if net and net:FindFirstChild("Ping") then
-        ping = net.Ping:GetValue()
-    end
-
-    local hrp = GetHRP()
-    local steps = 40 + math.floor(ping / 10)
-    local delay = 1 / math.clamp(fps, 20, 120) * 1.2
-    local height = 6
-    local random = Random.new()
-
-    for i = 1, steps do
-        local t = i / steps
-        local smooth = t * t * (3 - 2 * t)
-        local pos = startPos:Lerp(endPos, smooth)
-        local vertical = math.sin(math.pi * smooth) * height
-        local jitter = Vector3.new(
-            random:NextNumber(-0.001, 0.001),
-            random:NextNumber(-0.001, 0.001),
-            random:NextNumber(-0.001, 0.001)
-        )
-
-        local finalPos = pos + Vector3.new(0, vertical, 0) + jitter
-        hrp.CFrame = CFrame.new(finalPos)
-        task.wait(delay)
-    end
-end
-
 local function TweenSteal()
 	ToggleGod(true)
 
-    local delivery, baseIndex = getOwnPlotHitboxAndBaseIndex()
-    if not delivery or not baseIndex then
-        warn("[TweenSteal]: ❌ Teslim kutusu ya da base alanı tespit edilemedi.")
+	local hrp = GetHRP()
+	local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+	if not hrp or not hum then return end
+
+	-- Ufak zıplatma: pozisyon sabitlenmesine yardımcı
+	hrp.CFrame = hrp.CFrame + Vector3.new(0, 2, 0)
+	task.wait(0.1)
+
+	local delivery, baseIndex = getOwnPlotHitboxAndBaseIndex()
+	if not delivery or not baseIndex then
+		warn("[TweenSteal]: ❌ Teslim kutusu ya da base alanı tespit edilemedi.")
 		ToggleGod(false)
-        return
-    end
+		return
+	end
 
-    local deliveryPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
+	local deliveryPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
 
-    local rects = {
-        workspace:FindFirstChild("Rect_1"),
-        workspace:FindFirstChild("Rect_2"),
-        workspace:FindFirstChild("Rect_3"),
-        workspace:FindFirstChild("Rect_4"),
-    }
+	local rects = {
+		workspace:FindFirstChild("Rect_1"),
+		workspace:FindFirstChild("Rect_2"),
+		workspace:FindFirstChild("Rect_3"),
+		workspace:FindFirstChild("Rect_4"),
+	}
 
-    local highs = {
-        workspace:FindFirstChild("High_1"),
-        workspace:FindFirstChild("High_2"),
-        workspace:FindFirstChild("High_3"),
-        workspace:FindFirstChild("High_4"),
-    }
+	local highs = {
+		workspace:FindFirstChild("High_1"),
+		workspace:FindFirstChild("High_2"),
+		workspace:FindFirstChild("High_3"),
+		workspace:FindFirstChild("High_4"),
+	}
 
-    local currentIndex = nil
-    for i, rect in ipairs(rects) do
-        if isPointInRect(GetHRP().Position, rect) then
-            currentIndex = i
-            break
-        end
-    end
+	local currentIndex = nil
+	for i, rect in ipairs(rects) do
+		if isPointInRect(hrp.Position, rect) then
+			currentIndex = i
+			break
+		end
+	end
 
-    if not currentIndex then
-        warn("[TweenSteal]: ❌ Geçerli dikdörtgen üzerinde değilsin.")
-        ToggleGod(false)
-        return
-    end
+	if not currentIndex then
+		warn("[TweenSteal]: ❌ Geçerli dikdörtgen üzerinde değilsin.")
+		ToggleGod(false)
+		return
+	end
 
-    local step = currentIndex > baseIndex and -1 or 1
-    for i = currentIndex, baseIndex, step do
-        local high = highs[i]
-        if high then
-            tweenMove(GetHRP().Position, high.Position + Vector3.new(0, 2.5, 0))
-        end
-    end
+	local step = currentIndex > baseIndex and -1 or 1
+	for i = currentIndex, baseIndex, step do
+		local high = highs[i]
+		if high then
+			tweenMove(hrp.Position, high.Position + Vector3.new(0, 2.5, 0))
+		end
+	end
 
-    tweenToDelivery(GetHRP().Position, deliveryPos)
+	tweenToDelivery(hrp.Position, deliveryPos)
 
-    -- Konum sabitleme
-    for _ = 1, 2 do
-        GetHRP().Anchored = true
-        GetHRP().CFrame = CFrame.new(0, -3e38, 0)
-        task.wait(0.1)
-        GetHRP().CFrame = CFrame.new(deliveryPos)
-        GetHRP().Anchored = false
-        task.wait(0.1)
-    end
+	for _ = 1, 2 do
+		hrp.Anchored = true
+		hrp.CFrame = CFrame.new(0, -3e38, 0)
+		task.wait(0.1)
+		hrp.CFrame = CFrame.new(deliveryPos)
+		hrp.Anchored = false
+		task.wait(0.1)
+	end
 
-    -- Teslim mesafe kontrol + Steal değişimi
-    local finalDist = (GetHRP().Position - deliveryPos).Magnitude
-    if finalDist <= 60 then
-        local steals = Players.LocalPlayer:FindFirstChild("leaderstats") and Players.LocalPlayer.leaderstats:FindFirstChild("Steals")
-        if steals then
-            local oldValue = steals.Value
-            steals:GetPropertyChangedSignal("Value"):Once(function()
-                if steals.Value > oldValue then
-                    showSuccessIcon()
-                else
-                    showFailIcon()
-                end
-            end)
-        end
-    else
-        showFailIcon()
-    end
+	local finalDist = (hrp.Position - deliveryPos).Magnitude
+	if finalDist <= 60 then
+		local steals = Players.LocalPlayer:FindFirstChild("leaderstats") and Players.LocalPlayer.leaderstats:FindFirstChild("Steals")
+		if steals then
+			local oldValue = steals.Value
+			steals:GetPropertyChangedSignal("Value"):Once(function()
+				if steals.Value > oldValue then
+					showSuccessIcon()
+				else
+					showFailIcon()
+				end
+			end)
+		end
+	else
+		showFailIcon()
+	end
 
-    ToggleGod(false)
+	ToggleGod(false)
 end
-
 
 -- Butonlar
 local b1 = createButton("TP to Base", 1)
