@@ -589,17 +589,25 @@ local function tweenMove(startPos, endPos)
         ping = net.Ping:GetValue()
     end
 
-    local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-    if not humanoid then return end
-
+    local hrp = GetHRP()
     local steps = 40 + math.floor(ping / 10)
     local delay = 1 / math.clamp(fps, 20, 120) * 1.2
+    local height = 6
+    local random = Random.new()
 
     for i = 1, steps do
         local t = i / steps
         local smooth = t * t * (3 - 2 * t)
-        local position = startPos:Lerp(endPos, smooth)
-        humanoid:MoveTo(position)
+        local pos = startPos:Lerp(endPos, smooth)
+        local vertical = math.sin(math.pi * smooth) * height
+        local jitter = Vector3.new(
+            random:NextNumber(-0.001, 0.001),
+            random:NextNumber(-0.001, 0.001),
+            random:NextNumber(-0.001, 0.001)
+        )
+
+        local finalPos = pos + Vector3.new(0, vertical, 0) + jitter
+        hrp.CFrame = CFrame.new(finalPos)
         task.wait(delay)
     end
 end
