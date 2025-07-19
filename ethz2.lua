@@ -291,10 +291,10 @@ local function createFullRectangle(name, cornerA, cornerB, cornerC, cornerD)
  local normal = edge1:Cross(edge2).Unit
 
  local part = Instance.new("Part")
- part.Size = Vector3.new(side1, 5, side2)
+ part.Size = Vector3.new(side1, 50, side2)
  part.Anchored = true
  part.CanCollide = false
- part.Transparency = 0.5
+ part.Transparency = 0.2
  part.Position = center
  part.Name = name
  part.Parent = workspace
