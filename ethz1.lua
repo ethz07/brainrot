@@ -387,7 +387,7 @@ local function TweenSteal()
 
     local startPos = hrp.Position
     local endPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
-    local height = 20  -- uçuş yüksekliği
+    local height = 9  -- uçuş yüksekliği
     local steps = 50 + math.floor(ping / 10) -- daha uzun uçuş
     local delay = 1 / fps * 1.2
 
