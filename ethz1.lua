@@ -279,6 +279,40 @@ closeButton2.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
 end)
 
+local godConn = {}
+
+local function ToggleGod(state)
+    local char = player.Character or player.CharacterAdded:Wait()
+    local h = char:FindFirstChildOfClass("Humanoid")
+    if not h then return end
+    for _, c in pairs(godConn) do
+        c:Disconnect()
+    end
+    godConn = {}
+
+    if state then
+        _G.God = true
+        table.insert(godConn, RunService.Stepped:Connect(function()
+            if _G.God and h.Health < h.MaxHealth then
+                h.Health = h.MaxHealth
+            end
+        end))
+        table.insert(godConn, h.HealthChanged:Connect(function(newHealth)
+            if _G.God and newHealth < h.MaxHealth then
+                h.Health = h.MaxHealth
+            end
+        end))
+        table.insert(godConn, h.Died:Connect(function()
+            if _G.God then
+                h.Health = h.MaxHealth
+                h:ChangeState(Enum.HumanoidStateType.Physics)
+            end
+        end))
+    else
+        _G.God = false
+    end
+end
+
 -- Kendi base'inin Purchases.PlotBlock.Hitbox'unu bulur
 local function getOwnPlotHitbox()
     for _, plot in ipairs(workspace.Plots:GetChildren()) do
@@ -326,6 +360,7 @@ local function DeliverBrainrot()
 end
 
 local function TweenSteal()
+	ToggleGod(true)
     local delivery
     for _, v in ipairs(workspace.Plots:GetDescendants()) do
         if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") then
@@ -392,6 +427,7 @@ local function TweenSteal()
     else
         warn("[TweenSteal]: ❌ Başarısız, mesafe:", math.floor(finalDist))
     end
+	ToggleGod(false)
 end
 
 local moving = false
