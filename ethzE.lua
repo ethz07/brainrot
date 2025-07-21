@@ -29,6 +29,7 @@ title.TextColor3 = Color3.new(1, 1, 1)
 title.TextSize = 18
 title.Size = UDim2.new(1, 0, 0, 35)
 title.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+title.Parent = frame
 
 local UICorner2 = Instance.new("UICorner", title)
 UICorner2.CornerRadius = UDim.new(0, 10)
