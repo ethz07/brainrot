@@ -44,29 +44,62 @@ local petData = {
     }
 }
 
-local petGui = Instance.new("ScreenGui", player.PlayerGui)
-petGui.Name = "PetESPMainGui"
-petGui.ResetOnSpawn = false
-petGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local mainGui = Instance.new("ScreenGui", player.PlayerGui)
+mainGui.Name = "PetESP_UI"
+mainGui.ResetOnSpawn = false
+mainGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-local petFrame = Instance.new("Frame", petGui)
-petFrame.Size = UDim2.new(0, 250, 0, 270)
-petFrame.Position = UDim2.new(0.1, 0, 0.15, 0)
-petFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-petFrame.BorderSizePixel = 0
-petFrame.Active = true
-petFrame.Draggable = true
-local petUICorner = Instance.new("UICorner", petFrame)
-petUICorner.CornerRadius = UDim.new(0, 12)
+local mainFrame = Instance.new("Frame", mainGui)
+mainFrame.Size = UDim2.new(0, 220, 0, 260)
+mainFrame.Position = UDim2.new(0.02, 0, 0.2, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
 
-local petTitle = Instance.new("TextLabel", petFrame)
-petTitle.Size = UDim2.new(1, 0, 0, 30)
-petTitle.Position = UDim2.new(0, 0, 0, 0)
-petTitle.BackgroundTransparency = 1
-petTitle.Text = "🐾 Pet ESP Menu"
-petTitle.Font = Enum.Font.FredokaOne
-petTitle.TextColor3 = Color3.new(1, 1, 1)
-petTitle.TextSize = 18
+local uicorner = Instance.new("UICorner", mainFrame)
+uicorner.CornerRadius = UDim.new(0, 10)
+
+local titleBar = Instance.new("Frame", mainFrame)
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+local titleCorner = Instance.new("UICorner", titleBar)
+titleCorner.CornerRadius = UDim.new(0, 10)
+
+local title = Instance.new("TextLabel", titleBar)
+title.Text = "Brainrot ESP"
+title.Font = Enum.Font.FredokaOne
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 16
+title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, -40, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- ✅ Minimize/Close
+local closeBtn = Instance.new("TextButton", titleBar)
+closeBtn.Text = "×"
+closeBtn.Font = Enum.Font.FredokaOne
+closeBtn.TextSize = 18
+closeBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+closeBtn.Size = UDim2.new(0, 30, 1, 0)
+closeBtn.Position = UDim2.new(1, -30, 0, 0)
+closeBtn.BackgroundTransparency = 1
+
+local minimized = false
+local contentFrame = Instance.new("ScrollingFrame", mainFrame)
+contentFrame.Size = UDim2.new(1, -10, 1, -40)
+contentFrame.Position = UDim2.new(0, 5, 0, 35)
+contentFrame.ScrollBarThickness = 5
+contentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+contentFrame.BackgroundTransparency = 1
+
+local listLayout = Instance.new("UIListLayout", contentFrame)
+listLayout.Padding = UDim.new(0, 4)
+
+closeBtn.MouseButton1Click:Connect(function()
+    mainGui:Destroy()
+end)
 
 local toggleStates = {}
 local openWindows = {}
@@ -116,154 +149,142 @@ for i, cat in ipairs(categories) do
     createToggleButton(cat, i)
 end
 
-local function createHighlight(targetName, category)
-    local target = workspace:FindFirstChild(targetName)
-    if not target then return end
+function highlightAll(name, category)
+    for _, inst in ipairs(workspace:GetDescendants()) do
+        if inst.Name == name and not inst:FindFirstChild("ESP_HL_"..category) then
+            local hl = Instance.new("Highlight")
+            hl.Name = "ESP_HL_" .. category
+            hl.FillColor = Color3.fromRGB(0, 255, 0)
+            hl.FillTransparency = 0.65
+            hl.OutlineColor = Color3.new(1, 1, 1)
+            hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            hl.Adornee = inst
+            hl.Parent = inst
 
-    if target:FindFirstChild("ESP_HL_" .. category) then return end
+            local tag = Instance.new("BillboardGui", inst)
+            tag.Name = "ESP_NAME_" .. category
+            tag.Adornee = inst
+            tag.Size = UDim2.new(0, 120, 0, 20)
+            tag.StudsOffset = Vector3.new(0, 2.5, 0)
+            tag.AlwaysOnTop = true
 
-    local hl = Instance.new("Highlight")
-    hl.Name = "ESP_HL_" .. category
-    hl.FillColor = Color3.fromRGB(0, 255, 0)
-    hl.FillTransparency = 0.65
-    hl.OutlineColor = Color3.new(1, 1, 1)
-    hl.OutlineTransparency = 0
-    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    hl.Adornee = target
-    hl.Parent = target
-
-    local tag = Instance.new("BillboardGui", target)
-    tag.Name = "ESP_NAME_" .. category
-    tag.Adornee = target
-    tag.Size = UDim2.new(0, 120, 0, 20)
-    tag.StudsOffset = Vector3.new(0, 2.5, 0)
-    tag.AlwaysOnTop = true
-
-    local text = Instance.new("TextLabel", tag)
-    text.Size = UDim2.new(1, 0, 1, 0)
-    text.BackgroundTransparency = 1
-    text.Text = target.Name
-    text.Font = Enum.Font.FredokaOne
-    text.TextColor3 = Color3.new(1, 1, 1)
-    text.TextStrokeColor3 = Color3.new(0, 0, 0)
-    text.TextStrokeTransparency = 0.3
-    text.TextScaled = true
+            local label = Instance.new("TextLabel", tag)
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.Text = inst.Name
+            label.TextColor3 = Color3.fromRGB(255,255,255)
+            label.Font = Enum.Font.FredokaOne
+            label.TextScaled = true
+        end
+    end
 end
 
-function clearPetHighlights(category)
+function clearHighlightsForCategory(category)
     for _, obj in ipairs(workspace:GetDescendants()) do
-        if obj:IsA("Highlight") and obj.Name == "ESP_HL_" .. category then
+        if obj:IsA("Highlight") and obj.Name:match("ESP_HL_"..category) then
             obj:Destroy()
-        end
-        if obj:IsA("BillboardGui") and obj.Name == "ESP_NAME_" .. category then
+        elseif obj:IsA("BillboardGui") and obj.Name:match("ESP_NAME_"..category) then
             obj:Destroy()
         end
     end
 end
 
-function createPetListWindow(petType)
+function createPetWindow(category)
     local gui = Instance.new("ScreenGui", player.PlayerGui)
-    gui.Name = petType .. "_PetListGui"
+    gui.Name = category .. "_Window"
 
-    local frame = Instance.new("Frame", gui)
-    frame.Size = UDim2.new(0, 250, 0, 280)
-    frame.Position = UDim2.new(0.4, math.random(-100,100), 0.25, math.random(-50,50))
-    frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    frame.BorderSizePixel = 0
-    frame.Active = true
-    frame.Draggable = true
-    local corner = Instance.new("UICorner", frame)
-    corner.CornerRadius = UDim.new(0, 12)
+    local win = Instance.new("Frame", gui)
+    win.Size = UDim2.new(0, 200, 0, 240)
+    win.Position = UDim2.new(0.25, math.random(-50,50), 0.25, math.random(-30,30))
+    win.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    win.Active = true
+    win.Draggable = true
+    Instance.new("UICorner", win).CornerRadius = UDim.new(0, 10)
 
-    local top = Instance.new("Frame", frame)
+    local top = Instance.new("Frame", win)
     top.Size = UDim2.new(1, 0, 0, 30)
     top.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    top.BorderSizePixel = 0
-    local topCorner = Instance.new("UICorner", top)
-    topCorner.CornerRadius = UDim.new(0, 12)
+    Instance.new("UICorner", top).CornerRadius = UDim.new(0, 10)
 
     local close = Instance.new("TextButton", top)
     close.Text = "×"
     close.Font = Enum.Font.FredokaOne
     close.TextSize = 18
-    close.TextColor3 = Color3.new(1, 0.2, 0.2)
-    close.Size = UDim2.new(0, 30, 0, 30)
+    close.TextColor3 = Color3.fromRGB(255, 80, 80)
+    close.Size = UDim2.new(0, 30, 1, 0)
     close.Position = UDim2.new(1, -30, 0, 0)
     close.BackgroundTransparency = 1
 
-    local title = Instance.new("TextLabel", top)
-    title.Text = petType .. " Pets"
-    title.Font = Enum.Font.FredokaOne
-    title.TextColor3 = Color3.new(1, 1, 1)
-    title.Size = UDim2.new(1, -30, 1, 0)
-    title.Position = UDim2.new(0, 10, 0, 0)
-    title.BackgroundTransparency = 1
-    title.TextXAlignment = Enum.TextXAlignment.Left
-    title.TextSize = 15
-
-    local scroll = Instance.new("ScrollingFrame", frame)
-    scroll.Size = UDim2.new(1, -10, 1, -40)
-    scroll.Position = UDim2.new(0, 5, 0, 35)
-    scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    local scroll = Instance.new("ScrollingFrame", win)
+    scroll.Size = UDim2.new(1, -10, 1, -35)
+    scroll.Position = UDim2.new(0, 5, 0, 30)
     scroll.ScrollBarThickness = 5
+    scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
     scroll.BackgroundTransparency = 1
-
     local layout = Instance.new("UIListLayout", scroll)
-    layout.Padding = UDim.new(0, 4)
+    layout.Padding = UDim.new(0, 3)
 
-    local data = petData[petType]
-
-    for _, item in ipairs(data) do
-        local petName, value = nil, nil
-        if typeof(item) == "string" then
-            petName = item
-        elseif typeof(item) == "table" then
-            petName = item.name
-            value = item.value
-        end
-
+    for _, item in ipairs(petData[category]) do
+        local name, val = item.name or item, item.value
         local btn = Instance.new("TextButton", scroll)
-        btn.Size = UDim2.new(1, 0, 0, 30)
-        btn.Text = petName
+        btn.Size = UDim2.new(1, 0, 0, 38)
+        btn.BackgroundColor3 = Color3.fromRGB(50, 60, 85)
+        btn.Text = name
         btn.Font = Enum.Font.FredokaOne
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
+        btn.TextColor3 = Color3.new(1,1,1)
         btn.TextSize = 14
-        local c = Instance.new("UICorner", btn)
-        c.CornerRadius = UDim.new(0, 8)
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-        if value then
-            local val = Instance.new("TextLabel", btn)
-            val.Text = value
-            val.Font = Enum.Font.FredokaOne
-            val.TextColor3 = Color3.fromRGB(255, 225, 0)
-            val.TextStrokeColor3 = Color3.new(0,0,0)
-            val.TextStrokeTransparency = 0.3
-            val.Size = UDim2.new(1, 0, 1, 0)
-            val.Position = UDim2.new(0, 0, 0, 0)
-            val.BackgroundTransparency = 1
-            val.TextXAlignment = Enum.TextXAlignment.Right
-            val.TextSize = 12
+        if val then
+            local valLbl = Instance.new("TextLabel", btn)
+            valLbl.Text = val
+            valLbl.Font = Enum.Font.FredokaOne
+            valLbl.TextColor3 = Color3.fromRGB(255, 225, 0)
+            valLbl.TextStrokeColor3 = Color3.new(0,0,0)
+            valLbl.TextStrokeTransparency = 0.3
+            valLbl.Size = UDim2.new(1, -6, 0, 12)
+            valLbl.Position = UDim2.new(0, 3, 1, -12)
+            valLbl.BackgroundTransparency = 1
+            valLbl.TextScaled = true
         end
 
         btn.MouseButton1Click:Connect(function()
-            createHighlight(petName, petType)
+            highlightAll(name, category)
         end)
     end
-
-    scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+    scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y+6)
 
     close.MouseButton1Click:Connect(function()
         gui:Destroy()
-        toggleStates[petType] = false
-        local circle = petFrame:FindFirstChild(petType .. "_Indicator")
-        if circle then
-            circle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        end
-        clearPetHighlights(petType)
+        toggleStates[category] = false
+        clearHighlightsForCategory(category)
     end)
-
-    return gui
 end
+
+local i = 0
+for cat, _ in pairs(petData) do
+    i += 1
+    local btn = Instance.new("TextButton", contentFrame)
+    btn.Size = UDim2.new(1, 0, 0, 30)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.Text = cat .. " ESP"
+    btn.Font = Enum.Font.FredokaOne
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.TextSize = 13
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+    btn.MouseButton1Click:Connect(function()
+        toggleStates[cat] = not toggleStates[cat]
+        if toggleStates[cat] then
+            createPetWindow(cat)
+        else
+            clearHighlightsForCategory(cat)
+        end
+    end)
+end
+
+contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y+6)
+print("✨ GUI yüklendi")
+
 
 print("working")
