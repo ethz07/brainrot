@@ -2,45 +2,6 @@ local Players = game:GetService("Players") local RunService = game:GetService("R
 
 local SoundService = game:GetService("SoundService")
 
--- Bildirim sesi
-local function playNotifySound()
-	local sound = Instance.new("Sound", SoundService)
-	sound.SoundId = "rbxassetid://9118823102" -- Bildirim sesi örneği
-	sound.Volume = 1
-	sound:Play()
-	game.Debris:AddItem(sound, 3)
-end
-
--- Sağ alttan görsel bildirim
-local function notifyPetSpawn(petName)
-	local screenGui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
-	screenGui.Name = "EthzNotification"
-	screenGui.ResetOnSpawn = false
-
-	local frame = Instance.new("Frame", screenGui)
-	frame.Size = UDim2.new(0, 230, 0, 40)
-	frame.Position = UDim2.new(1, -240, 1, -50)
-	frame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-	frame.BorderSizePixel = 0
-	Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
-
-	local text = Instance.new("TextLabel", frame)
-	text.Size = UDim2.new(1, -10, 1, 0)
-	text.Position = UDim2.new(0, 5, 0, 0)
-	text.BackgroundTransparency = 1
-	text.Text = "Yeni Pet Geldi: " .. petName
-	text.Font = Enum.Font.FredokaOne
-	text.TextColor3 = Color3.fromRGB(255, 255, 255)
-	text.TextScaled = true
-
-	playNotifySound()
-
-	-- Otomatik yok etme
-	delay(5, function()
-		screenGui:Destroy()
-	end)
-end
-
 local petData = { Common = { {"Noobini Pizzanini"}, {"Lirilì Larilà"}, {"Tim Cheese"}, {"Fluriflura"}, {"Svinina Bombardino"}, {"Pipi Kiwi"} }, Rare = { {"Trippi Troppi"}, {"Tung Tung Tung Sahur"}, {"Gangster Footera"}, {"Bandito Bobritto"}, {"Boneca Ambalabu"}, {"Cacto Hipopotamo"}, {"Ta Ta Ta Ta Sahur"}, {"Tric Trac Baraboom"} }, Epic = { {"Cappuccino Assassino"}, {"Brr Brr Patapim"}, {"Trulimero Trulicina"}, {"Bambini Crostini"}, {"Bananita Dolphinita"}, {"Perochello Lemonchello"}, {"Brri Brri Bicus Dicus Bombicus"}, {"Avocadini Guffo"} }, Legendary = { {"Burbaloni Loliloli"}, {"Chimpanzini Bananini"}, {"Ballerina Cappuccina"}, {"Chef Crabracadabra"}, {"Lionel Cactuseli"}, {"Glorbo Fruttodrillo"}, {"Blueberrinni Octopusini"}, {"Strawberrelli Flamingelli"}, {"Pandaccini Bananini"} }, Mythic = { {"Mythic Lucky Block"}, {"Frigo Camelo"}, {"Orangutini Ananassini"}, {"Rhino Toasterino"}, {"Bombardiro Crocodilo"}, {"Bombombini Gusini"}, {"Cavallo Virtuoso"}, {"Spioniro Golubiro"}, {"Zibra Zubra Zibralini"}, {"Tigrilini Watermelini"} }, BrainrotGod = { {"Brainrot God Lucky Block"}, {"Cocofanto Elefanto", "$10K/s"}, {"Girafa Celestre", "$20K/s"}, {"Gattatino Neonino", "$25K/s"}, {"Matteo", "$50K/s"}, {"Tralalero Tralala", "$50K/s"}, {"Tigroligre Frutonni", "$60K/s"}, {"Espresso Signora", "$70K/s"}, {"Odin Din Din Dun", "$75K/s"}, {"Statutino Libertino", "$75K/s"}, {"Orcalero Orcala", "$100K/s"}, {"Trenostruzzo Turbo 3000", "$150K/s"}, {"Ballerino Lololo", "$200K/s"} }, Secret = { {"Secret Lucky Block"}, {"La Vacca Saturno Saturnita", "$250K/s"}, {"Chimpanzini Spiderini", "$325K/s"}, {"Torrtuginni Dragonfrutini", "$350K/s"}, {"Los Tralaleritos", "$500K/s"}, {"Las Tralaleritas", "$650K/s"}, {"Graipuss Medussi", "$1M/s"}, {"Pot Hotspot", "$2.5M/s"}, {"La Grande Combinasion", "$10M/s"}, {"Nuclearo Dinossauro", "$15M/s"}, {"Garama and Madundung", "$50M/s"} } }
 
 local openPetGUIs = {}
@@ -78,27 +39,6 @@ local h = Instance.new("Highlight")
 end
 
 end
-
-local knownPets = {}
-
-RunService.Heartbeat:Connect(function()
-	for _, model in pairs(workspace:GetDescendants()) do
-		if model:IsA("Model") and not knownPets[model] then
-			for category, pets in pairs(petData) do
-				for _, entry in ipairs(pets) do
-					local petName = typeof(entry) == "table" and entry[1] or entry
-					if model.Name == petName then
-						if categoryToggles[category] then
-							knownPets[model] = true
-							createESP(model.Name)
-							showNotification("Yeni Pet Geldi: " .. petName)
-						end
-					end
-				end
-			end
-		end
-	end
-end)
 
 local function createPetListGUI(category, pets) if openPetGUIs[category] then openPetGUIs[category]:Destroy() openPetGUIs[category] = nil return end
 
@@ -333,6 +273,66 @@ local function createMainGUI()
         gui:Destroy()
     end)
 end
+
+-- Bildirim sesi
+local function playNotifySound()
+	local sound = Instance.new("Sound", SoundService)
+	sound.SoundId = "rbxassetid://9118823102" -- Bildirim sesi örneği
+	sound.Volume = 1
+	sound:Play()
+	game.Debris:AddItem(sound, 3)
+end
+
+-- Sağ alttan görsel bildirim
+local function notifyPetSpawn(petName)
+	local screenGui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
+	screenGui.Name = "EthzNotification"
+	screenGui.ResetOnSpawn = false
+
+	local frame = Instance.new("Frame", screenGui)
+	frame.Size = UDim2.new(0, 230, 0, 40)
+	frame.Position = UDim2.new(1, -240, 1, -50)
+	frame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+	frame.BorderSizePixel = 0
+	Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
+
+	local text = Instance.new("TextLabel", frame)
+	text.Size = UDim2.new(1, -10, 1, 0)
+	text.Position = UDim2.new(0, 5, 0, 0)
+	text.BackgroundTransparency = 1
+	text.Text = "Yeni Pet Geldi: " .. petName
+	text.Font = Enum.Font.FredokaOne
+	text.TextColor3 = Color3.fromRGB(255, 255, 255)
+	text.TextScaled = true
+
+	playNotifySound()
+
+	-- Otomatik yok etme
+	delay(5, function()
+		screenGui:Destroy()
+	end)
+end
+
+local knownPets = {}
+
+RunService.Heartbeat:Connect(function()
+	for _, model in pairs(workspace:GetDescendants()) do
+		if model:IsA("Model") and not knownPets[model] then
+			for category, pets in pairs(petData) do
+				for _, entry in ipairs(pets) do
+					local petName = typeof(entry) == "table" and entry[1] or entry
+					if model.Name == petName then
+						if categoryToggles[category] then
+							knownPets[model] = true
+							createESP(model.Name)
+							showNotification("Yeni Pet Geldi: " .. petName)
+						end
+					end
+				end
+			end
+		end
+	end
+end)
 
 createMainGUI()
 print("zzz")
