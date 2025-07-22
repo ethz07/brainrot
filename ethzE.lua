@@ -94,115 +94,116 @@ local function clearESP(name)
 	end
 	end
 
+local function applyESPToModel(model, name, category)
+	local tag = Instance.new("BillboardGui")
+	tag.Name = "PetESPLabel"
+	tag.Adornee = model
+	tag.Size = UDim2.new(0, 100, 0, 20)
+	tag.StudsOffset = Vector3.new(0, 2.5, 0)
+	tag.AlwaysOnTop = true
+	tag.LightInfluence = 0
+	tag.Parent = model
+
+	local lbl = Instance.new("TextLabel", tag)
+	lbl.Size = UDim2.new(1, 0, 1, 0)
+	lbl.BackgroundTransparency = 1
+	lbl.Font = Enum.Font.FredokaOne
+	lbl.TextScaled = true
+	lbl.RichText = true
+
+	local lineColor1, lineColor2 = Color3.new(1,1,1), Color3.new(1,1,1)
+
+	if category == "Secret" then
+		lbl.Text = name
+		lbl.TextColor3 = Color3.fromRGB(0, 0, 0)
+		lbl.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+		lbl.TextStrokeTransparency = 0
+		lineColor1 = Color3.fromRGB(255,255,255)
+		lineColor2 = Color3.fromRGB(0,0,0)
+
+	elseif category == "BrainrotGod" then
+		lbl.Text = rainbowifyText(name)
+		lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+		lbl.TextStrokeTransparency = 0.2
+
+	else
+		if category == "Common" then
+			lineColor1 = Color3.fromRGB(100, 100, 150)
+			lineColor2 = Color3.fromRGB(150, 150, 200)
+		elseif category == "Rare" then
+			lineColor1 = Color3.fromRGB(80, 120, 200)
+			lineColor2 = Color3.fromRGB(120, 160, 255)
+		elseif category == "Epic" then
+			lineColor1 = Color3.fromRGB(180, 70, 255)
+			lineColor2 = Color3.fromRGB(210, 100, 255)
+		elseif category == "Legendary" then
+			lineColor1 = Color3.fromRGB(255, 215, 0)
+			lineColor2 = Color3.fromRGB(255, 235, 100)
+		elseif category == "Mythic" then
+			lineColor1 = Color3.fromRGB(200, 50, 50)
+			lineColor2 = Color3.fromRGB(255, 100, 100)
+		end
+		lbl.Text = name
+		lbl.TextColor3 = lineColor2
+		lbl.TextStrokeColor3 = lineColor1
+		lbl.TextStrokeTransparency = 0
+	end
+
+	local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+	local primaryPart = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+	if root and primaryPart then
+		local petAttachment = Instance.new("Attachment", primaryPart)
+		petAttachment.Name = "PetESP_Attachment"
+
+		local playerAttachmentName = "PlayerESP_Attachment_" .. name .. "_" .. tostring(math.random(100000))
+		local playerAttachment = Instance.new("Attachment")
+		playerAttachment.Name = playerAttachmentName
+		playerAttachment.Position = Vector3.new(0, 0, 0)
+		playerAttachment.Parent = root
+
+		local beam = Instance.new("Beam")
+		beam.Name = "PetESP_Beam"
+		beam.Attachment0 = playerAttachment
+		beam.Attachment1 = petAttachment
+		beam.FaceCamera = true
+		beam.Width0 = 0.15
+		beam.Width1 = 0.15
+		beam.Transparency = NumberSequence.new(0.4)
+
+		if category == "BrainrotGod" then
+			local colors = {}
+			for i = 0, 1, 0.2 do
+				local hsv = Color3.fromHSV(i, 1, 1)
+				table.insert(colors, ColorSequenceKeypoint.new(i, hsv))
+			end
+			beam.Color = ColorSequence.new(colors)
+		elseif category == "Secret" then
+			beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+			}
+			beam.Transparency = NumberSequence.new(0.5)
+		else
+			beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0, lineColor1),
+				ColorSequenceKeypoint.new(1, lineColor2)
+			}
+		end
+
+		beam.Parent = primaryPart
+	end
+	end
+
 local function createESP(name, category)
-	for _, model in pairs(Workspace:GetChildren()) do
-		if model:IsA("Model") and model.Name == name then
-			if model:FindFirstChild("PetESPLabel") then
-				-- Bu modelde ESP zaten var, diğerine geç
-				else
-			-- Billboard GUI
-			local tag = Instance.new("BillboardGui")
-			tag.Name = "PetESPLabel"
-			tag.Adornee = model
-			tag.Size = UDim2.new(0, 100, 0, 20)
-			tag.StudsOffset = Vector3.new(0, 2.5, 0)
-			tag.AlwaysOnTop = true
-			tag.LightInfluence = 0
-			tag.Parent = model
-
-			local lbl = Instance.new("TextLabel", tag)
-			lbl.Size = UDim2.new(1, 0, 1, 0)
-			lbl.BackgroundTransparency = 1
-			lbl.Font = Enum.Font.FredokaOne
-			lbl.TextScaled = true
-			lbl.RichText = true
-
-			-- Renkler
-			local lineColor1, lineColor2 = Color3.new(1,1,1), Color3.new(1,1,1)
-
-			if category == "Secret" then
-				lbl.Text = name
-				lbl.TextColor3 = Color3.fromRGB(0, 0, 0)
-				lbl.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-				lbl.TextStrokeTransparency = 0
-				lineColor1 = Color3.fromRGB(255,255,255)
-				lineColor2 = Color3.fromRGB(0,0,0)
-
-			elseif category == "BrainrotGod" then
-				lbl.Text = rainbowifyText(name)
-				lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-				lbl.TextStrokeTransparency = 0.2
-
-			else
-				if category == "Common" then
-					lineColor1 = Color3.fromRGB(100, 100, 150)
-					lineColor2 = Color3.fromRGB(150, 150, 200)
-				elseif category == "Rare" then
-					lineColor1 = Color3.fromRGB(80, 120, 200)
-					lineColor2 = Color3.fromRGB(120, 160, 255)
-				elseif category == "Epic" then
-					lineColor1 = Color3.fromRGB(180, 70, 255)
-					lineColor2 = Color3.fromRGB(210, 100, 255)
-				elseif category == "Legendary" then
-					lineColor1 = Color3.fromRGB(255, 215, 0)
-					lineColor2 = Color3.fromRGB(255, 235, 100)
-				elseif category == "Mythic" then
-					lineColor1 = Color3.fromRGB(200, 50, 50)
-					lineColor2 = Color3.fromRGB(255, 100, 100)
+	for _, obj in pairs(Workspace:GetChildren()) do
+		if obj:IsA("Folder") then
+			for _, model in pairs(obj:GetChildren()) do
+				if model:IsA("Model") and model.Name == name and not model:FindFirstChild("PetESPLabel") then
+					applyESPToModel(model, name, category)
 				end
-				lbl.Text = name
-				lbl.TextColor3 = lineColor2
-				lbl.TextStrokeColor3 = lineColor1
-				lbl.TextStrokeTransparency = 0
 			end
-
-			-- Line (Beam)
-			local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-			local primaryPart = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
-			if root and primaryPart then
-				local petAttachment = Instance.new("Attachment", primaryPart)
-				petAttachment.Name = "PetESP_Attachment"
-
-				local playerAttachmentName = "PlayerESP_Attachment_" .. name
-				local old = root:FindFirstChild(playerAttachmentName)
-				if old then old:Destroy() end
-
-				local playerAttachment = Instance.new("Attachment")
-				playerAttachment.Name = playerAttachmentName
-				playerAttachment.Position = Vector3.new(0, 0, 0)
-				playerAttachment.Parent = root
-
-				local beam = Instance.new("Beam")
-				beam.Name = "PetESP_Beam"
-				beam.Attachment0 = playerAttachment
-				beam.Attachment1 = petAttachment
-				beam.FaceCamera = true
-				beam.Width0 = 0.15
-				beam.Width1 = 0.15
-				beam.Transparency = NumberSequence.new(0.4)
-
-				if category == "BrainrotGod" then
-					local colors = {}
-					for i = 0, 1, 0.2 do
-						local hsv = Color3.fromHSV(i, 1, 1)
-						table.insert(colors, ColorSequenceKeypoint.new(i, hsv))
-					end
-					beam.Color = ColorSequence.new(colors)
-				elseif category == "Secret" then
-					beam.Color = ColorSequence.new{
-						ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
-					}
-					beam.Transparency = NumberSequence.new(0.5)
-				else
-					beam.Color = ColorSequence.new{
-						ColorSequenceKeypoint.new(0, lineColor1),
-						ColorSequenceKeypoint.new(1, lineColor2)
-					}
-				end
-
-				beam.Parent = primaryPart
-			end
+		elseif obj:IsA("Model") and obj.Name == name and not obj:FindFirstChild("PetESPLabel") then
+			applyESPToModel(obj, name, category)
 		end
 	end
 	end
