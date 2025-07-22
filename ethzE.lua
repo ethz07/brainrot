@@ -337,7 +337,7 @@ local function createMainGUI()
     gui.ResetOnSpawn = false
 
     local frame = Instance.new("Frame", gui)
-    frame.Size = UDim2.new(0, 260, 0, 295)
+    frame.Size = UDim2.new(0, 260, 0, 310)
     frame.Position = UDim2.new(0.5, -130, 1, -270)
     frame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
     frame.Active = true
@@ -421,6 +421,18 @@ local function createMainGUI()
         toggle.BorderColor3 = Color3.fromRGB(0, 0, 0)
         Instance.new("UICorner", toggle).CornerRadius = UDim.new(1, 0)
 
+	local footer = Instance.new("TextLabel", frame)
+        footer.Text = "made by _ethz on discord"
+        footer.Font = Enum.Font.FredokaOne
+        footer.TextColor3 = Color3.fromRGB(180, 180, 180)
+        footer.TextSize = 12
+        footer.BackgroundTransparency = 1
+        footer.Size = UDim2.new(1, 0, 0, 20)
+        footer.Position = UDim2.new(0, 0, 1, -20)
+        footer.TextStrokeTransparency = 0.8
+        footer.TextYAlignment = Enum.TextYAlignment.Center
+        footer.TextXAlignment = Enum.TextXAlignment.Center
+
         local state = false
         btn.MouseButton1Click:Connect(function()
             state = not state
@@ -433,7 +445,7 @@ local function createMainGUI()
     minimizeButton.MouseButton1Click:Connect(function()
         minimized = not minimized
         content.Visible = not minimized
-        frame.Size = minimized and UDim2.new(0, 260, 0, 35) or UDim2.new(0, 260, 0, 295)
+        frame.Size = minimized and UDim2.new(0, 260, 0, 35) or UDim2.new(0, 260, 0, 310)
     end)
 
     closeButton.MouseButton1Click:Connect(function()
