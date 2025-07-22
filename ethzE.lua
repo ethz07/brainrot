@@ -73,11 +73,9 @@ local openPetGUIs = {}
 local function clearESP(name)
 	for _, model in pairs(Workspace:GetChildren()) do
 		if model:IsA("Model") and model.Name == name then
-			-- Etiket
 			local label = model:FindFirstChild("PetESPLabel")
 			if label then label:Destroy() end
 
-			-- Beam & Attachments
 			local part = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
 			if part then
 				local beam = part:FindFirstChild("PetESP_Beam")
@@ -87,10 +85,9 @@ local function clearESP(name)
 				if att then att:Destroy() end
 			end
 
-			-- Oyuncu tarafındaki attachment
 			local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 			if root then
-				local playerAtt = root:FindFirstChild("PlayerESP_Attachment")
+				local playerAtt = root:FindFirstChild("PlayerESP_Attachment_" .. name)
 				if playerAtt then playerAtt:Destroy() end
 			end
 		end
@@ -132,10 +129,8 @@ local function createESP(name, category)
 				lbl.Text = rainbowifyText(name)
 				lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 				lbl.TextStrokeTransparency = 0.2
-				-- Renk karışık olacak, beam kısmında özel ayarlanır
 
 			else
-				-- Kategoriye göre renk belirle
 				if category == "Common" then
 					lineColor1 = Color3.fromRGB(100, 100, 150)
 					lineColor2 = Color3.fromRGB(150, 150, 200)
@@ -165,8 +160,12 @@ local function createESP(name, category)
 				local petAttachment = Instance.new("Attachment", primaryPart)
 				petAttachment.Name = "PetESP_Attachment"
 
+				local playerAttachmentName = "PlayerESP_Attachment_" .. name
+				local old = root:FindFirstChild(playerAttachmentName)
+				if old then old:Destroy() end
+
 				local playerAttachment = Instance.new("Attachment")
-				playerAttachment.Name = "PlayerESP_Attachment"
+				playerAttachment.Name = playerAttachmentName
 				playerAttachment.Position = Vector3.new(0, 0, 0)
 				playerAttachment.Parent = root
 
@@ -445,7 +444,21 @@ local function createMainGUI()
 
 	closeButton.MouseButton1Click:Connect(function()
 		gui:Destroy()
-	end)
+				closeButton.MouseButton1Click:Connect(function()
+	gui:Destroy()
+
+	-- Tüm aktif ESP'leri temizle
+	for petName, _ in pairs(activePetNames) do
+		clearESP(petName)
+	end
+	activePetNames = {}
+
+	-- Açık alt pet listelerini kapat
+	for _, petGui in pairs(openPetGUIs) do
+		if petGui then petGui:Destroy() end
+	end
+	openPetGUIs = {}
+end)
 	end
 
 function sendNotification(title, text, duration)
@@ -469,7 +482,7 @@ local knownPets = {} -- ?
 
 task.spawn(function()
 	while true do
-		for petName, _ in pairs(activePetNames) do
+		for petName, category in pairs(activePetNames) do
 			for _, model in pairs(Workspace:GetChildren()) do
 				if model:IsA("Model") and model.Name == petName and not model:FindFirstChild("PetESPLabel") then
 					createESP(petName, category)
