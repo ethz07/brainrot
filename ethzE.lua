@@ -484,3 +484,4 @@ end)
 
 createMainGUI()
 print("ZzZzZ")
+print("by _ethz on discord!")
