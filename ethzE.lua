@@ -438,7 +438,7 @@ local knownPets = {} -- ?
 
 task.spawn(function()
 	while true do
-		for petName, _ in pairs(activePetNames) do
+		for petName, category in pairs(activePetNames) do
 			for _, model in pairs(Workspace:GetChildren()) do
 				if model:IsA("Model") and model.Name == petName and not model:FindFirstChild("PetESPLabel") then
 					createESP(petName, category)
