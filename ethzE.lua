@@ -72,13 +72,12 @@ local openPetGUIs = {}
 
 local function clearESP(name)
 	for _, model in pairs(Workspace:GetChildren()) do
-		if model:IsA("Model") and model.Name == name and not model:FindFirstChild("PetESPLabel") then
-			local esp = model:FindFirstChild("PetESP")
-			if esp then esp:Destroy() end
-
+		if model:IsA("Model") and model.Name == name then
+			-- Etiket
 			local label = model:FindFirstChild("PetESPLabel")
 			if label then label:Destroy() end
 
+			-- Beam & Attachments
 			local part = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
 			if part then
 				local beam = part:FindFirstChild("PetESP_Beam")
@@ -88,6 +87,7 @@ local function clearESP(name)
 				if att then att:Destroy() end
 			end
 
+			-- Oyuncu tarafındaki attachment
 			local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 			if root then
 				local playerAtt = root:FindFirstChild("PlayerESP_Attachment")
@@ -98,7 +98,7 @@ local function clearESP(name)
 	end
 
 local function createESP(name, category)
-	for _, model in pairs(Workspace:GetDescendants()) do
+	for _, model in pairs(Workspace:GetChildren()) do
 		if model:IsA("Model") and model.Name == name and not model:FindFirstChild("PetESPLabel") then
 			-- Billboard GUI
 			local tag = Instance.new("BillboardGui")
@@ -117,10 +117,48 @@ local function createESP(name, category)
 			lbl.TextScaled = true
 			lbl.RichText = true
 
-			local textColor = Color3.new(1, 1, 1) -- varsayılan beyaz
-			local strokeColor = Color3.fromRGB(30, 30, 30)
+			-- Renkler
+			local lineColor1, lineColor2 = Color3.new(1,1,1), Color3.new(1,1,1)
 
-			-- Line ESP (Beam)
+			if category == "Secret" then
+				lbl.Text = name
+				lbl.TextColor3 = Color3.fromRGB(0, 0, 0)
+				lbl.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+				lbl.TextStrokeTransparency = 0
+				lineColor1 = Color3.fromRGB(255,255,255)
+				lineColor2 = Color3.fromRGB(0,0,0)
+
+			elseif category == "BrainrotGod" then
+				lbl.Text = rainbowifyText(name)
+				lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+				lbl.TextStrokeTransparency = 0.2
+				-- Renk karışık olacak, beam kısmında özel ayarlanır
+
+			else
+				-- Kategoriye göre renk belirle
+				if category == "Common" then
+					lineColor1 = Color3.fromRGB(100, 100, 150)
+					lineColor2 = Color3.fromRGB(150, 150, 200)
+				elseif category == "Rare" then
+					lineColor1 = Color3.fromRGB(80, 120, 200)
+					lineColor2 = Color3.fromRGB(120, 160, 255)
+				elseif category == "Epic" then
+					lineColor1 = Color3.fromRGB(180, 70, 255)
+					lineColor2 = Color3.fromRGB(210, 100, 255)
+				elseif category == "Legendary" then
+					lineColor1 = Color3.fromRGB(255, 215, 0)
+					lineColor2 = Color3.fromRGB(255, 235, 100)
+				elseif category == "Mythic" then
+					lineColor1 = Color3.fromRGB(200, 50, 50)
+					lineColor2 = Color3.fromRGB(255, 100, 100)
+				end
+				lbl.Text = name
+				lbl.TextColor3 = lineColor2
+				lbl.TextStrokeColor3 = lineColor1
+				lbl.TextStrokeTransparency = 0
+			end
+
+			-- Line (Beam)
 			local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 			local primaryPart = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
 			if root and primaryPart then
@@ -137,73 +175,28 @@ local function createESP(name, category)
 				beam.Attachment0 = playerAttachment
 				beam.Attachment1 = petAttachment
 				beam.FaceCamera = true
-				beam.Width0 = 0.45
-				beam.Width1 = 0.45
+				beam.Width0 = 0.15
+				beam.Width1 = 0.15
 				beam.Transparency = NumberSequence.new(0.4)
 
-				if category == "Secret" then
+				if category == "BrainrotGod" then
+					local colors = {}
+					for i = 0, 1, 0.2 do
+						local hsv = Color3.fromHSV(i, 1, 1)
+						table.insert(colors, ColorSequenceKeypoint.new(i, hsv))
+					end
+					beam.Color = ColorSequence.new(colors)
+				elseif category == "Secret" then
 					beam.Color = ColorSequence.new{
 						ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
 						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
 					}
 					beam.Transparency = NumberSequence.new(0.5)
-					lbl.Text = name
-					lbl.TextColor3 = Color3.fromRGB(0, 0, 0)
-					lbl.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-					lbl.TextStrokeTransparency = 0
-				elseif category == "BrainrotGod" then
-					local colors = {}
-					for i = 0, 1, 0.2 do
-						table.insert(colors, ColorSequenceKeypoint.new(i, Color3.fromHSV(i, 1, 1)))
-					end
-					beam.Color = ColorSequence.new(colors)
-					lbl.Text = rainbowifyText(name)
-					lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-					lbl.TextStrokeTransparency = 0.2
 				else
-					-- Renk belirleme
-					if category == "Mythic" then
-						textColor = Color3.fromRGB(255, 60, 60)
-						beam.Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 0, 0)),
-							ColorSequenceKeypoint.new(1, textColor)
-						}
-					elseif category == "Legendary" then
-						textColor = Color3.fromRGB(255, 255, 100)
-						beam.Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),
-							ColorSequenceKeypoint.new(1, textColor)
-						}
-					elseif category == "Epic" then
-						textColor = Color3.fromRGB(180, 80, 255)
-						beam.Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 0, 180)),
-							ColorSequenceKeypoint.new(1, textColor)
-						}
-					elseif category == "Rare" then
-						textColor = Color3.fromRGB(100, 130, 255)
-						beam.Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 70, 150)),
-							ColorSequenceKeypoint.new(1, textColor)
-						}
-					elseif category == "Common" then
-						textColor = Color3.fromRGB(180, 180, 180)
-						beam.Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 90)),
-							ColorSequenceKeypoint.new(1, textColor)
-						}
-					else
-						textColor = Color3.fromRGB(255, 255, 255)
-						beam.Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 180, 180)),
-							ColorSequenceKeypoint.new(1, textColor)
-						}
-					end
-
-					lbl.Text = name
-					lbl.TextColor3 = textColor
-					lbl.TextStrokeColor3 = strokeColor
-					lbl.TextStrokeTransparency = 0.2
+					beam.Color = ColorSequence.new{
+						ColorSequenceKeypoint.new(0, lineColor1),
+						ColorSequenceKeypoint.new(1, lineColor2)
+					}
 				end
 
 				beam.Parent = primaryPart
