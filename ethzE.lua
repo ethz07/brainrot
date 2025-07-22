@@ -160,8 +160,7 @@ local function createESP(name, category)
 				if category == "Secret" then
 					beam.Color = ColorSequence.new{
 						ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), -- beyaz kenar
-						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))         -- siyah iç
-						beam.Transparency = NumberSequence.new(0.5)
+						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))   -- siyah iç
 					}
 				elseif category == "BrainrotGod" then
 					local colors = {}
@@ -173,7 +172,6 @@ local function createESP(name, category)
 					beam.Color = ColorSequence.new{
 						ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 180, 180)), -- gri
 						ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))  -- beyaz
-						beam.Transparency = NumberSequence.new(0.5)
 					}
 				end
 
