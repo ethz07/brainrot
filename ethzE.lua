@@ -447,21 +447,19 @@ local function createMainGUI()
 
 	closeButton.MouseButton1Click:Connect(function()
 		gui:Destroy()
-				closeButton.MouseButton1Click:Connect(function()
-	gui:Destroy()
 
-	-- Tüm aktif ESP'leri temizle
-	for petName, _ in pairs(activePetNames) do
-		clearESP(petName)
-	end
-	activePetNames = {}
+		-- Tüm aktif ESP'leri temizle
+		for petName, _ in pairs(activePetNames) do
+			clearESP(petName)
+		end
+		activePetNames = {}
 
-	-- Açık alt pet listelerini kapat
-	for _, petGui in pairs(openPetGUIs) do
-		if petGui then petGui:Destroy() end
-	end
-	openPetGUIs = {}
-end)
+		-- Açık alt pet listelerini kapat
+		for _, petGui in pairs(openPetGUIs) do
+			if petGui then petGui:Destroy() end
+		end
+		openPetGUIs = {}
+	end)
 	end
 
 function sendNotification(title, text, duration)
