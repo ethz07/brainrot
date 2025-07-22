@@ -371,6 +371,5 @@ function loadPetWindow(category, petList)
 	end)
 end
 
-print("working")
-
 createGUI()
+print("working")
