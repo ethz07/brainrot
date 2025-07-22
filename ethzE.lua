@@ -6,6 +6,8 @@ local Workspace = game:GetService("Workspace")
 
 local SoundService = game:GetService("SoundService")
 
+categoryToggles = {}
+
 local petData = {
 	Common = {
 		{"Noobini Pizzanini"}, {"Lirilì Larilà"}, {"Tim Cheese"}, {"Fluriflura"}, {"Svinina Bombardino"}, {"Pipi Kiwi"}
