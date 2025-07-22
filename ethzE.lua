@@ -1,4 +1,8 @@
-local Players = game:GetService("Players") local RunService = game:GetService("RunService") local TweenService = game:GetService("TweenService") local LocalPlayer = Players.LocalPlayer local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players") 
+local RunService = game:GetService("RunService") 
+local TweenService = game:GetService("TweenService") 
+local LocalPlayer = Players.LocalPlayer 
+local Workspace = game:GetService("Workspace")
 
 local SoundService = game:GetService("SoundService")
 
@@ -45,16 +49,6 @@ local function clearESP(name) for _, model in pairs(Workspace:GetDescendants()) 
 
 local function createESP(name) for _, model in pairs(Workspace:GetDescendants()) do if model:IsA("Model") and model.Name == name then if model:FindFirstChild("PetESP") then continue end
 
-local h = Instance.new("Highlight")
-		h.Name = "PetESP"
-		h.FillColor = Color3.fromRGB(0, 255, 0)
-		h.FillTransparency = 0.6
-		h.OutlineColor = Color3.fromRGB(255, 255, 255)
-		h.OutlineTransparency = 0
-		h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-		h.Adornee = model
-		h.Parent = model
-
 		local tag = Instance.new("BillboardGui")
 		tag.Name = "PetESPLabel"
 		tag.Adornee = model
@@ -64,15 +58,13 @@ local h = Instance.new("Highlight")
 
 		local lbl = Instance.new("TextLabel", tag)
 		lbl.Size = UDim2.new(1, 0, 1, 0)
-		lbl.BackgroundTransparency = 1
-		lbl.Text = name
-		lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-		lbl.Font = Enum.Font.FredokaOne
-		lbl.TextScaled = true
-		tag.Parent = model
+		lbl.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                lbl.BorderSizePixel = 1
+                lbl.BorderColor3 = Color3.fromRGB(100, 100, 100)
+                lbl.TextStrokeTransparency = 0.4
+                lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+		end
 	end
-end
-
 end
 
 local function createPetListGUI(category, pets) if openPetGUIs[category] then openPetGUIs[category]:Destroy() openPetGUIs[category] = nil return end
@@ -310,58 +302,39 @@ local function createMainGUI()
 end
 
 -- Bildirim sesi
-local function playNotifySound()
-	local sound = Instance.new("Sound", SoundService)
-	sound.SoundId = "rbxassetid://9118823102" -- Bildirim sesi örneği
-	sound.Volume = 1
+local function sendNotification(text)
+	local notif = Instance.new("TextLabel")
+	notif.Size = UDim2.new(0, 200, 0, 30)
+	notif.Position = UDim2.new(1, -220, 1, -40)
+	notif.AnchorPoint = Vector2.new(1, 1)
+	notif.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	notif.TextColor3 = Color3.fromRGB(255, 255, 0)
+	notif.Font = Enum.Font.FredokaOne
+	notif.TextSize = 14
+	notif.Text = "Yeni Pet Görüldü: " .. text
+	notif.Parent = LocalPlayer:WaitForChild("PlayerGui")
+	Instance.new("UICorner", notif).CornerRadius = UDim.new(0, 6)
+
+	local sound = Instance.new("Sound", workspace)
+	sound.SoundId = "rbxassetid://9118823103" -- Basit ping sesi
 	sound:Play()
-	game.Debris:AddItem(sound, 3)
-end
-
--- Sağ alttan görsel bildirim
-local function notifyPetSpawn(petName)
-	local screenGui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
-	screenGui.Name = "EthzNotification"
-	screenGui.ResetOnSpawn = false
-
-	local frame = Instance.new("Frame", screenGui)
-	frame.Size = UDim2.new(0, 230, 0, 40)
-	frame.Position = UDim2.new(1, -240, 1, -50)
-	frame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-	frame.BorderSizePixel = 0
-	Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
-
-	local text = Instance.new("TextLabel", frame)
-	text.Size = UDim2.new(1, -10, 1, 0)
-	text.Position = UDim2.new(0, 5, 0, 0)
-	text.BackgroundTransparency = 1
-	text.Text = "Yeni Pet Geldi: " .. petName
-	text.Font = Enum.Font.FredokaOne
-	text.TextColor3 = Color3.fromRGB(255, 255, 255)
-	text.TextScaled = true
-
-	playNotifySound()
-
-	-- Otomatik yok etme
-	delay(5, function()
-		screenGui:Destroy()
+	game.Debris:AddItem(sound, 2)
+	task.delay(3, function()
+		notif:Destroy()
 	end)
 end
 
 local knownPets = {}
 
 RunService.Heartbeat:Connect(function()
-	for _, model in pairs(workspace:GetDescendants()) do
-		if model:IsA("Model") and not knownPets[model] then
-			for category, pets in pairs(petData) do
-				for _, entry in ipairs(pets) do
-					local petName = typeof(entry) == "table" and entry[1] or entry
-					if model.Name == petName then
-						if categoryToggles[category] then
-							knownPets[model] = true
-							createESP(model.Name)
-							showNotification("Yeni Pet Geldi: " .. petName)
-						end
+	for category, pets in pairs(petData) do
+		if categoryToggles[category] then
+			for _, entry in pairs(pets) do
+				local name = typeof(entry) == "table" and entry[1] or entry
+				for _, obj in pairs(workspace:GetChildren()) do
+					if obj:IsA("Model") and obj.Name == name and not obj:FindFirstChild("PetESPLabel") then
+						createESP(name)
+						sendNotification(name)
 					end
 				end
 			end
