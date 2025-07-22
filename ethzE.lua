@@ -162,13 +162,11 @@ local function createESP(name, category)
 						ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), -- beyaz kenar
 						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))   -- siyah iç
 					}
-				elseif category == "BrainrotGod" then
-					local colors = {}
-for i = 0, 1, 0.2 do
-	table.insert(colors, ColorSequenceKeypoint.new(i, Color3.fromHSV(i, 1, 1)))
-end
-beam.Color = ColorSequence.new(colors)
-beam.Transparency = NumberSequence.new(0.4)
+						elseif category == "BrainrotGod" then
+    beam.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)), -- Pembe
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))
+						}
 				else
 					beam.Color = ColorSequence.new{
 						ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 180, 180)), -- gri
