@@ -75,16 +75,6 @@ end
 
 local function createPetListGUI(category, pets) if openPetGUIs[category] then openPetGUIs[category]:Destroy() openPetGUIs[category] = nil return end
 
-	for _, entry in pairs(pets) do
-    local name, val
-    if type(entry) == "table" then
-        name = entry[1]
-        val = entry[2]
-    else
-        name = entry
-        val = nil
-		end
-		
 local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 gui.Name = "PetList_" .. category
 gui.IgnoreGuiInset = true
@@ -298,26 +288,12 @@ local function createMainGUI()
         Instance.new("UICorner", toggle).CornerRadius = UDim.new(1, 0)
 
         local state = false
-		btn.MouseButton1Click:Connect(function()
-	state = not state
-	toggle.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-	createPetListGUI(name, petData[name])
-
-	for _, entry in pairs(petData[name]) do
-		local petName
-		if type(entry) == "table" then
-			petName = entry[1]
-		else
-			petName = entry
-		end
-
-		if state then
-			activePetNames[petName] = true
-		else
-			activePetNames[petName] = nil
-		end
-	end
-end)
+        btn.MouseButton1Click:Connect(function()
+            state = not state
+            toggle.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+            createPetListGUI(name, petData[name])
+        end)
+    end
 
     local minimized = false
     minimizeButton.MouseButton1Click:Connect(function()
@@ -374,4 +350,4 @@ task.spawn(function()
 end)
 
 createMainGUI()
-print("zzz3")
+print("zzz2")
