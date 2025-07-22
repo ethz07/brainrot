@@ -71,16 +71,14 @@ local function rainbowifyText(text: string): string
 local openPetGUIs = {}
 
 local function clearESP(name)
-	for _, model in pairs(Workspace:GetDescendants()) do
-		if model:IsA("Model") and model.Name == name then
-			-- Yazı etiketi
+	for _, model in pairs(Workspace:GetChildren()) do
+		if model:IsA("Model") and model.Name == name and not model:FindFirstChild("PetESPLabel") then
 			local esp = model:FindFirstChild("PetESP")
 			if esp then esp:Destroy() end
 
 			local label = model:FindFirstChild("PetESPLabel")
 			if label then label:Destroy() end
 
-			-- Çizgi (Beam) ve Attachments
 			local part = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
 			if part then
 				local beam = part:FindFirstChild("PetESP_Beam")
@@ -90,7 +88,6 @@ local function clearESP(name)
 				if att then att:Destroy() end
 			end
 
-			-- Oyuncunun içindeki attachment (Beam'le bağlandıysa)
 			local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 			if root then
 				local playerAtt = root:FindFirstChild("PlayerESP_Attachment")
@@ -456,7 +453,7 @@ function sendNotification(title, text, duration)
 	StarterGui:SetCore("SendNotification", {
 		Title = title,
 		Text = text,
-		Duration = duration or 3
+		Duration = duration or 5
 	})
 end
 
@@ -472,11 +469,11 @@ local knownPets = {} -- ?
 
 task.spawn(function()
 	while true do
-		for petName, category in pairs(activePetNames) do
+		for petName, _ in pairs(activePetNames) do
 			for _, model in pairs(Workspace:GetChildren()) do
 				if model:IsA("Model") and model.Name == petName and not model:FindFirstChild("PetESPLabel") then
 					createESP(petName, category)
-					sendNotification("Yeni Pet Geldi!", petName .. " ESP uygulandı!", 3)
+					sendNotification("New Pet!", petName .. " ESP uygulandı!", 5)
 					playSound()
 				end
 			end
