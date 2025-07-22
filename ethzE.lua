@@ -117,6 +117,8 @@ minimizeBtn.MouseButton1Click:Connect(function()
     contentFrame.Visible = not minimized
 end)
 
+local minimized = false
+
 local toggleStates = {}
 local openWindows = {}
 
