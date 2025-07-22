@@ -153,8 +153,8 @@ local function createESP(name, category)
 				beam.Attachment0 = playerAttachment
 				beam.Attachment1 = petAttachment
 				beam.FaceCamera = true
-				beam.Width0 = 0.14
-				beam.Width1 = 0.14
+				beam.Width0 = 0.30
+				beam.Width1 = 0.30
 				beam.Transparency = NumberSequence.new(0.4)
 
 				if category == "Secret" then
@@ -164,10 +164,11 @@ local function createESP(name, category)
 					}
 				elseif category == "BrainrotGod" then
 					local colors = {}
-					for i = 0, 1, 0.2 do
-						table.insert(colors, ColorSequenceKeypoint.new(i, Color3.fromHSV(i, 1, 1)))
-					end
-					beam.Color = ColorSequence.new(colors)
+for i = 0, 1, 0.2 do
+	table.insert(colors, ColorSequenceKeypoint.new(i, Color3.fromHSV(i, 1, 1)))
+end
+beam.Color = ColorSequence.new(colors)
+beam.Transparency = NumberSequence.new(0.4)
 				else
 					beam.Color = ColorSequence.new{
 						ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 180, 180)), -- gri
