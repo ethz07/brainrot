@@ -289,11 +289,19 @@ local function createMainGUI()
 
         local state = false
         btn.MouseButton1Click:Connect(function()
-            state = not state
-            toggle.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-            createPetListGUI(name, petData[name])
-        end)
-    end
+	state = not state
+	toggle.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+	createPetListGUI(name, petData[name])
+
+	for _, entry in pairs(petData[name]) do
+		local petName = typeof(entry) == "table" and entry[1] or entry
+		if state then
+			activePetNames[petName] = true
+		else
+			activePetNames[petName] = nil
+		end
+	end
+end)
 
     local minimized = false
     minimizeButton.MouseButton1Click:Connect(function()
