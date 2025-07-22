@@ -147,6 +147,36 @@ frame.Active = true
 frame.Draggable = true
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
+local titleBar = Instance.new("Frame", frame)
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.Position = UDim2.new(0, 0, 0, 0)
+titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+titleBar.BorderSizePixel = 0
+Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 8)
+
+local title = Instance.new("TextLabel", titleBar)
+title.Text = "ETHZ PET ESP HUB"
+title.Font = Enum.Font.FredokaOne
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 16
+title.Size = UDim2.new(1, -30, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+local minimize = Instance.new("TextButton", titleBar)
+minimize.Text = "-"
+minimize.Font = Enum.Font.FredokaOne
+minimize.TextSize = 18
+minimize.Size = UDim2.new(0, 25, 0, 25)
+minimize.Position = UDim2.new(1, -28, 0, 2)
+minimize.BackgroundTransparency = 1
+minimize.TextColor3 = Color3.fromRGB(255, 215, 0)
+
+minimize.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+end)
+
 local list = Instance.new("UIListLayout", frame)
 list.Padding = UDim.new(0, 6)
 list.SortOrder = Enum.SortOrder.LayoutOrder
