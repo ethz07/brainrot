@@ -86,6 +86,20 @@ closeBtn.Size = UDim2.new(0, 30, 1, 0)
 closeBtn.Position = UDim2.new(1, -30, 0, 0)
 closeBtn.BackgroundTransparency = 1
 
+local contentFrame = Instance.new("ScrollingFrame", mainFrame)
+contentFrame.Size = UDim2.new(1, -10, 1, -40)
+contentFrame.Position = UDim2.new(0, 5, 0, 35)
+contentFrame.ScrollBarThickness = 5
+contentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+contentFrame.BackgroundTransparency = 1
+
+local listLayout = Instance.new("UIListLayout", contentFrame)
+listLayout.Padding = UDim.new(0, 4)
+
+closeBtn.MouseButton1Click:Connect(function()
+    mainGui:Destroy()
+end)
+
 -- Minimize Butonu
 local minimizeBtn = Instance.new("TextButton", titleBar)
 minimizeBtn.Text = "−"
@@ -101,20 +115,6 @@ local minimized = false
 minimizeBtn.MouseButton1Click:Connect(function()
     minimized = not minimized
     contentFrame.Visible = not minimized
-end)
-
-local contentFrame = Instance.new("ScrollingFrame", mainFrame)
-contentFrame.Size = UDim2.new(1, -10, 1, -40)
-contentFrame.Position = UDim2.new(0, 5, 0, 35)
-contentFrame.ScrollBarThickness = 5
-contentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-contentFrame.BackgroundTransparency = 1
-
-local listLayout = Instance.new("UIListLayout", contentFrame)
-listLayout.Padding = UDim.new(0, 4)
-
-closeBtn.MouseButton1Click:Connect(function()
-    mainGui:Destroy()
 end)
 
 local toggleStates = {}
