@@ -159,7 +159,7 @@ local function createMainGUI()
     Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 8)
 
     local title = Instance.new("TextLabel", titleBar)
-    title.Text = "ETHZ PET ESP HUB"
+    title.Text = "Brainrot ESP"
     title.Font = Enum.Font.FredokaOne
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.TextSize = 16
