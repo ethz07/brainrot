@@ -75,6 +75,16 @@ end
 
 local function createPetListGUI(category, pets) if openPetGUIs[category] then openPetGUIs[category]:Destroy() openPetGUIs[category] = nil return end
 
+	for _, entry in pairs(pets) do
+    local name, val
+    if type(entry) == "table" then
+        name = entry[1]
+        val = entry[2]
+    else
+        name = entry
+        val = nil
+		end
+		
 local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 gui.Name = "PetList_" .. category
 gui.IgnoreGuiInset = true
