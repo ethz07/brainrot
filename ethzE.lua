@@ -95,8 +95,9 @@ local function clearESP(name)
 	end
 
 local function createESP(name, category)
-	for _, model in pairs(Workspace:GetChildren()) do
-		if model:IsA("Model") and model.Name == name and not model:FindFirstChild("PetESPLabel") then
+	if model:IsA("Model") and model.Name == name then
+	local alreadyHasESP = model:FindFirstChild("PetESPLabel")
+	if alreadyHasESP then continue end
 			-- Billboard GUI
 			local tag = Instance.new("BillboardGui")
 			tag.Name = "PetESPLabel"
