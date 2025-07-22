@@ -6,6 +6,7 @@ local Workspace = game:GetService("Workspace")
 local SoundService = game:GetService("SoundService")
 
 categoryToggles = {}
+local activePetNames = {}
 
 local petData = {
 	Common = {
@@ -328,8 +329,6 @@ end
 
 local knownPets = {} -- ?
 
-local activePetNames = {}
-
 task.spawn(function()
 	while true do
 		for petName, _ in pairs(activePetNames) do
@@ -346,4 +345,4 @@ task.spawn(function()
 end)
 
 createMainGUI()
-print("zzz100")
+print("ZzZzZ")
