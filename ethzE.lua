@@ -139,12 +139,12 @@ end
 
 local function createMainGUI()
     local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-    gui.Name = "EthzESP_Hub"
+    gui.Name = "Brainrot ESP"
     gui.IgnoreGuiInset = true
     gui.ResetOnSpawn = false
 
     local frame = Instance.new("Frame", gui)
-    frame.Size = UDim2.new(0, 260, 0, 260)
+    frame.Size = UDim2.new(0, 260, 0, 295)
     frame.Position = UDim2.new(0.5, -130, 1, -270)
     frame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
     frame.Active = true
@@ -240,7 +240,7 @@ local function createMainGUI()
     minimizeButton.MouseButton1Click:Connect(function()
         minimized = not minimized
         content.Visible = not minimized
-        frame.Size = minimized and UDim2.new(0, 260, 0, 35) or UDim2.new(0, 260, 0, 260)
+        frame.Size = minimized and UDim2.new(0, 260, 0, 35) or UDim2.new(0, 260, 0, 295)
     end)
 
     closeButton.MouseButton1Click:Connect(function()
