@@ -327,8 +327,6 @@ for _, entry in pairs(pets) do
 end)
 end
 
-end
-
 local function createMainGUI()
 	local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 	gui.Name = "Brainrot ESP"
