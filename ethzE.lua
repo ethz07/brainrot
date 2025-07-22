@@ -45,6 +45,30 @@ local petData = {
 	}
 }
 
+-- rainbow
+local GRAPHEMES_PER_COLOR_LOOP = 16
+local COLOR_SATURATION = 0.75
+
+local function rainbowifyText(text: string): string
+	local rainbowText = ""
+	local currentColorIndex = Random.new():NextNumber() * GRAPHEMES_PER_COLOR_LOOP 
+	for first, last in utf8.graphemes(text) do 
+		local grapheme = text:sub(first, last)
+		local isColoredGrapheme = grapheme ~= " "
+		
+		rainbowText ..= if not isColoredGrapheme then grapheme else ('<font color="#%s">%s</font>'):format(
+			Color3.fromHSV(currentColorIndex / GRAPHEMES_PER_COLOR_LOOP % 1, COLOR_SATURATION, 1):ToHex(),
+			grapheme
+		)
+		
+		if isColoredGrapheme then
+			currentColorIndex += 1
+		end
+	end
+	return rainbowText
+	end
+end
+
 local openPetGUIs = {}
 
 local function clearESP(name) for _, model in pairs(Workspace:GetDescendants()) do if model:IsA("Model") and model.Name == name then local esp = model:FindFirstChild("PetESP") if esp then esp:Destroy() end local gui = model:FindFirstChild("PetESPLabel") if gui then gui:Destroy() end end end end
@@ -64,27 +88,21 @@ local function createESP(name, category)
 			local lbl = Instance.new("TextLabel", tag)
 			lbl.Size = UDim2.new(1, 0, 1, 0)
 			lbl.BackgroundTransparency = 1
-			lbl.Text = name
 			lbl.Font = Enum.Font.FredokaOne
 			lbl.TextScaled = true
+			lbl.RichText = true -- RAINBOW için gerekli
 
 			if category == "Secret" then
-				lbl.TextColor3 = Color3.fromRGB(0, 0, 0)
-				lbl.TextStrokeColor3 = Color3.fromRGB(30, 30, 30)
-				lbl.TextStrokeTransparency = 0.2
+				lbl.Text = name
+				lbl.TextColor3 = Color3.fromRGB(0, 0, 0) -- siyah yazı
+				lbl.TextStrokeColor3 = Color3.fromRGB(255, 255, 255) -- beyaz kenarlık
+				lbl.TextStrokeTransparency = 0 -- tam görünür (kalın)
 			elseif category == "BrainrotGod" then
+				lbl.Text = rainbowifyText(name)
 				lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 				lbl.TextStrokeTransparency = 0.2
-
-				-- RAINBOW ANİMASYONU
-				task.spawn(function()
-					while lbl and lbl.Parent do
-						local t = tick() * 2
-						lbl.TextColor3 = Color3.fromHSV((t % 1), 1, 1)
-						task.wait(0.1)
-					end
-				end)
 			else
+				lbl.Text = name
 				lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
 				lbl.TextStrokeColor3 = Color3.fromRGB(30, 30, 30)
 				lbl.TextStrokeTransparency = 0.2
