@@ -294,7 +294,7 @@ local function createMainGUI()
 	createPetListGUI(name, petData[name])
 
 	for _, entry in pairs(petData[name]) do
-		local petName = typeof(entry) == "table" and entry[1] or entry
+		local petName = type(entry) == "table" and entry[1] or entry
 		if state then
 			activePetNames[petName] = true
 		else
