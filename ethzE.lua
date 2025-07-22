@@ -195,7 +195,7 @@ local function createToggleButton(petType, index)
     end)
 end
 
-function createPetWindow(category)
+local function createPetWindow(category)
     local gui = Instance.new("ScreenGui", player.PlayerGui)
     gui.Name = category .. "_Window"
 
