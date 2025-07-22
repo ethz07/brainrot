@@ -188,8 +188,10 @@ for _, entry in pairs(pets) do
 		toggle.BackgroundColor3 = isOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
 		if isOn then
 			createESP(name)
+			activePetNames[name] = true
 		else
 			clearESP(name)
+			activePetNames[name] = nil
 		end
 	end)
 end
