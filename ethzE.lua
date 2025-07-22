@@ -82,15 +82,17 @@ end
 local knownPets = {}
 
 RunService.Heartbeat:Connect(function()
-	for _, obj in pairs(workspace:GetChildren()) do
-		if obj:IsA("Model") and not knownPets[obj] then
+	for _, model in pairs(workspace:GetDescendants()) do
+		if model:IsA("Model") and not knownPets[model] then
 			for category, pets in pairs(petData) do
-				for _, entry in pairs(pets) do
-					local name = typeof(entry) == "table" and entry[1] or entry
-					if obj.Name == name then
-						knownPets[obj] = true
-						createESP(name)
-						notifyPetSpawn(name)
+				for _, entry in ipairs(pets) do
+					local petName = typeof(entry) == "table" and entry[1] or entry
+					if model.Name == petName then
+						if categoryToggles[category] then
+							knownPets[model] = true
+							createESP(model.Name)
+							showNotification("Yeni Pet Geldi: " .. petName)
+						end
 					end
 				end
 			end
