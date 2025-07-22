@@ -122,45 +122,6 @@ local minimized = false
 local toggleStates = {}
 local openWindows = {}
 
-local function createToggleButton(petType, index)
-    local button = Instance.new("TextButton", contentFrame)
-    button.Size = UDim2.new(1, 0, 0, 30)
-    button.Text = petType .. " ESP"
-    button.Font = Enum.Font.FredokaOne
-    button.TextSize = 13
-    button.BackgroundColor3 = Color3.fromRGB(200, 50, 50) -- Başlangıç: kırmızı
-    button.TextColor3 = Color3.new(1, 1, 1)
-    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
-
-    toggleStates[petType] = false
-
-    button.MouseButton1Click:Connect(function()
-        toggleStates[petType] = not toggleStates[petType]
-        button.TextColor3 = toggleStates[petType] and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 80, 80)
-
-        if toggleStates[petType] then
-            if openWindows[petType] then
-                openWindows[petType]:Destroy()
-                openWindows[petType] = nil
-            end
-            local win = createPetWindow(petType)
-            openWindows[petType] = win
-        else
-            if openWindows[petType] then
-                openWindows[petType]:Destroy()
-                openWindows[petType] = nil
-            end
-            clearHighlightsForCategory(petType)
-        end
-    end)
-end
-
-local categories = {"Secret", "BrainrotGod", "Mythic", "Legendary", "Epic", "Rare", "Common"}
--- Bu kodla eski for döngüsünü değiştir:
-for i, cat in ipairs(categories) do
-    createToggleButton(cat, i)
-end
-
 function highlightAll(name, category)
     for _, inst in ipairs(workspace:GetDescendants()) do
         if inst.Name == name and not inst:FindFirstChild("ESP_HL_"..category) then
@@ -199,6 +160,39 @@ function clearHighlightsForCategory(category)
             obj:Destroy()
         end
     end
+end
+
+local function createToggleButton(petType, index)
+    local button = Instance.new("TextButton", contentFrame)
+    button.Size = UDim2.new(1, 0, 0, 30)
+    button.Text = petType .. " ESP"
+    button.Font = Enum.Font.FredokaOne
+    button.TextSize = 13
+    button.BackgroundColor3 = Color3.fromRGB(200, 50, 50) -- Başlangıç: kırmızı
+    button.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
+
+    toggleStates[petType] = false
+
+    button.MouseButton1Click:Connect(function()
+        toggleStates[petType] = not toggleStates[petType]
+        button.TextColor3 = toggleStates[petType] and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 80, 80)
+
+        if toggleStates[petType] then
+            if openWindows[petType] then
+                openWindows[petType]:Destroy()
+                openWindows[petType] = nil
+            end
+            local win = createPetWindow(petType)
+            openWindows[petType] = win
+        else
+            if openWindows[petType] then
+                openWindows[petType]:Destroy()
+                openWindows[petType] = nil
+            end
+            clearHighlightsForCategory(petType)
+        end
+    end)
 end
 
 function createPetWindow(category)
@@ -277,6 +271,13 @@ function createPetWindow(category)
         end
     end
 end)
+
+local categories = {"Secret", "BrainrotGod", "Mythic", "Legendary", "Epic", "Rare", "Common"}
+-- Bu kodla eski for döngüsünü değiştir:
+for i, cat in ipairs(categories) do
+    createToggleButton(cat, i)
+end
+
 
 contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y+6)
 print("✨ GUI yüklendi")
