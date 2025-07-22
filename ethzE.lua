@@ -125,6 +125,16 @@ minimize.BackgroundTransparency = 1
 minimize.Font = Enum.Font.FredokaOne
 minimize.TextSize = 18
 
+local scroll = Instance.new("ScrollingFrame", frame)
+scroll.Size = UDim2.new(1, -10, 1, -30)
+scroll.Position = UDim2.new(0, 5, 0, 30)
+scroll.CanvasSize = UDim2.new(0, 0, 0, #pets * 40)
+scroll.ScrollBarThickness = 5
+scroll.BackgroundTransparency = 1
+local list = Instance.new("UIListLayout", scroll)
+list.Padding = UDim.new(0, 6)
+list.SortOrder = Enum.SortOrder.LayoutOrder
+
 local minimized = false
 local originalSize = frame.Size
 local originalScrollVisible = scroll.Visible
@@ -139,16 +149,6 @@ minimize.MouseButton1Click:Connect(function()
         frame.Size = originalSize
     end
 end)
-
-local scroll = Instance.new("ScrollingFrame", frame)
-scroll.Size = UDim2.new(1, -10, 1, -30)
-scroll.Position = UDim2.new(0, 5, 0, 30)
-scroll.CanvasSize = UDim2.new(0, 0, 0, #pets * 40)
-scroll.ScrollBarThickness = 5
-scroll.BackgroundTransparency = 1
-local list = Instance.new("UIListLayout", scroll)
-list.Padding = UDim.new(0, 6)
-list.SortOrder = Enum.SortOrder.LayoutOrder
 
 for _, entry in pairs(pets) do
 	local name, val = unpack(entry)
