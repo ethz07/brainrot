@@ -49,22 +49,31 @@ local openPetGUIs = {}
 
 local function clearESP(name) for _, model in pairs(Workspace:GetDescendants()) do if model:IsA("Model") and model.Name == name then local esp = model:FindFirstChild("PetESP") if esp then esp:Destroy() end local gui = model:FindFirstChild("PetESPLabel") if gui then gui:Destroy() end end end end
 
-local function createESP(name) for _, model in pairs(Workspace:GetDescendants()) do if model:IsA("Model") and model.Name == name then if model:FindFirstChild("PetESP") then continue end
+local function createESP(name)
+	for _, model in pairs(Workspace:GetDescendants()) do
+		if model:IsA("Model") and model.Name == name then
+			if model:FindFirstChild("PetESPLabel") then continue end
 
-		local tag = Instance.new("BillboardGui")
-		tag.Name = "PetESPLabel"
-		tag.Adornee = model
-		tag.Size = UDim2.new(0, 100, 0, 20)
-		tag.StudsOffset = Vector3.new(0, 2.5, 0)
-		tag.AlwaysOnTop = true
+			local tag = Instance.new("BillboardGui")
+			tag.Name = "PetESPLabel"
+			tag.Adornee = model
+			tag.Size = UDim2.new(0, 100, 0, 20)
+			tag.StudsOffset = Vector3.new(0, 2.5, 0)
+			tag.AlwaysOnTop = true
+			tag.Parent = model
 
-		local lbl = Instance.new("TextLabel", tag)
-		lbl.Size = UDim2.new(1, 0, 1, 0)
-		lbl.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-                lbl.BorderSizePixel = 1
-                lbl.BorderColor3 = Color3.fromRGB(100, 100, 100)
-                lbl.TextStrokeTransparency = 0.4
-                lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+			local lbl = Instance.new("TextLabel", tag)
+			lbl.Size = UDim2.new(1, 0, 1, 0)
+			lbl.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+			lbl.BorderSizePixel = 1
+			lbl.BorderColor3 = Color3.fromRGB(100, 100, 100)
+			lbl.TextStrokeTransparency = 0.4
+			lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+			lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+			lbl.Font = Enum.Font.FredokaOne
+			lbl.TextScaled = true
+			lbl.Text = name
+			lbl.Parent = tag
 		end
 	end
 end
