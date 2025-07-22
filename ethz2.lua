@@ -662,6 +662,7 @@ end
 
 -- Güncellenmiş ana fonksiyon
 local function TweenSteal()
+	local hrp = GetHRP()
 	local delivery
 	for _, v in ipairs(workspace.Plots:GetDescendants()) do
 		if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") then
