@@ -105,46 +105,44 @@ local toggleStates = {}
 local openWindows = {}
 
 local function createToggleButton(petType, index)
-    local button = Instance.new("TextButton", petFrame)
-    button.Size = UDim2.new(0.75, 0, 0, 30)
-    button.Position = UDim2.new(0.05, 0, 0, 30 + (index - 1) * 35)
+    local button = Instance.new("TextButton", contentFrame)
+    button.Size = UDim2.new(1, 0, 0, 30)
     button.Text = petType .. " ESP"
     button.Font = Enum.Font.FredokaOne
-    button.TextSize = 14
-    button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    button.TextSize = 13
+    button.BackgroundColor3 = Color3.fromRGB(200, 50, 50) -- Başlangıç: kırmızı
     button.TextColor3 = Color3.new(1, 1, 1)
-    local corner = Instance.new("UICorner", button)
-    corner.CornerRadius = UDim.new(0, 8)
-
-    local circle = Instance.new("Frame", petFrame)
-    circle.Size = UDim2.new(0, 18, 0, 18)
-    circle.Position = UDim2.new(0.82, 0, 0, 35 + (index - 1) * 35)
-    circle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-    circle.BorderColor3 = Color3.new(0, 0, 0)
-    circle.BorderSizePixel = 1
-    circle.Name = petType .. "_Indicator"
-    local circCorner = Instance.new("UICorner", circle)
-    circCorner.CornerRadius = UDim.new(1, 0)
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
 
     toggleStates[petType] = false
 
     button.MouseButton1Click:Connect(function()
         toggleStates[petType] = not toggleStates[petType]
-        circle.BackgroundColor3 = toggleStates[petType] and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
+        button.BackgroundColor3 = toggleStates[petType] and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
+
         if toggleStates[petType] then
-            local win = createPetListWindow(petType)
+            if openWindows[petType] then
+                openWindows[petType]:Destroy()
+                openWindows[petType] = nil
+            end
+            local win = createPetWindow(petType)
             openWindows[petType] = win
         else
             if openWindows[petType] then
                 openWindows[petType]:Destroy()
                 openWindows[petType] = nil
             end
-            clearPetHighlights(petType)
+            clearHighlightsForCategory(petType)
         end
     end)
 end
 
-local categories = {"Common", "Rare", "Epic", "Legendary", "Mythic", "BrainrotGod", "Secret"}
+-- Bu kodla eski for döngüsünü değiştir:
+for i, cat in ipairs(categories) do
+    createToggleButton(cat, i)
+end
+
+local categories = {"Secret", "BrainrotGod", "Mythic", "Legendary", "Epic", "Rare", "Common"}
 for i, cat in ipairs(categories) do
     createToggleButton(cat, i)
 end
@@ -214,6 +212,23 @@ function createPetWindow(category)
     close.Size = UDim2.new(0, 30, 1, 0)
     close.Position = UDim2.new(1, -30, 0, 0)
     close.BackgroundTransparency = 1
+
+    -- Minimize Butonu
+local minimizeBtn = Instance.new("TextButton", titleBar)
+minimizeBtn.Text = "−"
+minimizeBtn.Font = Enum.Font.FredokaOne
+minimizeBtn.TextSize = 18
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 80)
+minimizeBtn.Size = UDim2.new(0, 30, 1, 0)
+minimizeBtn.Position = UDim2.new(1, -60, 0, 0)
+minimizeBtn.BackgroundTransparency = 1
+
+local minimized = false
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    contentFrame.Visible = not minimized
+end)
 
     local scroll = Instance.new("ScrollingFrame", win)
     scroll.Size = UDim2.new(1, -10, 1, -35)
