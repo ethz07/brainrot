@@ -322,3 +322,5 @@ function loadPetWindow(category, petList)
 end
 
 print("working")
+
+createMainGUI()
