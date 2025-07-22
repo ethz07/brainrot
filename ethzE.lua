@@ -204,128 +204,133 @@ local function createESP(name, category)
 	end
 	end
 
-local function createPetListGUI(category, pets) if openPetGUIs[category] then openPetGUIs[category]:Destroy() openPetGUIs[category] = nil return end
-
-local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-gui.Name = "PetList_" .. category
-gui.IgnoreGuiInset = true
-gui.ResetOnSpawn = false
-openPetGUIs[category] = gui
-
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 250, 0, 200)
-frame.Position = UDim2.new(0.5, -125, 1, -210)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.Active = true
-frame.Draggable = true
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
-
-local title = Instance.new("TextLabel", frame)
-title.Text = category .. " Pets"
-title.Font = Enum.Font.FredokaOne
-title.TextSize = 14
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.BackgroundTransparency = 1
-title.Size = UDim2.new(1, -50, 0, 25)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.TextXAlignment = Enum.TextXAlignment.Left
-
-local close = Instance.new("TextButton", frame)
-close.Text = "X"
-close.Size = UDim2.new(0, 25, 0, 25)
-close.Position = UDim2.new(1, -30, 0, 0)
-close.TextColor3 = Color3.fromRGB(255, 0, 0)
-close.BackgroundTransparency = 1
-close.Font = Enum.Font.FredokaOne
-close.TextSize = 18
-close.MouseButton1Click:Connect(function()
-	gui:Destroy()
-	openPetGUIs[category] = nil
-end)
-
-local minimize = Instance.new("TextButton", frame)
-minimize.Text = "-"
-minimize.Size = UDim2.new(0, 25, 0, 25)
-minimize.Position = UDim2.new(1, -60, 0, 3)
-minimize.TextColor3 = Color3.fromRGB(255, 215, 0)
-minimize.BackgroundTransparency = 1
-minimize.Font = Enum.Font.FredokaOne
-minimize.TextSize = 18
-
-local scroll = Instance.new("ScrollingFrame", frame)
-scroll.Size = UDim2.new(1, -10, 1, -30)
-scroll.Position = UDim2.new(0, 5, 0, 30)
-scroll.CanvasSize = UDim2.new(0, 0, 0, #pets * 40)
-scroll.ScrollBarThickness = 5
-scroll.BackgroundTransparency = 1
-local list = Instance.new("UIListLayout", scroll)
-list.Padding = UDim.new(0, 6)
-list.SortOrder = Enum.SortOrder.LayoutOrder
-
-local minimized = false
-local originalSize = frame.Size
-local originalScrollVisible = scroll.Visible
-
-minimize.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    if minimized then
-        scroll.Visible = false
-        frame.Size = UDim2.new(0, 250, 0, 35)
-    else
-        scroll.Visible = true
-        frame.Size = originalSize
-    end
-end)
-
-for _, entry in pairs(pets) do
-	local name, val = unpack(entry)
-	local holder = Instance.new("Frame", scroll)
-	holder.Size = UDim2.new(1, 0, 0, 30)
-	holder.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-	Instance.new("UICorner", holder).CornerRadius = UDim.new(0, 6)
-
-	local btn = Instance.new("TextButton", holder)
-	btn.Text = name
-	btn.Size = UDim2.new(0.6, 0, 1, 0)
-	btn.Position = UDim2.new(0, 0, 0, 0)
-	btn.BackgroundTransparency = 1
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	btn.TextSize = 13
-	btn.Font = Enum.Font.FredokaOne
-
-	local toggle = Instance.new("Frame", holder)
-	toggle.Size = UDim2.new(0, 22, 0, 22)
-	toggle.Position = UDim2.new(1, -30, 0.5, -11)
-	toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	toggle.BorderSizePixel = 1
-	toggle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Instance.new("UICorner", toggle).CornerRadius = UDim.new(1, 0)
-
-	if val then
-		local label = Instance.new("TextLabel", holder)
-		label.Text = val
-		label.Font = Enum.Font.FredokaOne
-		label.TextSize = 12
-		label.TextColor3 = Color3.fromRGB(255, 215, 0)
-		label.TextStrokeTransparency = 0
-		label.BackgroundTransparency = 1
-		label.Position = UDim2.new(0.6, 5, 0, 0)
-		label.Size = UDim2.new(0.4, -35, 1, 0)
+local function createPetListGUI(category, pets)
+	if openPetGUIs[category] then
+		openPetGUIs[category]:Destroy()
+		openPetGUIs[category] = nil
+		return
 	end
 
-	local isOn = false
-	btn.MouseButton1Click:Connect(function()
-    isOn = not isOn
-    toggle.BackgroundColor3 = isOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-    if isOn then
-        activePetNames[name] = category  -- burayı düzelt!
-        createESP(name, category)
-    else
-        clearESP(name)
-        activePetNames[name] = nil
-    end
-end)
-end
+	local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+	gui.Name = "PetList_" .. category
+	gui.IgnoreGuiInset = true
+	gui.ResetOnSpawn = false
+	openPetGUIs[category] = gui
+
+	local frame = Instance.new("Frame", gui)
+	frame.Size = UDim2.new(0, 250, 0, 200)
+	frame.Position = UDim2.new(0.5, -125, 1, -210)
+	frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	frame.Active = true
+	frame.Draggable = true
+	Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+
+	local title = Instance.new("TextLabel", frame)
+	title.Text = category .. " Pets"
+	title.Font = Enum.Font.FredokaOne
+	title.TextSize = 14
+	title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	title.BackgroundTransparency = 1
+	title.Size = UDim2.new(1, -50, 0, 25)
+	title.Position = UDim2.new(0, 10, 0, 0)
+	title.TextXAlignment = Enum.TextXAlignment.Left
+
+	local close = Instance.new("TextButton", frame)
+	close.Text = "X"
+	close.Size = UDim2.new(0, 25, 0, 25)
+	close.Position = UDim2.new(1, -30, 0, 0)
+	close.TextColor3 = Color3.fromRGB(255, 0, 0)
+	close.BackgroundTransparency = 1
+	close.Font = Enum.Font.FredokaOne
+	close.TextSize = 18
+	close.MouseButton1Click:Connect(function()
+		gui:Destroy()
+		openPetGUIs[category] = nil
+	end)
+
+	local minimize = Instance.new("TextButton", frame)
+	minimize.Text = "-"
+	minimize.Size = UDim2.new(0, 25, 0, 25)
+	minimize.Position = UDim2.new(1, -60, 0, 3)
+	minimize.TextColor3 = Color3.fromRGB(255, 215, 0)
+	minimize.BackgroundTransparency = 1
+	minimize.Font = Enum.Font.FredokaOne
+	minimize.TextSize = 18
+
+	local scroll = Instance.new("ScrollingFrame", frame)
+	scroll.Size = UDim2.new(1, -10, 1, -30)
+	scroll.Position = UDim2.new(0, 5, 0, 30)
+	scroll.CanvasSize = UDim2.new(0, 0, 0, #pets * 40)
+	scroll.ScrollBarThickness = 5
+	scroll.BackgroundTransparency = 1
+	local list = Instance.new("UIListLayout", scroll)
+	list.Padding = UDim.new(0, 6)
+	list.SortOrder = Enum.SortOrder.LayoutOrder
+
+	local minimized = false
+	local originalSize = frame.Size
+
+	minimize.MouseButton1Click:Connect(function()
+		minimized = not minimized
+		if minimized then
+			scroll.Visible = false
+			frame.Size = UDim2.new(0, 250, 0, 35)
+		else
+			scroll.Visible = true
+			frame.Size = originalSize
+		end
+	end)
+
+	for _, entry in pairs(pets) do
+		local name, val = unpack(entry)
+		local holder = Instance.new("Frame", scroll)
+		holder.Size = UDim2.new(1, 0, 0, 30)
+		holder.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+		Instance.new("UICorner", holder).CornerRadius = UDim.new(0, 6)
+
+		local btn = Instance.new("TextButton", holder)
+		btn.Text = name
+		btn.Size = UDim2.new(0.6, 0, 1, 0)
+		btn.Position = UDim2.new(0, 0, 0, 0)
+		btn.BackgroundTransparency = 1
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btn.TextSize = 13
+		btn.Font = Enum.Font.FredokaOne
+
+		local toggle = Instance.new("Frame", holder)
+		toggle.Size = UDim2.new(0, 22, 0, 22)
+		toggle.Position = UDim2.new(1, -30, 0.5, -11)
+		toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+		toggle.BorderSizePixel = 1
+		toggle.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Instance.new("UICorner", toggle).CornerRadius = UDim.new(1, 0)
+
+		if val then
+			local label = Instance.new("TextLabel", holder)
+			label.Text = val
+			label.Font = Enum.Font.FredokaOne
+			label.TextSize = 12
+			label.TextColor3 = Color3.fromRGB(255, 215, 0)
+			label.TextStrokeTransparency = 0
+			label.BackgroundTransparency = 1
+			label.Position = UDim2.new(0.6, 5, 0, 0)
+			label.Size = UDim2.new(0.4, -35, 1, 0)
+		end
+
+		local isOn = false
+		btn.MouseButton1Click:Connect(function()
+			isOn = not isOn
+			toggle.BackgroundColor3 = isOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+			if isOn then
+				createESP(name, category)
+				activePetNames[name] = category -- burada kategori atandı
+			else
+				clearESP(name)
+				activePetNames[name] = nil
+			end
+		end)
+	end
+	end
 
 local function createMainGUI()
 	local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
