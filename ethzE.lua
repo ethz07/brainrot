@@ -153,8 +153,8 @@ local function createESP(name, category)
 				beam.Attachment0 = playerAttachment
 				beam.Attachment1 = petAttachment
 				beam.FaceCamera = true
-				beam.Width0 = 5
-				beam.Width1 = 5
+				beam.Width0 = 2.50
+				beam.Width1 = 2.50
 				beam.Transparency = NumberSequence.new(0.4)
 
 				if category == "Secret" then
