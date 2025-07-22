@@ -315,16 +315,16 @@ for _, entry in pairs(pets) do
 
 	local isOn = false
 	btn.MouseButton1Click:Connect(function()
-		isOn = not isOn
-		toggle.BackgroundColor3 = isOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-		if isOn then
-			createESP(name, category)
-			activePetNames[name] = true
-		else
-			clearESP(name)
-			activePetNames[name] = nil
-		end
-	end)
+    isOn = not isOn
+    toggle.BackgroundColor3 = isOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    if isOn then
+        activePetNames[name] = category  -- burayı düzelt!
+        createESP(name, category)
+    else
+        clearESP(name)
+        activePetNames[name] = nil
+    end
+end)
 end
 
 end
