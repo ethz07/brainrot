@@ -284,7 +284,7 @@ local function createMainGUI()
     list.SortOrder = Enum.SortOrder.LayoutOrder
     list.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    local petCategories = {"Common", "Rare", "Epic", "Legendary", "Mythic", "BrainrotGod", "Secret"}
+    local petCategories = {"Secret", "BrainrotGod", "Mythic", "Legendary", "Epic", "Rare", "Common"}
 
     for _, name in ipairs(petCategories) do
         local btnFrame = Instance.new("Frame", content)
