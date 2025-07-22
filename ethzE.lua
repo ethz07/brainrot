@@ -154,12 +154,8 @@ local function createToggleButton(petType, index)
     end)
 end
 
--- Bu kodla eski for döngüsünü değiştir:
-for i, cat in ipairs(categories) do
-    createToggleButton(cat, i)
-end
-
 local categories = {"Secret", "BrainrotGod", "Mythic", "Legendary", "Epic", "Rare", "Common"}
+-- Bu kodla eski for döngüsünü değiştir:
 for i, cat in ipairs(categories) do
     createToggleButton(cat, i)
 end
@@ -273,28 +269,6 @@ function createPetWindow(category)
         gui:Destroy()
         toggleStates[category] = false
         clearHighlightsForCategory(category)
-    end)
-end
-
-local i = 0
-for cat, _ in pairs(petData) do
-    i += 1
-    local btn = Instance.new("TextButton", contentFrame)
-    btn.Size = UDim2.new(1, 0, 0, 30)
-    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    btn.Text = cat .. " ESP"
-    btn.Font = Enum.Font.FredokaOne
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.TextSize = 13
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-
-    btn.MouseButton1Click:Connect(function()
-        toggleStates[cat] = not toggleStates[cat]
-        if toggleStates[cat] then
-            createPetWindow(cat)
-        else
-            clearHighlightsForCategory(cat)
-        end
     end)
 end
 
