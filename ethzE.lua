@@ -2,7 +2,42 @@ local Players = game:GetService("Players") local RunService = game:GetService("R
 
 local SoundService = game:GetService("SoundService")
 
-local petData = { Common = { {"Noobini Pizzanini"}, {"Lirilì Larilà"}, {"Tim Cheese"}, {"Fluriflura"}, {"Svinina Bombardino"}, {"Pipi Kiwi"} }, Rare = { {"Trippi Troppi"}, {"Tung Tung Tung Sahur"}, {"Gangster Footera"}, {"Bandito Bobritto"}, {"Boneca Ambalabu"}, {"Cacto Hipopotamo"}, {"Ta Ta Ta Ta Sahur"}, {"Tric Trac Baraboom"} }, Epic = { {"Cappuccino Assassino"}, {"Brr Brr Patapim"}, {"Trulimero Trulicina"}, {"Bambini Crostini"}, {"Bananita Dolphinita"}, {"Perochello Lemonchello"}, {"Brri Brri Bicus Dicus Bombicus"}, {"Avocadini Guffo"} }, Legendary = { {"Burbaloni Loliloli"}, {"Chimpanzini Bananini"}, {"Ballerina Cappuccina"}, {"Chef Crabracadabra"}, {"Lionel Cactuseli"}, {"Glorbo Fruttodrillo"}, {"Blueberrinni Octopusini"}, {"Strawberrelli Flamingelli"}, {"Pandaccini Bananini"} }, Mythic = { {"Mythic Lucky Block"}, {"Frigo Camelo"}, {"Orangutini Ananassini"}, {"Rhino Toasterino"}, {"Bombardiro Crocodilo"}, {"Bombombini Gusini"}, {"Cavallo Virtuoso"}, {"Spioniro Golubiro"}, {"Zibra Zubra Zibralini"}, {"Tigrilini Watermelini"} }, BrainrotGod = { {"Brainrot God Lucky Block"}, {"Cocofanto Elefanto", "$10K/s"}, {"Girafa Celestre", "$20K/s"}, {"Gattatino Neonino", "$25K/s"}, {"Matteo", "$50K/s"}, {"Tralalero Tralala", "$50K/s"}, {"Tigroligre Frutonni", "$60K/s"}, {"Espresso Signora", "$70K/s"}, {"Odin Din Din Dun", "$75K/s"}, {"Statutino Libertino", "$75K/s"}, {"Orcalero Orcala", "$100K/s"}, {"Trenostruzzo Turbo 3000", "$150K/s"}, {"Ballerino Lololo", "$200K/s"} }, Secret = { {"Secret Lucky Block"}, {"La Vacca Saturno Saturnita", "$250K/s"}, {"Chimpanzini Spiderini", "$325K/s"}, {"Torrtuginni Dragonfrutini", "$350K/s"}, {"Los Tralaleritos", "$500K/s"}, {"Las Tralaleritas", "$650K/s"}, {"Graipuss Medussi", "$1M/s"}, {"Pot Hotspot", "$2.5M/s"}, {"La Grande Combinasion", "$10M/s"}, {"Nuclearo Dinossauro", "$15M/s"}, {"Garama and Madundung", "$50M/s"} } }
+local petData = {
+	Common = {
+		{"Noobini Pizzanini"}, {"Lirilì Larilà"}, {"Tim Cheese"}, {"Fluriflura"}, {"Svinina Bombardino"}, {"Pipi Kiwi"}
+	},
+	Rare = {
+		{"Trippi Troppi"}, {"Tung Tung Tung Sahur"}, {"Gangster Footera"}, {"Bandito Bobritto"},
+		{"Boneca Ambalabu"}, {"Cacto Hipopotamo"}, {"Ta Ta Ta Ta Sahur"}, {"Tric Trac Baraboom"}
+	},
+	Epic = {
+		{"Cappuccino Assassino"}, {"Brr Brr Patapim"}, {"Trulimero Trulicina"}, {"Bambini Crostini"},
+		{"Bananita Dolphinita"}, {"Perochello Lemonchello"}, {"Brri Brri Bicus Dicus Bombicus"}, {"Avocadini Guffo"}
+	},
+	Legendary = {
+		{"Burbaloni Loliloli"}, {"Chimpanzini Bananini"}, {"Ballerina Cappuccina"}, {"Chef Crabracadabra"},
+		{"Lionel Cactuseli"}, {"Glorbo Fruttodrillo"}, {"Blueberrinni Octopusini"}, {"Strawberrelli Flamingelli"},
+		{"Pandaccini Bananini"}
+	},
+	Mythic = {
+		{"Mythic Lucky Block"}, {"Frigo Camelo"}, {"Orangutini Ananassini"}, {"Rhino Toasterino"},
+		{"Bombardiro Crocodilo"}, {"Bombombini Gusini"}, {"Cavallo Virtuoso"}, {"Spioniro Golubiro"},
+		{"Zibra Zubra Zibralini"}, {"Tigrilini Watermelini"}
+	},
+	BrainrotGod = {
+		{"Brainrot God Lucky Block"}, {"Cocofanto Elefanto", "$10K/s"}, {"Girafa Celestre", "$20K/s"},
+		{"Gattatino Neonino", "$25K/s"}, {"Matteo", "$50K/s"}, {"Tralalero Tralala", "$50K/s"},
+		{"Tigroligre Frutonni", "$60K/s"}, {"Espresso Signora", "$70K/s"}, {"Odin Din Din Dun", "$75K/s"},
+		{"Statutino Libertino", "$75K/s"}, {"Orcalero Orcala", "$100K/s"}, {"Trenostruzzo Turbo 3000", "$150K/s"},
+		{"Ballerino Lololo", "$200K/s"}
+	},
+	Secret = {
+		{"Secret Lucky Block"}, {"La Vacca Saturno Saturnita", "$250K/s"}, {"Chimpanzini Spiderini", "$325K/s"},
+		{"Torrtuginni Dragonfrutini", "$350K/s"}, {"Los Tralaleritos", "$500K/s"}, {"Las Tralaleritas", "$650K/s"},
+		{"Graipuss Medussi", "$1M/s"}, {"Pot Hotspot", "$2.5M/s"}, {"La Grande Combinasion", "$10M/s"},
+		{"Nuclearo Dinossauro", "$15M/s"}, {"Garama and Madundung", "$50M/s"}
+	}
+}
 
 local openPetGUIs = {}
 
