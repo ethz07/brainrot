@@ -117,8 +117,6 @@ minimizeBtn.MouseButton1Click:Connect(function()
     contentFrame.Visible = not minimized
 end)
 
-local minimized = false
-
 local toggleStates = {}
 local openWindows = {}
 
@@ -273,14 +271,10 @@ local function createPetWindow(category)
 end)
 
 local categories = {"Secret", "BrainrotGod", "Mythic", "Legendary", "Epic", "Rare", "Common"}
--- Bu kodla eski for döngüsünü değiştir:
 for i, cat in ipairs(categories) do
     createToggleButton(cat, i)
+    end
 end
 
-
 contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y+6)
-print("✨ GUI yüklendi")
-
-
 print("working")
