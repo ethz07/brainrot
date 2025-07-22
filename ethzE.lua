@@ -49,7 +49,7 @@ local openPetGUIs = {}
 
 local function clearESP(name) for _, model in pairs(Workspace:GetDescendants()) do if model:IsA("Model") and model.Name == name then local esp = model:FindFirstChild("PetESP") if esp then esp:Destroy() end local gui = model:FindFirstChild("PetESPLabel") if gui then gui:Destroy() end end end end
 
-local function createESP(name)
+local function createESP(name, category)
 	for _, model in pairs(Workspace:GetDescendants()) do
 		if model:IsA("Model") and model.Name == name and not model:FindFirstChild("PetESPLabel") then
 			local tag = Instance.new("BillboardGui")
@@ -67,9 +67,28 @@ local function createESP(name)
 			lbl.Text = name
 			lbl.Font = Enum.Font.FredokaOne
 			lbl.TextScaled = true
-			lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-			lbl.TextStrokeTransparency = 0.2
-			lbl.TextStrokeColor3 = Color3.fromRGB(30, 30, 30) -- koyu gri kenarlık
+
+			if category == "Secret" then
+				lbl.TextColor3 = Color3.fromRGB(0, 0, 0)
+				lbl.TextStrokeColor3 = Color3.fromRGB(30, 30, 30)
+				lbl.TextStrokeTransparency = 0.2
+			elseif category == "BrainrotGod" then
+				lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+				lbl.TextStrokeTransparency = 0.2
+
+				-- RAINBOW ANİMASYONU
+				task.spawn(function()
+					while lbl and lbl.Parent do
+						local t = tick() * 2
+						lbl.TextColor3 = Color3.fromHSV((t % 1), 1, 1)
+						task.wait(0.1)
+					end
+				end)
+			else
+				lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+				lbl.TextStrokeColor3 = Color3.fromRGB(30, 30, 30)
+				lbl.TextStrokeTransparency = 0.2
+			end
 		end
 	end
 end
