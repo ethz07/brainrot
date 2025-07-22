@@ -331,127 +331,122 @@ end
 end
 
 local function createMainGUI()
-    local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-    gui.Name = "Brainrot ESP"
-    gui.IgnoreGuiInset = true
-    gui.ResetOnSpawn = false
+	local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+	gui.Name = "Brainrot ESP"
+	gui.IgnoreGuiInset = true
+	gui.ResetOnSpawn = false
 
-    local frame = Instance.new("Frame", gui)
-    frame.Size = UDim2.new(0, 260, 0, 310)
-    frame.Position = UDim2.new(0.5, -130, 1, -270)
-    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-    frame.Active = true
-    frame.Draggable = true
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+	local frame = Instance.new("Frame", gui)
+	frame.Size = UDim2.new(0, 260, 0, 150)
+	frame.Position = UDim2.new(0.5, -130, 1, -160)
+	frame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+	frame.Active = true
+	frame.Draggable = true
+	Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
-    local titleBar = Instance.new("Frame", frame)
-    titleBar.Size = UDim2.new(1, 0, 0, 35)
-    titleBar.Position = UDim2.new(0, 0, 0, 0)
-    titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-    titleBar.BorderSizePixel = 0
-    Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 8)
+	local titleBar = Instance.new("Frame", frame)
+	titleBar.Size = UDim2.new(1, 0, 0, 35)
+	titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+	Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 8)
+	titleBar.Parent = frame
 
-    local title = Instance.new("TextLabel", titleBar)
-    title.Text = "Brainrot ESP"
-    title.Font = Enum.Font.FredokaOne
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.TextSize = 16
-    title.Size = UDim2.new(1, -60, 1, 0)
-    title.Position = UDim2.new(0, 10, 0, 0)
-    title.BackgroundTransparency = 1
-    title.TextXAlignment = Enum.TextXAlignment.Left
+	local title = Instance.new("TextLabel", titleBar)
+	title.Text = "Brainrot ESP"
+	title.Font = Enum.Font.FredokaOne
+	title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	title.TextSize = 16
+	title.Size = UDim2.new(1, -60, 1, 0)
+	title.Position = UDim2.new(0, 10, 0, 0)
+	title.BackgroundTransparency = 1
+	title.TextXAlignment = Enum.TextXAlignment.Left
 
-    local buttonFrame = Instance.new("Frame", titleBar)
-    buttonFrame.Size = UDim2.new(0, 60, 1, 0)
-    buttonFrame.Position = UDim2.new(1, -60, 0, 0)
-    buttonFrame.BackgroundTransparency = 1
+	local buttonFrame = Instance.new("Frame", titleBar)
+	buttonFrame.Size = UDim2.new(0, 60, 1, 0)
+	buttonFrame.Position = UDim2.new(1, -60, 0, 0)
+	buttonFrame.BackgroundTransparency = 1
+	buttonFrame.Parent = titleBar
 
-    local minimizeButton = Instance.new("TextButton", buttonFrame)
-    minimizeButton.Text = "-"
-    minimizeButton.Font = Enum.Font.FredokaOne
-    minimizeButton.TextSize = 18
-    minimizeButton.TextColor3 = Color3.fromRGB(255, 215, 0)
-    minimizeButton.Size = UDim2.new(0.5, 0, 1, 0)
-    minimizeButton.BackgroundTransparency = 1
+	local minimizeButton = Instance.new("TextButton", buttonFrame)
+	minimizeButton.Text = "-"
+	minimizeButton.Font = Enum.Font.FredokaOne
+	minimizeButton.TextSize = 18
+	minimizeButton.TextColor3 = Color3.fromRGB(255, 215, 0)
+	minimizeButton.Size = UDim2.new(0.5, 0, 1, 0)
+	minimizeButton.BackgroundTransparency = 1
 
-    local closeButton = Instance.new("TextButton", buttonFrame)
-    closeButton.Text = "X"
-    closeButton.Font = Enum.Font.FredokaOne
-    closeButton.TextSize = 18
-    closeButton.TextColor3 = Color3.fromRGB(255, 50, 50)
-    closeButton.Size = UDim2.new(0.5, 0, 1, 0)
-    closeButton.Position = UDim2.new(0.5, 0, 0, 0)
-    closeButton.BackgroundTransparency = 1
+	local closeButton = Instance.new("TextButton", buttonFrame)
+	closeButton.Text = "X"
+	closeButton.Font = Enum.Font.FredokaOne
+	closeButton.TextSize = 18
+	closeButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+	closeButton.Size = UDim2.new(0.5, 0, 1, 0)
+	closeButton.Position = UDim2.new(0.5, 0, 0, 0)
+	closeButton.BackgroundTransparency = 1
 
-    buttonFrame.Parent = titleBar
+	local scroll = Instance.new("ScrollingFrame", frame)
+	scroll.Size = UDim2.new(1, -10, 1, -50)
+	scroll.Position = UDim2.new(0, 5, 0, 40)
+	scroll.BackgroundTransparency = 1
+	scroll.CanvasSize = UDim2.new(0, 0, 0, 300)
+	scroll.ScrollBarThickness = 5
 
-    local content = Instance.new("Frame", frame)
-    content.Name = "Content"
-    content.Size = UDim2.new(1, 0, 1, -35)
-    content.Position = UDim2.new(0, 0, 0, 35)
-    content.BackgroundTransparency = 1
+	local listLayout = Instance.new("UIListLayout", scroll)
+	listLayout.Padding = UDim.new(0, 5)
+	listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    local list = Instance.new("UIListLayout", content)
-    list.Padding = UDim.new(0, 6)
-    list.SortOrder = Enum.SortOrder.LayoutOrder
-    list.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	local petCategories = {"Secret", "BrainrotGod", "Mythic", "Legendary", "Epic", "Rare", "Common"}
 
-    local petCategories = {"Secret", "BrainrotGod", "Mythic", "Legendary", "Epic", "Rare", "Common"}
+	for _, name in ipairs(petCategories) do
+		local btn = Instance.new("TextButton", scroll)
+		btn.Text = name .. " ESP"
+		btn.Size = UDim2.new(0.9, 0, 0, 30)
+		btn.Font = Enum.Font.FredokaOne
+		btn.TextSize = 14
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+		btn.BorderSizePixel = 0
+		Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-    for _, name in ipairs(petCategories) do
-        local btnFrame = Instance.new("Frame", content)
-        btnFrame.Size = UDim2.new(0.9, 0, 0, 32)
-        btnFrame.BackgroundTransparency = 1
+		local toggle = Instance.new("Frame", btn)
+		toggle.Size = UDim2.new(0, 20, 0, 20)
+		toggle.Position = UDim2.new(1, -25, 0.5, -10)
+		toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+		toggle.BorderSizePixel = 1
+		toggle.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Instance.new("UICorner", toggle).CornerRadius = UDim.new(1, 0)
 
-        local btn = Instance.new("TextButton", btnFrame)
-        btn.Text = name .. " ESP"
-        btn.Size = UDim2.new(0.75, 0, 1, 0)
-        btn.Font = Enum.Font.FredokaOne
-        btn.TextSize = 14
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
-        btn.BorderSizePixel = 0
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-
-        local toggle = Instance.new("Frame", btnFrame)
-        toggle.Size = UDim2.new(0, 25, 0, 25)
-        toggle.Position = UDim2.new(1, -30, 0.5, -12)
-        toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        toggle.BorderSizePixel = 1
-        toggle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-        Instance.new("UICorner", toggle).CornerRadius = UDim.new(1, 0)
+		local state = false
+		btn.MouseButton1Click:Connect(function()
+			state = not state
+			toggle.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+			createPetListGUI(name, petData[name])
+		end)
+	end
 
 	local footer = Instance.new("TextLabel", frame)
-        footer.Text = "made by _ethz on discord"
-        footer.Font = Enum.Font.FredokaOne
-        footer.TextColor3 = Color3.fromRGB(180, 180, 180)
-        footer.TextSize = 12
-        footer.BackgroundTransparency = 1
-        footer.Size = UDim2.new(1, 0, 0, 20)
-        footer.Position = UDim2.new(0, 0, 1, -20)
-        footer.TextStrokeTransparency = 0.8
-        footer.TextYAlignment = Enum.TextYAlignment.Center
-        footer.TextXAlignment = Enum.TextXAlignment.Center
+	footer.Text = "by _ethz on discord"
+	footer.Font = Enum.Font.FredokaOne
+	footer.TextColor3 = Color3.fromRGB(180, 180, 180)
+	footer.TextSize = 12
+	footer.BackgroundTransparency = 1
+	footer.Size = UDim2.new(1, 0, 0, 20)
+	footer.Position = UDim2.new(0, 0, 1, -20)
+	footer.TextStrokeTransparency = 0.8
+	footer.TextYAlignment = Enum.TextYAlignment.Center
+	footer.TextXAlignment = Enum.TextXAlignment.Center
 
-        local state = false
-        btn.MouseButton1Click:Connect(function()
-            state = not state
-            toggle.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-            createPetListGUI(name, petData[name])
-        end)
-    end
+	local minimized = false
+	minimizeButton.MouseButton1Click:Connect(function()
+		minimized = not minimized
+		scroll.Visible = not minimized
+		frame.Size = minimized and UDim2.new(0, 260, 0, 35) or UDim2.new(0, 260, 0, 150)
+	end)
 
-    local minimized = false
-    minimizeButton.MouseButton1Click:Connect(function()
-        minimized = not minimized
-        content.Visible = not minimized
-        frame.Size = minimized and UDim2.new(0, 260, 0, 35) or UDim2.new(0, 260, 0, 310)
-    end)
-
-    closeButton.MouseButton1Click:Connect(function()
-        gui:Destroy()
-    end)
-end
+	closeButton.MouseButton1Click:Connect(function()
+		gui:Destroy()
+	end)
+	end
 
 function sendNotification(title, text, duration)
 	local StarterGui = game:GetService("StarterGui")
