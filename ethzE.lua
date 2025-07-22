@@ -120,21 +120,8 @@ local function createESP(name, category)
 			lbl.TextScaled = true
 			lbl.RichText = true
 
-			if category == "Secret" then
-				lbl.Text = name
-				lbl.TextColor3 = Color3.fromRGB(0, 0, 0)
-				lbl.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-				lbl.TextStrokeTransparency = 0
-			elseif category == "BrainrotGod" then
-				lbl.Text = rainbowifyText(name)
-				lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-				lbl.TextStrokeTransparency = 0.2
-			else
-				lbl.Text = name
-				lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-				lbl.TextStrokeColor3 = Color3.fromRGB(30, 30, 30)
-				lbl.TextStrokeTransparency = 0.2
-			end
+			local textColor = Color3.new(1, 1, 1) -- varsayılan beyaz
+			local strokeColor = Color3.fromRGB(30, 30, 30)
 
 			-- Line ESP (Beam)
 			local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -159,19 +146,67 @@ local function createESP(name, category)
 
 				if category == "Secret" then
 					beam.Color = ColorSequence.new{
-						ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), -- beyaz kenar
-						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))   -- siyah iç
+						ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
 					}
-						elseif category == "BrainrotGod" then
-    beam.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 128)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 128))
-						}
+					beam.Transparency = NumberSequence.new(0.5)
+					lbl.Text = name
+					lbl.TextColor3 = Color3.fromRGB(0, 0, 0)
+					lbl.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+					lbl.TextStrokeTransparency = 0
+				elseif category == "BrainrotGod" then
+					local colors = {}
+					for i = 0, 1, 0.2 do
+						table.insert(colors, ColorSequenceKeypoint.new(i, Color3.fromHSV(i, 1, 1)))
+					end
+					beam.Color = ColorSequence.new(colors)
+					lbl.Text = rainbowifyText(name)
+					lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+					lbl.TextStrokeTransparency = 0.2
 				else
-					beam.Color = ColorSequence.new{
-						ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 180, 180)), -- gri
-						ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))  -- beyaz
-					}
+					-- Renk belirleme
+					if category == "Mythic" then
+						textColor = Color3.fromRGB(255, 60, 60)
+						beam.Color = ColorSequence.new{
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 0, 0)),
+							ColorSequenceKeypoint.new(1, textColor)
+						}
+					elseif category == "Legendary" then
+						textColor = Color3.fromRGB(255, 255, 100)
+						beam.Color = ColorSequence.new{
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),
+							ColorSequenceKeypoint.new(1, textColor)
+						}
+					elseif category == "Epic" then
+						textColor = Color3.fromRGB(180, 80, 255)
+						beam.Color = ColorSequence.new{
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 0, 180)),
+							ColorSequenceKeypoint.new(1, textColor)
+						}
+					elseif category == "Rare" then
+						textColor = Color3.fromRGB(100, 130, 255)
+						beam.Color = ColorSequence.new{
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 70, 150)),
+							ColorSequenceKeypoint.new(1, textColor)
+						}
+					elseif category == "Common" then
+						textColor = Color3.fromRGB(180, 180, 180)
+						beam.Color = ColorSequence.new{
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 90)),
+							ColorSequenceKeypoint.new(1, textColor)
+						}
+					else
+						textColor = Color3.fromRGB(255, 255, 255)
+						beam.Color = ColorSequence.new{
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 180, 180)),
+							ColorSequenceKeypoint.new(1, textColor)
+						}
+					end
+
+					lbl.Text = name
+					lbl.TextColor3 = textColor
+					lbl.TextStrokeColor3 = strokeColor
+					lbl.TextStrokeTransparency = 0.2
 				end
 
 				beam.Parent = primaryPart
