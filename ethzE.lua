@@ -307,7 +307,6 @@ local function createMainGUI()
     end)
 end
 
--- Bildirim sesi
 function sendNotification(title, text, duration)
 	local StarterGui = game:GetService("StarterGui")
 	StarterGui:SetCore("SendNotification", {
@@ -325,15 +324,10 @@ function playSound()
 	game.Debris:AddItem(sound, 5)
 end
 
-local knownPets = {}
+local knownPets = {} -- ?
 
--- Pet ESP aktiflerini takip et
 local activePetNames = {}
 
--- ESP toggle edildiğinde çağır:
--- örnek: activePetNames["Pipi Kiwi"] = true veya nil
-
--- Optimize edilen sürekli kontrol:
 task.spawn(function()
 	while true do
 		for petName, _ in pairs(activePetNames) do
