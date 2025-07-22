@@ -71,7 +71,7 @@ local function rainbowifyText(text: string): string
 local openPetGUIs = {}
 
 local function clearESP(name)
-	for _, model in pairs(Workspace:GetChildren()) do
+	local function cleanModel(model)
 		if model:IsA("Model") and model.Name == name then
 			local label = model:FindFirstChild("PetESPLabel")
 			if label then label:Destroy() end
@@ -87,10 +87,17 @@ local function clearESP(name)
 
 			local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 			if root then
-				local playerAtt = root:FindFirstChild("PlayerESP_Attachment_" .. name)
-				if playerAtt then playerAtt:Destroy() end
+				for _, att in pairs(root:GetChildren()) do
+					if att:IsA("Attachment") and att.Name:match("^PlayerESP_Attachment_" .. name) then
+						att:Destroy()
+					end
+				end
 			end
 		end
+	end
+
+	for _, obj in pairs(Workspace:GetDescendants()) do
+		cleanModel(obj)
 	end
 	end
 
