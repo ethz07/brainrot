@@ -3,7 +3,6 @@ local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService") 
 local LocalPlayer = Players.LocalPlayer 
 local Workspace = game:GetService("Workspace")
-
 local SoundService = game:GetService("SoundService")
 
 categoryToggles = {}
@@ -51,29 +50,25 @@ local function clearESP(name) for _, model in pairs(Workspace:GetDescendants()) 
 
 local function createESP(name)
 	for _, model in pairs(Workspace:GetDescendants()) do
-		if model:IsA("Model") and model.Name == name then
-			if model:FindFirstChild("PetESPLabel") then continue end
-
+		if model:IsA("Model") and model.Name == name and not model:FindFirstChild("PetESPLabel") then
 			local tag = Instance.new("BillboardGui")
 			tag.Name = "PetESPLabel"
 			tag.Adornee = model
 			tag.Size = UDim2.new(0, 100, 0, 20)
 			tag.StudsOffset = Vector3.new(0, 2.5, 0)
 			tag.AlwaysOnTop = true
+			tag.LightInfluence = 0
 			tag.Parent = model
 
 			local lbl = Instance.new("TextLabel", tag)
 			lbl.Size = UDim2.new(1, 0, 1, 0)
-			lbl.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-			lbl.BorderSizePixel = 1
-			lbl.BorderColor3 = Color3.fromRGB(100, 100, 100)
-			lbl.TextStrokeTransparency = 0.4
-			lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-			lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+			lbl.BackgroundTransparency = 1
+			lbl.Text = name
 			lbl.Font = Enum.Font.FredokaOne
 			lbl.TextScaled = true
-			lbl.Text = name
-			lbl.Parent = tag
+			lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+			lbl.TextStrokeTransparency = 0.2
+			lbl.TextStrokeColor3 = Color3.fromRGB(30, 30, 30) -- koyu gri kenarlık
 		end
 	end
 end
@@ -313,45 +308,46 @@ local function createMainGUI()
 end
 
 -- Bildirim sesi
-local function sendNotification(text)
-	local notif = Instance.new("TextLabel")
-	notif.Size = UDim2.new(0, 200, 0, 30)
-	notif.Position = UDim2.new(1, -220, 1, -40)
-	notif.AnchorPoint = Vector2.new(1, 1)
-	notif.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-	notif.TextColor3 = Color3.fromRGB(255, 255, 0)
-	notif.Font = Enum.Font.FredokaOne
-	notif.TextSize = 14
-	notif.Text = "Yeni Pet Görüldü: " .. text
-	notif.Parent = LocalPlayer:WaitForChild("PlayerGui")
-	Instance.new("UICorner", notif).CornerRadius = UDim.new(0, 6)
+function sendNotification(title, text, duration)
+	local StarterGui = game:GetService("StarterGui")
+	StarterGui:SetCore("SendNotification", {
+		Title = title,
+		Text = text,
+		Duration = duration or 3
+	})
+end
 
-	local sound = Instance.new("Sound", workspace)
-	sound.SoundId = "rbxassetid://9118823103" -- Basit ping sesi
+function playSound()
+	local sound = Instance.new("Sound", game:GetService("SoundService"))
+	sound.SoundId = "rbxassetid://9118823103" -- ding ses
+	sound.Volume = 2
 	sound:Play()
-	game.Debris:AddItem(sound, 2)
-	task.delay(3, function()
-		notif:Destroy()
-	end)
+	game.Debris:AddItem(sound, 5)
 end
 
 local knownPets = {}
 
-RunService.Heartbeat:Connect(function()
-	for category, pets in pairs(petData) do
-		if categoryToggles[category] then
-			for _, entry in pairs(pets) do
-				local name = typeof(entry) == "table" and entry[1] or entry
-				for _, obj in pairs(workspace:GetChildren()) do
-					if obj:IsA("Model") and obj.Name == name and not obj:FindFirstChild("PetESPLabel") then
-						createESP(name)
-						sendNotification(name)
-					end
+-- Pet ESP aktiflerini takip et
+local activePetNames = {}
+
+-- ESP toggle edildiğinde çağır:
+-- örnek: activePetNames["Pipi Kiwi"] = true veya nil
+
+-- Optimize edilen sürekli kontrol:
+task.spawn(function()
+	while true do
+		for petName, _ in pairs(activePetNames) do
+			for _, model in pairs(Workspace:GetChildren()) do
+				if model:IsA("Model") and model.Name == petName and not model:FindFirstChild("PetESPLabel") then
+					createESP(petName)
+					sendNotification("Yeni Pet Geldi!", petName .. " ESP uygulandı!", 3)
+					playSound()
 				end
 			end
 		end
+		task.wait(1.2)
 	end
 end)
 
 createMainGUI()
-print("zzz1")
+print("zzz2")
