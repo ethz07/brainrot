@@ -70,11 +70,40 @@ local function rainbowifyText(text: string): string
 
 local openPetGUIs = {}
 
-local function clearESP(name) for _, model in pairs(Workspace:GetDescendants()) do if model:IsA("Model") and model.Name == name then local esp = model:FindFirstChild("PetESP") if esp then esp:Destroy() end local gui = model:FindFirstChild("PetESPLabel") if gui then gui:Destroy() end end end end
+local function clearESP(name)
+	for _, model in pairs(Workspace:GetDescendants()) do
+		if model:IsA("Model") and model.Name == name then
+			-- Yazı etiketi
+			local esp = model:FindFirstChild("PetESP")
+			if esp then esp:Destroy() end
+
+			local label = model:FindFirstChild("PetESPLabel")
+			if label then label:Destroy() end
+
+			-- Çizgi (Beam) ve Attachments
+			local part = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+			if part then
+				local beam = part:FindFirstChild("PetESP_Beam")
+				if beam then beam:Destroy() end
+
+				local att = part:FindFirstChild("PetESP_Attachment")
+				if att then att:Destroy() end
+			end
+
+			-- Oyuncunun içindeki attachment (Beam'le bağlandıysa)
+			local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+			if root then
+				local playerAtt = root:FindFirstChild("PlayerESP_Attachment")
+				if playerAtt then playerAtt:Destroy() end
+			end
+		end
+	end
+	end
 
 local function createESP(name, category)
 	for _, model in pairs(Workspace:GetDescendants()) do
 		if model:IsA("Model") and model.Name == name and not model:FindFirstChild("PetESPLabel") then
+			-- Billboard GUI
 			local tag = Instance.new("BillboardGui")
 			tag.Name = "PetESPLabel"
 			tag.Adornee = model
@@ -89,13 +118,13 @@ local function createESP(name, category)
 			lbl.BackgroundTransparency = 1
 			lbl.Font = Enum.Font.FredokaOne
 			lbl.TextScaled = true
-			lbl.RichText = true -- RAINBOW için gerekli
+			lbl.RichText = true
 
 			if category == "Secret" then
 				lbl.Text = name
-				lbl.TextColor3 = Color3.fromRGB(0, 0, 0) -- siyah yazı
-				lbl.TextStrokeColor3 = Color3.fromRGB(255, 255, 255) -- beyaz kenarlık
-				lbl.TextStrokeTransparency = 0 -- tam görünür (kalın)
+				lbl.TextColor3 = Color3.fromRGB(0, 0, 0)
+				lbl.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+				lbl.TextStrokeTransparency = 0
 			elseif category == "BrainrotGod" then
 				lbl.Text = rainbowifyText(name)
 				lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -106,9 +135,53 @@ local function createESP(name, category)
 				lbl.TextStrokeColor3 = Color3.fromRGB(30, 30, 30)
 				lbl.TextStrokeTransparency = 0.2
 			end
+
+			-- Line ESP (Beam)
+			local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+			local primaryPart = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+			if root and primaryPart then
+				local petAttachment = Instance.new("Attachment", primaryPart)
+				petAttachment.Name = "PetESP_Attachment"
+
+				local playerAttachment = Instance.new("Attachment")
+				playerAttachment.Name = "PlayerESP_Attachment"
+				playerAttachment.Position = Vector3.new(0, 0, 0)
+				playerAttachment.Parent = root
+
+				local beam = Instance.new("Beam")
+				beam.Name = "PetESP_Beam"
+				beam.Attachment0 = playerAttachment
+				beam.Attachment1 = petAttachment
+				beam.FaceCamera = true
+				beam.Width0 = 0.08
+				beam.Width1 = 0.08
+				beam.Transparency = NumberSequence.new(0.4)
+
+				if category == "Secret" then
+					beam.Color = ColorSequence.new{
+						ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), -- beyaz kenar
+						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))         -- siyah iç
+						beam.Transparency = NumberSequence.new(0.5)
+					}
+				elseif category == "BrainrotGod" then
+					local colors = {}
+					for i = 0, 1, 0.2 do
+						table.insert(colors, ColorSequenceKeypoint.new(i, Color3.fromHSV(i, 1, 1)))
+					end
+					beam.Color = ColorSequence.new(colors)
+				else
+					beam.Color = ColorSequence.new{
+						ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 180, 180)), -- gri
+						ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))  -- beyaz
+						beam.Transparency = NumberSequence.new(0.5)
+					}
+				end
+
+				beam.Parent = primaryPart
+			end
 		end
 	end
-end
+	end
 
 local function createPetListGUI(category, pets) if openPetGUIs[category] then openPetGUIs[category]:Destroy() openPetGUIs[category] = nil return end
 
