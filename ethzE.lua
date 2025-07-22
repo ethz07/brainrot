@@ -103,7 +103,6 @@ minimizeBtn.MouseButton1Click:Connect(function()
     contentFrame.Visible = not minimized
 end)
 
-local minimized = false
 local contentFrame = Instance.new("ScrollingFrame", mainFrame)
 contentFrame.Size = UDim2.new(1, -10, 1, -40)
 contentFrame.Position = UDim2.new(0, 5, 0, 35)
@@ -135,7 +134,7 @@ local function createToggleButton(petType, index)
 
     button.MouseButton1Click:Connect(function()
         toggleStates[petType] = not toggleStates[petType]
-        button.BackgroundColor3 = toggleStates[petType] and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
+        button.TextColor3 = toggleStates[petType] and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 80, 80)
 
         if toggleStates[petType] then
             if openWindows[petType] then
@@ -266,11 +265,16 @@ function createPetWindow(category)
     scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y+6)
 
     close.MouseButton1Click:Connect(function()
-        gui:Destroy()
-        toggleStates[category] = false
-        clearHighlightsForCategory(category)
-    end)
-end
+    gui:Destroy()
+    toggleStates[category] = false
+    clearHighlightsForCategory(category)
+    -- Buton yazısını kırmızıya çevir
+    for _, btn in ipairs(contentFrame:GetChildren()) do
+        if btn:IsA("TextButton") and btn.Text:find(category) then
+            btn.TextColor3 = Color3.fromRGB(255, 80, 80)
+        end
+    end
+end)
 
 contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y+6)
 print("✨ GUI yüklendi")
