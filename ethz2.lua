@@ -594,8 +594,8 @@ local function tweenAnchorMove(startPos, endPos)
 	hum.PlatformStand = false
 end
 
--- Motor6D geçici kapatmalı R6 tp fonksiyonu
-local function R6Teleport(pos)
+-- Motor6D'leri geçici devre dışı bırakıp tp yapan method
+local function Motor6DTeleport(pos)
 	local char = player.Character or player.CharacterAdded:Wait()
 	local hrp = char:FindFirstChild("HumanoidRootPart")
 	local hum = char:FindFirstChildOfClass("Humanoid")
@@ -603,18 +603,17 @@ local function R6Teleport(pos)
 
 	hum.PlatformStand = true
 
-	-- Motor6D'leri geçici devre dışı bırak
 	for _, motor in pairs(char:GetDescendants()) do
 		if motor:IsA("Motor6D") then
 			motor.Enabled = false
 		end
 	end
 
-	-- Ani tp
+	hrp.Anchored = true
 	hrp.CFrame = CFrame.new(pos)
+	hrp.Velocity = Vector3.zero
 	task.wait(0.05)
 
-	-- Motor6D'leri geri aç
 	for _, motor in pairs(char:GetDescendants()) do
 		if motor:IsA("Motor6D") then
 			motor.Enabled = true
@@ -622,29 +621,20 @@ local function R6Teleport(pos)
 	end
 
 	hum.PlatformStand = false
+	hrp.Anchored = false
 end
 
--- Güncellenmiş TweenSteal fonksiyonu
-local function TweenSteal()
-	ToggleGod(true)
+-- Dikdörtgen içinde mi
+local function isPointInRect(point, rect)
+	if not rect then return false end
+	local cf = rect.CFrame
+	local size = rect.Size
+	local localPos = cf:PointToObjectSpace(point)
+	return math.abs(localPos.X) <= size.X / 2 and math.abs(localPos.Z) <= size.Z / 2
+end
 
-	local hrp = GetHRP()
-	local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	if not hrp or not hum then return end
-
-	-- Küçük zıplatma
-	hrp.CFrame = hrp.CFrame + Vector3.new(0, 2, 0)
-	task.wait(0.1)
-
-	local delivery, baseIndex = getOwnPlotHitboxAndBaseIndex()
-	if not delivery or not baseIndex then
-		warn("[TweenSteal]: ❌ Teslim kutusu ya da base alanı tespit edilemedi.")
-		ToggleGod(false)
-		return
-	end
-
-	local deliveryPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
-
+-- Base indexini ve current recti bul
+local function getRectIndices(deliveryPos)
 	local rects = {
 		workspace:FindFirstChild("Rect_1"),
 		workspace:FindFirstChild("Rect_2"),
@@ -652,6 +642,47 @@ local function TweenSteal()
 		workspace:FindFirstChild("Rect_4"),
 	}
 
+	local currentIndex, baseIndex
+
+	for i, rect in ipairs(rects) do
+		if isPointInRect(hrp.Position, rect) then
+			currentIndex = i
+		end
+		if isPointInRect(deliveryPos, rect) then
+			baseIndex = i
+		end
+	end
+
+	return currentIndex, baseIndex
+end
+
+-- Güncellenmiş ana fonksiyon
+local function TweenSteal()
+	local delivery
+	for _, v in ipairs(workspace.Plots:GetDescendants()) do
+		if v.Name == "DeliveryHitbox" and v.Parent:FindFirstChild("PlotSign") then
+			local sign = v.Parent:FindFirstChild("PlotSign")
+			if sign and sign:FindFirstChild("YourBase") and sign.YourBase.Enabled then
+				delivery = v
+				break
+			end
+		end
+	end
+	if not delivery then
+		warn("[TweenSteal]: ❌ Teslim kutusu bulunamadı.")
+		return
+	end
+
+	local deliveryPos = (delivery.CFrame * CFrame.new(0, -2.5, 0)).Position
+
+	-- Rect indexlerini bul
+	local currentIndex, baseIndex = getRectIndices(deliveryPos)
+	if not currentIndex or not baseIndex then
+		warn("[TweenSteal]: ❌ Geçerli dikdörtgen tespiti başarısız.")
+		return
+	end
+
+	-- Sıralı high tp
 	local highs = {
 		workspace:FindFirstChild("High_1"),
 		workspace:FindFirstChild("High_2"),
@@ -659,63 +690,65 @@ local function TweenSteal()
 		workspace:FindFirstChild("High_4"),
 	}
 
-	local currentIndex = nil
-	for i, rect in ipairs(rects) do
-		if isPointInRect(hrp.Position, rect) then
-			currentIndex = i
-			break
-		end
-	end
-
-	if not currentIndex then
-		warn("[TweenSteal]: ❌ Geçerli dikdörtgen üzerinde değilsin.")
-		ToggleGod(false)
-		return
-	end
-
-	-- High bloklara giderken ani R6 teleport
 	local step = currentIndex > baseIndex and -1 or 1
 	for i = currentIndex, baseIndex, step do
 		local high = highs[i]
 		if high then
-			R6Teleport(high.Position + Vector3.new(0, 2.5, 0))
+			Motor6DTeleport(high.Position + Vector3.new(0, 2.5, 0))
+			task.wait(0.2)
 		end
 	end
 
-	-- Son adım: Teslim noktasına tween ile git
-	tweenAnchorMove(hrp.Position, deliveryPos)
+	-- Tween uçuş kısmı
+	local fps = 60
+	local ping = 50
+	local stats = game:GetService("Stats")
+	local net = stats:FindFirstChild("Network")
+	if net and net:FindFirstChild("Ping") then
+		ping = net.Ping:GetValue()
+	end
 
-	-- Teslim noktası sabitleme
+	local startPos = hrp.Position
+	local endPos = deliveryPos
+	local height = 20
+	local steps = 50 + math.floor(ping / 10)
+	local delay = 1 / fps * 1.2
+
+	local random = Random.new()
+	for i = 1, steps do
+		local t = i / steps
+		local smooth = t * t * (3 - 2 * t)
+		local horizontal = startPos:Lerp(endPos, smooth)
+		local verticalOffset = math.sin(math.pi * smooth) * height
+		local jitter = Vector3.new(
+			random:NextNumber(-0.002, 0.002),
+			random:NextNumber(-0.002, 0.002),
+			random:NextNumber(-0.002, 0.002)
+		)
+
+		local finalPos = horizontal + Vector3.new(0, verticalOffset, 0) + jitter
+		hrp.CFrame = CFrame.new(finalPos)
+		task.wait(delay)
+	end
+
+	-- Son sabitleme
 	for _ = 1, 2 do
 		hrp.Anchored = true
 		hrp.CFrame = CFrame.new(0, -3e38, 0)
 		task.wait(0.1)
-		hrp.CFrame = CFrame.new(deliveryPos)
+		hrp.CFrame = CFrame.new(endPos)
 		hrp.Anchored = false
 		task.wait(0.1)
 	end
 
-	-- Başarı kontrolü
-	local finalDist = (hrp.Position - deliveryPos).Magnitude
+	local finalDist = (hrp.Position - endPos).Magnitude
 	if finalDist <= 60 then
-		local steals = Players.LocalPlayer:FindFirstChild("leaderstats") and Players.LocalPlayer.leaderstats:FindFirstChild("Steals")
-		if steals then
-			local oldValue = steals.Value
-			steals:GetPropertyChangedSignal("Value"):Once(function()
-				if steals.Value > oldValue then
-					showSuccessIcon()
-				else
-					showFailIcon()
-				end
-			end)
-		end
+		print("[TweenSteal]: ✅ Süzülerek başarılı!")
+		showSuccessIcon()
 	else
-		showFailIcon()
+		warn("[TweenSteal]: ❌ Başarısız, mesafe:", math.floor(finalDist))
 	end
-
-	ToggleGod(false)
 end
-	
 
 -- Butonlar
 local b1 = createButton("TP to Base", 1)
