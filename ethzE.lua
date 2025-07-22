@@ -86,6 +86,23 @@ closeBtn.Size = UDim2.new(0, 30, 1, 0)
 closeBtn.Position = UDim2.new(1, -30, 0, 0)
 closeBtn.BackgroundTransparency = 1
 
+-- Minimize Butonu
+local minimizeBtn = Instance.new("TextButton", titleBar)
+minimizeBtn.Text = "−"
+minimizeBtn.Font = Enum.Font.FredokaOne
+minimizeBtn.TextSize = 18
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 80)
+minimizeBtn.Size = UDim2.new(0, 30, 1, 0)
+minimizeBtn.Position = UDim2.new(1, -60, 0, 0)
+minimizeBtn.BackgroundTransparency = 1
+
+local minimized = false
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    contentFrame.Visible = not minimized
+end)
+
 local minimized = false
 local contentFrame = Instance.new("ScrollingFrame", mainFrame)
 contentFrame.Size = UDim2.new(1, -10, 1, -40)
@@ -212,23 +229,6 @@ function createPetWindow(category)
     close.Size = UDim2.new(0, 30, 1, 0)
     close.Position = UDim2.new(1, -30, 0, 0)
     close.BackgroundTransparency = 1
-
-    -- Minimize Butonu
-local minimizeBtn = Instance.new("TextButton", titleBar)
-minimizeBtn.Text = "−"
-minimizeBtn.Font = Enum.Font.FredokaOne
-minimizeBtn.TextSize = 18
-minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 80)
-minimizeBtn.Size = UDim2.new(0, 30, 1, 0)
-minimizeBtn.Position = UDim2.new(1, -60, 0, 0)
-minimizeBtn.BackgroundTransparency = 1
-
-local minimized = false
-
-minimizeBtn.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    contentFrame.Visible = not minimized
-end)
 
     local scroll = Instance.new("ScrollingFrame", win)
     scroll.Size = UDim2.new(1, -10, 1, -35)
