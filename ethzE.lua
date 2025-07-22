@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local player = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
 
 local petsData = {
 	Common = {
@@ -84,78 +85,127 @@ local petsData = {
 	}
 }
 
-local function createMainGUI()
-	local gui = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
+local function createGUI()
+	local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 	gui.Name = "EthzESP_Hub"
+	gui.ResetOnSpawn = false
+	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	gui.IgnoreGuiInset = true
 
 	local frame = Instance.new("Frame", gui)
-	frame.Size = UDim2.new(0, 265, 0, 350)
+	frame.Size = UDim2.new(0, 260, 0, 350)
 	frame.Position = UDim2.new(0.5, -130, 0.5, -175)
-	frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	frame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+	frame.BorderSizePixel = 0
 	frame.Active = true
 	frame.Draggable = true
+	local frameCorner = Instance.new("UICorner", frame)
+	frameCorner.CornerRadius = UDim.new(0, 10)
 
-	local uic = Instance.new("UICorner", frame)
-	uic.CornerRadius = UDim.new(0, 10)
+	-- Başlık barı
+	local titleBar = Instance.new("Frame", frame)
+	titleBar.Size = UDim2.new(1, 0, 0, 35)
+	titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+	titleBar.BorderSizePixel = 0
+	local titleCorner = Instance.new("UICorner", titleBar)
+	titleCorner.CornerRadius = UDim.new(0, 10)
 
+	local title = Instance.new("TextLabel", titleBar)
+	title.Text = "ETHZ FARM TTS"
+	title.Font = Enum.Font.FredokaOne
+	title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	title.TextSize = 18
+	title.Size = UDim2.new(1, -70, 1, 0)
+	title.Position = UDim2.new(0, 10, 0, 0)
+	title.BackgroundTransparency = 1
+	title.TextXAlignment = Enum.TextXAlignment.Left
+
+	-- Minimize Butonu
+	local minimize = Instance.new("TextButton", titleBar)
+	minimize.Text = "-"
+	minimize.Font = Enum.Font.FredokaOne
+	minimize.TextSize = 18
+	minimize.Size = UDim2.new(0, 30, 0, 30)
+	minimize.Position = UDim2.new(1, -65, 0, 2)
+	minimize.BackgroundTransparency = 1
+	minimize.TextColor3 = Color3.fromRGB(255, 215, 0)
+
+	-- Close Butonu
+	local close = Instance.new("TextButton", titleBar)
+	close.Text = "X"
+	close.Font = Enum.Font.FredokaOne
+	close.TextSize = 18
+	close.Size = UDim2.new(0, 30, 0, 30)
+	close.Position = UDim2.new(1, -35, 0, 2)
+	close.BackgroundTransparency = 1
+	close.TextColor3 = Color3.fromRGB(255, 0, 0)
+
+	-- Scroll alanı
 	local scroll = Instance.new("ScrollingFrame", frame)
-	scroll.Size = UDim2.new(1, 0, 1, 0)
-	scroll.CanvasSize = UDim2.new(0, 0, 0, 700)
+	scroll.Size = UDim2.new(1, 0, 1, -35)
+	scroll.Position = UDim2.new(0, 0, 0, 35)
+	scroll.CanvasSize = UDim2.new(0, 0, 0, 600)
 	scroll.ScrollBarThickness = 5
 	scroll.BackgroundTransparency = 1
-
 	local uiList = Instance.new("UIListLayout", scroll)
-	uiList.Padding = UDim.new(0, 6)
+	uiList.Padding = UDim.new(0, 8)
 	uiList.SortOrder = Enum.SortOrder.LayoutOrder
 
-	local categories = {
-		"Common", "Rare", "Epic", "Legendary", "Mythic", "BrainrotGod", "Secret"
-	}
+	-- Toggle durumları
+	local categoryToggles = {}
 
-	local toggles = {}
+	-- Buton oluşturma fonksiyonu
+	local function addCategory(name)
+		local holder = Instance.new("Frame", scroll)
+		holder.Size = UDim2.new(1, -10, 0, 35)
+		holder.BackgroundTransparency = 1
 
-	for _, cat in ipairs(categories) do
-		local container = Instance.new("Frame", scroll)
-		container.Size = UDim2.new(1, -10, 0, 35)
-		container.BackgroundTransparency = 1
-
-		local btn = Instance.new("TextButton", container)
-		btn.Text = cat .. " ESP"
+		local btn = Instance.new("TextButton", holder)
+		btn.Text = name .. " ESP"
 		btn.Size = UDim2.new(0.75, 0, 1, 0)
-		btn.Position = UDim2.new(0, 0, 0, 0)
 		btn.Font = Enum.Font.FredokaOne
-		btn.TextColor3 = Color3.new(1, 1, 1)
 		btn.TextSize = 14
-		btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+		btn.BorderSizePixel = 0
+		local corner = Instance.new("UICorner", btn)
+		corner.CornerRadius = UDim.new(0, 6)
 
-		local toggle = Instance.new("Frame", container)
+		local toggle = Instance.new("Frame", holder)
 		toggle.Size = UDim2.new(0, 25, 0, 25)
 		toggle.Position = UDim2.new(1, -30, 0.5, -12)
 		toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-		local uiCorner = Instance.new("UICorner", toggle)
-		uiCorner.CornerRadius = UDim.new(1, 0)
 		toggle.BorderSizePixel = 1
 		toggle.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		local tCorner = Instance.new("UICorner", toggle)
+		tCorner.CornerRadius = UDim.new(1, 0)
 
-		toggles[cat] = false
+		categoryToggles[name] = false
 
 		btn.MouseButton1Click:Connect(function()
-			toggles[cat] = not toggles[cat]
-			toggle.BackgroundColor3 = toggles[cat] and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-
-			if toggles[cat] then
-				spawn(function()
-					loadPetWindow(cat, petsData[cat])
-				end)
-			else
-				local existing = game.Players.LocalPlayer.PlayerGui:FindFirstChild("ESP_"..cat)
-				if existing then
-					existing:Destroy()
-				end
-			end
+			categoryToggles[name] = not categoryToggles[name]
+			toggle.BackgroundColor3 = categoryToggles[name] and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+			-- Load / Unload GUI burada olacak (devam scriptinde)
 		end)
 	end
+
+	-- Kategoriler
+	local petCategories = {"Common", "Rare", "Epic", "Legendary", "Mythic", "BrainrotGod", "Secret"}
+	for _, cat in ipairs(petCategories) do
+		addCategory(cat)
+	end
+
+	-- Buton işlevleri
+	minimize.MouseButton1Click:Connect(function()
+		scroll.Visible = not scroll.Visible
+		frame.Size = scroll.Visible and UDim2.new(0, 260, 0, 350) or UDim2.new(0, 260, 0, 35)
+	end)
+
+	close.MouseButton1Click:Connect(function()
+		gui:Destroy()
+	end)
 end
+
 
 function loadPetWindow(category, petList)
 	local gui = Instance.new("ScreenGui", Players.LocalPlayer.PlayerGui)
