@@ -644,12 +644,16 @@ local function getRectIndices(deliveryPos)
 
 	local currentIndex, baseIndex
 
+	local hrp = GetHRP()
+
 	for i, rect in ipairs(rects) do
-		if isPointInRect(hrp.Position, rect) then
-			currentIndex = i
-		end
-		if isPointInRect(deliveryPos, rect) then
-			baseIndex = i
+		if rect then
+			if isPointInRect(hrp.Position, rect) then
+				currentIndex = i
+			end
+			if isPointInRect(deliveryPos, rect) then
+				baseIndex = i
+			end
 		end
 	end
 
