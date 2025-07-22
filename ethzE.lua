@@ -67,7 +67,6 @@ local function rainbowifyText(text: string): string
 	end
 	return rainbowText
 	end
-end
 
 local openPetGUIs = {}
 
