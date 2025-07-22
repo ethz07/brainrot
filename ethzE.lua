@@ -39,8 +39,6 @@ local petData = {
 	}
 }
 
-local categoryToggles = {}
-
 local openPetGUIs = {}
 
 local function clearESP(name) for _, model in pairs(Workspace:GetDescendants()) do if model:IsA("Model") and model.Name == name then local esp = model:FindFirstChild("PetESP") if esp then esp:Destroy() end local gui = model:FindFirstChild("PetESPLabel") if gui then gui:Destroy() end end end end
