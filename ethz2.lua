@@ -594,6 +594,37 @@ local function tweenAnchorMove(startPos, endPos)
 	hum.PlatformStand = false
 end
 
+-- Motor6D geçici kapatmalı R6 tp fonksiyonu
+local function R6Teleport(pos)
+	local char = player.Character or player.CharacterAdded:Wait()
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if not hrp or not hum then return end
+
+	hum.PlatformStand = true
+
+	-- Motor6D'leri geçici devre dışı bırak
+	for _, motor in pairs(char:GetDescendants()) do
+		if motor:IsA("Motor6D") then
+			motor.Enabled = false
+		end
+	end
+
+	-- Ani tp
+	hrp.CFrame = CFrame.new(pos)
+	task.wait(0.05)
+
+	-- Motor6D'leri geri aç
+	for _, motor in pairs(char:GetDescendants()) do
+		if motor:IsA("Motor6D") then
+			motor.Enabled = true
+		end
+	end
+
+	hum.PlatformStand = false
+end
+
+-- Güncellenmiş TweenSteal fonksiyonu
 local function TweenSteal()
 	ToggleGod(true)
 
@@ -642,18 +673,19 @@ local function TweenSteal()
 		return
 	end
 
+	-- High bloklara giderken ani R6 teleport
 	local step = currentIndex > baseIndex and -1 or 1
 	for i = currentIndex, baseIndex, step do
 		local high = highs[i]
 		if high then
-			tweenAnchorMove(hrp.Position, high.Position + Vector3.new(0, 2.5, 0))
+			R6Teleport(high.Position + Vector3.new(0, 2.5, 0))
 		end
 	end
 
-	-- 🧠 Target'a aynı sistemle git
+	-- Son adım: Teslim noktasına tween ile git
 	tweenAnchorMove(hrp.Position, deliveryPos)
 
-	-- Hedefe sabitleme
+	-- Teslim noktası sabitleme
 	for _ = 1, 2 do
 		hrp.Anchored = true
 		hrp.CFrame = CFrame.new(0, -3e38, 0)
@@ -683,6 +715,7 @@ local function TweenSteal()
 
 	ToggleGod(false)
 end
+	
 
 -- Butonlar
 local b1 = createButton("TP to Base", 1)
