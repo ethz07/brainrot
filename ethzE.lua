@@ -207,7 +207,7 @@ for _, entry in pairs(pets) do
 		isOn = not isOn
 		toggle.BackgroundColor3 = isOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
 		if isOn then
-			createESP(name)
+			createESP(name, category)
 			activePetNames[name] = true
 		else
 			clearESP(name)
@@ -353,7 +353,7 @@ task.spawn(function()
 		for petName, _ in pairs(activePetNames) do
 			for _, model in pairs(Workspace:GetChildren()) do
 				if model:IsA("Model") and model.Name == petName and not model:FindFirstChild("PetESPLabel") then
-					createESP(petName)
+					createESP(petName, category)
 					sendNotification("Yeni Pet Geldi!", petName .. " ESP uygulandı!", 3)
 					playSound()
 				end
