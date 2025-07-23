@@ -27,7 +27,7 @@ gui.ResetOnSpawn = false
 
 -- Ana Frame
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 270, 0, 320)
+frame.Size = UDim2.new(0, 270, 0, 250)
 frame.Position = UDim2.new(0.5, -135, 0.5, -160)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 frame.Active = true
@@ -44,7 +44,7 @@ Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 10)
 
 -- Title
 local title = Instance.new("TextLabel", titleBar)
-title.Text = "ethz ESP Panel"
+title.Text = "ethz SAB Script"
 title.Font = Enum.Font.FredokaOne
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextSize = 16
@@ -100,7 +100,7 @@ end)
 
 -- BOOST Ayraç
 local boostLabel = Instance.new("TextLabel", scrolling)
-boostLabel.Text = "——— BOOST ———"
+boostLabel.Text = "——— Boost ———"
 boostLabel.Font = Enum.Font.FredokaOne
 boostLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
 boostLabel.TextSize = 12
@@ -159,29 +159,39 @@ separator2.Position = UDim2.new(0, 0, 0, 135)
 separator2.Size = UDim2.new(1, 0, 0, 20)
 separator2.BackgroundTransparency = 1
 
+-- Nametag ESP Butonu
 local nameBtn = Instance.new("TextButton", scrolling)
-nameBtn.Text = "Nametag ESP"
-nameBtn.Font = Enum.Font.FredokaOne
-nameBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-nameBtn.TextSize = 14
-nameBtn.Size = UDim2.new(0.7, 0, 0, 30)
+nameBtn.Size = UDim2.new(0.9, 0, 0, 40)
 nameBtn.Position = UDim2.new(0.05, 0, 0, 160)
 nameBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
-Instance.new("UICorner", nameBtn).CornerRadius = UDim.new(0, 6)
+nameBtn.Font = Enum.Font.FredokaOne
+nameBtn.TextSize = 16
+nameBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+nameBtn.Text = "Enable Nametag ESP"
+Instance.new("UICorner", nameBtn).CornerRadius = UDim.new(0, 8)
 
-local nameToggle = Instance.new("Frame", nameBtn)
-nameToggle.Size = UDim2.new(0, 20, 0, 20)
-nameToggle.Position = UDim2.new(1.1, 0, 0.5, -10)
-nameToggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-nameToggle.BorderSizePixel = 1
-nameToggle.BorderColor3 = Color3.new(0, 0, 0)
-Instance.new("UICorner", nameToggle).CornerRadius = UDim.new(1, 0)
+-- Durum güncelleme fonksiyonu
+local function updateNameBtn(enabled)
+	if enabled then
+		nameBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0) -- yeşil aktif
+		nameBtn.Text = "Disable Nametag ESP"
+	else
+		nameBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50) -- koyu gri pasif
+		nameBtn.Text = "Enable Nametag ESP"
+	end
+end
 
+updateNameBtn(nametagESPEnabled)
+
+-- Buton tıklama eventi
 nameBtn.MouseButton1Click:Connect(function()
 	nametagESPEnabled = not nametagESPEnabled
-	nameToggle.BackgroundColor3 = nametagESPEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+	updateNameBtn(nametagESPEnabled)
+
+	-- Mevcut nametagları temizle
 	for _, tag in pairs(nametags) do tag:Destroy() end
 	table.clear(nametags)
+
 	if nametagESPEnabled then
 		for _, plr in ipairs(Players:GetPlayers()) do
 			if plr ~= LocalPlayer then
@@ -209,30 +219,38 @@ nameBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- BODY ESP TOGGLE
 local bodyBtn = Instance.new("TextButton", scrolling)
-bodyBtn.Text = "Body ESP"
-bodyBtn.Font = Enum.Font.FredokaOne
-bodyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-bodyBtn.TextSize = 14
-bodyBtn.Size = UDim2.new(0.7, 0, 0, 30)
-bodyBtn.Position = UDim2.new(0.05, 0, 0, 200)
+bodyBtn.Size = UDim2.new(0.9, 0, 0, 40)
+bodyBtn.Position = UDim2.new(0.05, 0, 0, 210) -- Nametag'den biraz aşağıda
 bodyBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
-Instance.new("UICorner", bodyBtn).CornerRadius = UDim.new(0, 6)
+bodyBtn.Font = Enum.Font.FredokaOne
+bodyBtn.TextSize = 16
+bodyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+bodyBtn.Text = "Enable Body ESP"
+Instance.new("UICorner", bodyBtn).CornerRadius = UDim.new(0, 8)
 
-local bodyToggle = Instance.new("Frame", bodyBtn)
-bodyToggle.Size = UDim2.new(0, 20, 0, 20)
-bodyToggle.Position = UDim2.new(1.1, 0, 0.5, -10)
-bodyToggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-bodyToggle.BorderSizePixel = 1
-bodyToggle.BorderColor3 = Color3.new(0, 0, 0)
-Instance.new("UICorner", bodyToggle).CornerRadius = UDim.new(1, 0)
+-- Durum güncelleme fonksiyonu
+local function updateBodyBtn(enabled)
+	if enabled then
+		bodyBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0) -- yeşil aktif
+		bodyBtn.Text = "Disable Body ESP"
+	else
+		bodyBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50) -- koyu gri pasif
+		bodyBtn.Text = "Enable Body ESP"
+	end
+end
 
+updateBodyBtn(bodyESPEnabled)
+
+-- Buton tıklama eventi
 bodyBtn.MouseButton1Click:Connect(function()
 	bodyESPEnabled = not bodyESPEnabled
-	bodyToggle.BackgroundColor3 = bodyESPEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+	updateBodyBtn(bodyESPEnabled)
+
+	-- Mevcut highlightları temizle
 	for _, h in pairs(highlights) do h:Destroy() end
 	table.clear(highlights)
+
 	if bodyESPEnabled then
 		for _, plr in ipairs(Players:GetPlayers()) do
 			if plr ~= LocalPlayer then
