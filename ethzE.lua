@@ -246,6 +246,7 @@ local function createPetListGUI(category, pets)
 	title.Position = UDim2.new(0, 10, 0, 0)
 	title.TextXAlignment = Enum.TextXAlignment.Left
 
+--[[
 	local close = Instance.new("TextButton", frame)
 	close.Text = "X"
 	close.Size = UDim2.new(0, 25, 0, 25)
@@ -258,6 +259,7 @@ local function createPetListGUI(category, pets)
 		gui:Destroy()
 		openPetGUIs[category] = nil
 	end)
+--]]
 
 	local minimize = Instance.new("TextButton", frame)
 	minimize.Text = "-"
