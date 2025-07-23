@@ -26,7 +26,7 @@ gui.ResetOnSpawn = false
 
 -- Ana Frame
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 270, 0, 250)
+frame.Size = UDim2.new(0, 270, 0, 200)
 frame.Position = UDim2.new(0.5, -135, 0.5, -160)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 frame.Active = true
@@ -90,7 +90,7 @@ local minimized = false
 minimizeBtn.MouseButton1Click:Connect(function()
 	minimized = not minimized
 	scrolling.Visible = not minimized
-	frame.Size = minimized and UDim2.new(0, 270, 0, 35) or UDim2.new(0, 270, 0, 320)
+	frame.Size = minimized and UDim2.new(0, 270, 0, 35) or UDim2.new(0, 270, 0, 200)
 end)
 
 closeBtn.MouseButton1Click:Connect(function()
