@@ -328,18 +328,25 @@ local function createPetListGUI(category, pets)
 			label.Size = UDim2.new(0.4, -35, 1, 0)
 		end
 
-		local isOn = false
-		btn.MouseButton1Click:Connect(function()
-			isOn = not isOn
-			toggle.BackgroundColor3 = isOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-			if isOn then
-				createESP(name, category)
-				activePetNames[name] = category -- burada kategori atandı
-			else
-				clearESP(name)
-				activePetNames[name] = nil
-			end
-		end)
+		-- dışarıda:
+local isOn = activePetNames[name] ~= nil
+
+-- başlangıçta buton rengini ayarla:
+toggle.BackgroundColor3 = isOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+
+-- tıklama:
+btn.MouseButton1Click:Connect(function()
+	isOn = not isOn
+	toggle.BackgroundColor3 = isOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+
+	if isOn then
+		createESP(name, category)
+		activePetNames[name] = category
+	else
+		clearESP(name)
+		activePetNames[name] = nil
+	end
+end)
 	end
 	end
 
