@@ -1,5 +1,4 @@
--- ethz ESP + Boost GUI - Tümleşik Versiyon
--- by _ethz
+-- by ethz
 
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -10,7 +9,7 @@ local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 local LocalPlayer = player
 
--- GLOBAL FLAGS
+-- flag
 local boostEnabled = false
 local boostConns = {}
 local lastPart = nil
@@ -19,12 +18,10 @@ local bodyESPEnabled = false
 local highlights = {}
 local nametags = {}
 
--- GUI
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "ethzMainGUI"
 gui.ResetOnSpawn = false
 
--- Ana Frame
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0, 270, 0, 200)
 frame.Position = UDim2.new(0.5, -135, 0.5, -160)
@@ -33,7 +30,6 @@ frame.Active = true
 frame.Draggable = true
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
--- TitleBar
 local titleBar = Instance.new("Frame", frame)
 titleBar.Size = UDim2.new(1, 0, 0, 35)
 titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
@@ -41,7 +37,6 @@ titleBar.BorderSizePixel = 0
 titleBar.Active = true
 Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 10)
 
--- Title
 local title = Instance.new("TextLabel", titleBar)
 title.Text = "ethz SAB Script"
 title.Font = Enum.Font.FredokaOne
@@ -52,7 +47,6 @@ title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
 title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Minimize & Close Butonları
 local buttonFrame = Instance.new("Frame", titleBar)
 buttonFrame.Size = UDim2.new(0, 60, 1, 0)
 buttonFrame.Position = UDim2.new(1, -60, 0, 0)
@@ -75,7 +69,6 @@ closeBtn.Size = UDim2.new(0.5, 0, 1, 0)
 closeBtn.Position = UDim2.new(0.5, 0, 0, 0)
 closeBtn.BackgroundTransparency = 1
 
--- Scroll Alanı
 local scrolling = Instance.new("ScrollingFrame", frame)
 scrolling.Size = UDim2.new(1, 0, 1, -35)
 scrolling.Position = UDim2.new(0, 0, 0, 35)
@@ -85,7 +78,6 @@ scrolling.BackgroundTransparency = 1
 scrolling.AutomaticCanvasSize = Enum.AutomaticSize.Y
 scrolling.CanvasPosition = Vector2.new(0, 0)
 
--- Minimize / Close işlevi
 local minimized = false
 minimizeBtn.MouseButton1Click:Connect(function()
 	minimized = not minimized
@@ -97,7 +89,6 @@ closeBtn.MouseButton1Click:Connect(function()
 	gui:Destroy()
 end)
 
--- BOOST Ayraç
 local boostLabel = Instance.new("TextLabel", scrolling)
 boostLabel.Text = "——— Boost ———"
 boostLabel.Font = Enum.Font.FredokaOne
@@ -107,7 +98,6 @@ boostLabel.Position = UDim2.new(0, 0, 0, 0)
 boostLabel.Size = UDim2.new(1, 0, 0, 20)
 boostLabel.BackgroundTransparency = 1
 
--- BOOST Toggle Butonu
 local boostBtn = Instance.new("TextButton", scrolling)
 boostBtn.Text = "Enable Boost"
 boostBtn.Font = Enum.Font.FredokaOne
@@ -118,7 +108,6 @@ boostBtn.Position = UDim2.new(0.05, 0, 0, 25)
 boostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 Instance.new("UICorner", boostBtn).CornerRadius = UDim.new(0, 6)
 
--- BRAINROT ESP Ayraç
 local separator1 = Instance.new("TextLabel", scrolling)
 separator1.Text = "——— Brainrot ESP ———"
 separator1.Font = Enum.Font.FredokaOne
@@ -128,7 +117,6 @@ separator1.Position = UDim2.new(0, 0, 0, 70)
 separator1.Size = UDim2.new(1, 0, 0, 20)
 separator1.BackgroundTransparency = 1
 
--- Brainrot ESP Butonu
 local brainrotBtn = Instance.new("TextButton", scrolling)
 brainrotBtn.Text = "Brainrot ESP"
 brainrotBtn.Font = Enum.Font.FredokaOne
@@ -143,7 +131,6 @@ brainrotBtn.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/ethz07/brainrot/refs/heads/main/ethzE.lua"))()
 end)
 
--- PLAYER ESP Ayraç
 local separator2 = Instance.new("TextLabel", scrolling)
 separator2.Text = "——— Player ESP ———"
 separator2.Font = Enum.Font.FredokaOne
@@ -153,7 +140,6 @@ separator2.Position = UDim2.new(0, 0, 0, 135)
 separator2.Size = UDim2.new(1, 0, 0, 20)
 separator2.BackgroundTransparency = 1
 
--- Nametag ESP Butonu
 local nameBtn = Instance.new("TextButton", scrolling)
 nameBtn.Size = UDim2.new(0.9, 0, 0, 40)
 nameBtn.Position = UDim2.new(0.05, 0, 0, 160)
@@ -164,7 +150,6 @@ nameBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 nameBtn.Text = "Enable Nametag ESP"
 Instance.new("UICorner", nameBtn).CornerRadius = UDim.new(0, 8)
 
--- Durum güncelleme fonksiyonu
 local function updateNameBtn(enabled)
 	if enabled then
 		nameBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0) -- yeşil aktif
@@ -177,12 +162,10 @@ end
 
 updateNameBtn(nametagESPEnabled)
 
--- Buton tıklama eventi
 nameBtn.MouseButton1Click:Connect(function()
 	nametagESPEnabled = not nametagESPEnabled
 	updateNameBtn(nametagESPEnabled)
 
-	-- Mevcut nametagları temizle
 	for _, tag in pairs(nametags) do tag:Destroy() end
 	table.clear(nametags)
 
@@ -215,7 +198,7 @@ end)
 
 local bodyBtn = Instance.new("TextButton", scrolling)
 bodyBtn.Size = UDim2.new(0.9, 0, 0, 40)
-bodyBtn.Position = UDim2.new(0.05, 0, 0, 210) -- Nametag'den biraz aşağıda
+bodyBtn.Position = UDim2.new(0.05, 0, 0, 210)
 bodyBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
 bodyBtn.Font = Enum.Font.FredokaOne
 bodyBtn.TextSize = 14
@@ -233,12 +216,10 @@ end
 
 updateBodyBtn(bodyESPEnabled)
 
--- Buton tıklama eventi
 bodyBtn.MouseButton1Click:Connect(function()
 	bodyESPEnabled = not bodyESPEnabled
 	updateBodyBtn(bodyESPEnabled)
-
-	-- Mevcut highlightları temizle
+		
 	for _, h in pairs(highlights) do h:Destroy() end
 	table.clear(highlights)
 
@@ -346,7 +327,6 @@ local function enableBoost()
 	protect()
 end
 
--- BOOST Devre Dışı
 local function disableBoost()
 	for _, conn in pairs(boostConns) do
 		if conn and typeof(conn) == "RBXScriptConnection" then
@@ -360,7 +340,6 @@ local function disableBoost()
 	end
 end
 
--- Boost Buton Fonksiyonu
 boostBtn.MouseButton1Click:Connect(function()
 	boostEnabled = not boostEnabled
 	boostBtn.Text = boostEnabled and "Disable Boost" or "Enable Boost"
@@ -371,3 +350,4 @@ boostBtn.MouseButton1Click:Connect(function()
 	end
 end)
 		
+print("🔋")
