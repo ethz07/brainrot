@@ -113,7 +113,7 @@ boostBtn.Text = "Enable Boost"
 boostBtn.Font = Enum.Font.FredokaOne
 boostBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostBtn.TextSize = 14
-boostBtn.Size = UDim2.new(0.9, 0, 0, 30)
+boostBtn.Size = UDim2.new(0.9, 0, 0, 40)
 boostBtn.Position = UDim2.new(0.05, 0, 0, 25)
 boostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 Instance.new("UICorner", boostBtn).CornerRadius = UDim.new(0, 6)
@@ -134,7 +134,7 @@ brainrotBtn.Text = "Brainrot ESP"
 brainrotBtn.Font = Enum.Font.FredokaOne
 brainrotBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 brainrotBtn.TextSize = 14
-brainrotBtn.Size = UDim2.new(0.9, 0, 0, 30)
+brainrotBtn.Size = UDim2.new(0.9, 0, 0, 40)
 brainrotBtn.Position = UDim2.new(0.05, 0, 0, 95)
 brainrotBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50) -- koyu gri
 Instance.new("UICorner", brainrotBtn).CornerRadius = UDim.new(0, 8)
@@ -223,13 +223,10 @@ bodyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 bodyBtn.Text = "Enable Body ESP"
 Instance.new("UICorner", bodyBtn).CornerRadius = UDim.new(0, 8)
 
--- Durum güncelleme fonksiyonu
 local function updateBodyBtn(enabled)
 	if enabled then
-		bodyBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0) -- yeşil aktif
 		bodyBtn.Text = "Disable Body ESP"
 	else
-		bodyBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50) -- koyu gri pasif
 		bodyBtn.Text = "Enable Body ESP"
 	end
 end
