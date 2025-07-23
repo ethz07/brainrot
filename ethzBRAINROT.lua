@@ -18,7 +18,6 @@ local nametagESPEnabled = false
 local bodyESPEnabled = false
 local highlights = {}
 local nametags = {}
-_G.brainrotESPloaded = false
 
 -- GUI
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
@@ -141,12 +140,7 @@ brainrotBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50) -- koyu gri
 Instance.new("UICorner", brainrotBtn).CornerRadius = UDim.new(0, 8)
 
 brainrotBtn.MouseButton1Click:Connect(function()
-	if not _G.brainrotESPloaded then
-		_G.brainrotESPloaded = true
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/ethz07/brainrot/refs/heads/main/ethzE.lua"))()
-	else
-		warn("✅ Brainrot ESP zaten yüklendi.")
-	end
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ethz07/brainrot/refs/heads/main/ethzE.lua"))()
 end)
 
 -- PLAYER ESP Ayraç
