@@ -237,7 +237,7 @@ local function createPetListGUI(category, pets)
 	Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
 	local title = Instance.new("TextLabel", frame)
-	title.Text = category .. " Pets"
+	title.Text = category .. " Brainrots"
 	title.Font = Enum.Font.FredokaOne
 	title.TextSize = 14
 	title.TextColor3 = Color3.fromRGB(255, 255, 255)
