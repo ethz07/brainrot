@@ -251,7 +251,8 @@ bodyBtn.MouseButton1Click:Connect(function()
 				end
 			end
 		end
-		end
+	end
+end)
 
 local function enableBoost()
 	local player = game.Players.LocalPlayer
