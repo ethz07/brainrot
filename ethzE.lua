@@ -175,7 +175,7 @@ local function applyESPToModel(model, name, category)
 		beam.FaceCamera = true
 		beam.Width0 = 0.30
 		beam.Width1 = 0.30
-		beam.Transparency = NumberSequence.new(1)
+		beam.Transparency = NumberSequence.new(0)
 
 		if category == "BrainrotGod" then
 			local colors = {}
@@ -189,7 +189,7 @@ local function applyESPToModel(model, name, category)
 				ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
 				ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
 			}
-			beam.Transparency = NumberSequence.new(1)
+			beam.Transparency = NumberSequence.new(0)
 		else
 			beam.Color = ColorSequence.new{
 				ColorSequenceKeypoint.new(0, lineColor1),
