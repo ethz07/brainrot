@@ -137,8 +137,6 @@ local function disableBoost()
 end
 -- end of boost function
 
-
-
 -- BOOST Ayraç
 local boostLabel = Instance.new("TextLabel", frame)
 boostLabel.Text = "——— BOOST ———"
