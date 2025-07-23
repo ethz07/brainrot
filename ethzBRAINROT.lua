@@ -1,4 +1,11 @@
 -- check
+local boostEnabled = false
+local boostConns = {}
+local lastPart = nil
+local nametagESPEnabled = false
+local bodyESPEnabled = false
+local highlights = {}
+local nametags = {}
 _G.brainrotESPloaded = false
 
 local Players = game:GetService("Players")
