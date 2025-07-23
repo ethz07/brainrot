@@ -173,9 +173,9 @@ local function applyESPToModel(model, name, category)
 		beam.Attachment0 = playerAttachment
 		beam.Attachment1 = petAttachment
 		beam.FaceCamera = true
-		beam.Width0 = 0.15
-		beam.Width1 = 0.15
-		beam.Transparency = NumberSequence.new(0.4)
+		beam.Width0 = 0.30
+		beam.Width1 = 0.30
+		beam.Transparency = NumberSequence.new(1)
 
 		if category == "BrainrotGod" then
 			local colors = {}
@@ -189,7 +189,7 @@ local function applyESPToModel(model, name, category)
 				ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
 				ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
 			}
-			beam.Transparency = NumberSequence.new(0.5)
+			beam.Transparency = NumberSequence.new(1)
 		else
 			beam.Color = ColorSequence.new{
 				ColorSequenceKeypoint.new(0, lineColor1),
