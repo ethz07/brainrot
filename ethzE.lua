@@ -264,7 +264,7 @@ local function createPetListGUI(category, pets)
 	local minimize = Instance.new("TextButton", frame)
 	minimize.Text = "-"
 	minimize.Size = UDim2.new(0, 25, 0, 25)
-	minimize.Position = UDim2.new(1, -60, 0, 3)
+	minimize.Position = UDim2.new(1, -30, 0, 0)
 	minimize.TextColor3 = Color3.fromRGB(255, 215, 0)
 	minimize.BackgroundTransparency = 1
 	minimize.Font = Enum.Font.FredokaOne
