@@ -9,10 +9,43 @@ local Camera = Workspace.CurrentCamera
 local player = Players.LocalPlayer
 local LocalPlayer = player
 
--- instance
+-- instances
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+local toggleFrame = Instance.new("Frame")
+local toggleUICorner = Instance.new("UICorner", toggleFrame)
+local toggleStroke = Instance.new("UIStroke", toggleFrame)
+local toggleButton = Instance.new("TextButton")
+local mainFrame = Instance.new("Frame")
+local mainCorner = Instance.new("UICorner", mainFrame)
+local mainStroke = Instance.new("UIStroke", mainFrame)
+local titleLabel = Instance.new("TextLabel")
+local boostBtn = Instance.new("TextButton")
+local boostMobileGui = Instance.new("ScreenGui")
+local boostFrame = Instance.new("Frame")
+local boostRGBStroke = Instance.new("UIStroke", boostFrame)
 
+
+
+
+-- other
+local boostEnabled = false
+local godModeEnabled = false
+local wasBoostEnabledBeforeFloat = false
+local boostConns, connections = {}, {}
+local lastPart = nil
+local highlights, nametags = {}, {}
 local hue = 0
 local activeNotifications = {}
+local buttonNames = {"Main", "Visual", "Misc"}
+local buttons = {}
+local buttonStrokes = {}
+local selectedButton = nil
+local selectedStroke = nil
+local hue = 0
+local buttonWidth = 80
+local buttonSpacing = 10
+local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
+local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 
 function showNotification(message, duration)
 	duration = duration or 4
@@ -143,14 +176,6 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 -- how to use: showNotification("text here", duration here: 5)
-
-local boostEnabled = false
-local godModeEnabled = false
-local wasBoostEnabledBeforeFloat = false
-local boostConns, connections = {}, {}
-local lastPart = nil
-local highlights, nametags = {}, {}
-local hue = 0
 
 -- BOOST Func
 local function enableBoost()
@@ -307,12 +332,11 @@ function disableGodMode()
 	connections = {}
 end
 
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+-- main
 gui.ResetOnSpawn = false
 gui.Name = "RGBTabGUI"
 gui.Parent = player:WaitForChild("PlayerGui")
 
-local toggleFrame = Instance.new("Frame")
 toggleFrame.Size = UDim2.new(0, 60, 0, 60)
 toggleFrame.Position = UDim2.new(0, 10, 0, 10)
 toggleFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
@@ -320,14 +344,11 @@ toggleFrame.Active = true
 toggleFrame.Draggable = true
 toggleFrame.Parent = gui
 
-local toggleUICorner = Instance.new("UICorner", toggleFrame)
 toggleUICorner.CornerRadius = UDim.new(0, 4)
 
-local toggleStroke = Instance.new("UIStroke", toggleFrame)
 toggleStroke.Thickness = 2
 toggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(1, 0, 1, 0)
 toggleButton.BackgroundTransparency = 1
 toggleButton.Text = "Toggle"
@@ -337,7 +358,6 @@ toggleButton.Font = Enum.Font.GothamBold
 toggleButton.AutoButtonColor = false
 toggleButton.Parent = toggleFrame
 
-local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 300, 0, 285)
 mainFrame.Position = UDim2.new(0.5, -150, 0.5, -140)
 mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -346,14 +366,11 @@ mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = gui
 
-local mainCorner = Instance.new("UICorner", mainFrame)
 mainCorner.CornerRadius = UDim.new(0, 16)
 
-local mainStroke = Instance.new("UIStroke", mainFrame)
 mainStroke.Thickness = 3
 mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -10, 0, 16)
 titleLabel.Position = UDim2.new(0, 5, 0, 2)
 titleLabel.BackgroundTransparency = 1
@@ -365,21 +382,7 @@ titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Top
 titleLabel.Parent = mainFrame
 
-local buttonNames = {"Main", "Visual", "Misc"}
-local buttons = {}
-local buttonStrokes = {}
-
-local selectedButton = nil
-local selectedStroke = nil
-local hue = 0
-
-local buttonWidth = 80
-local buttonSpacing = 10
-local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
-local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
-
 -- BOOST BUTONU
-local boostBtn = Instance.new("TextButton")
 boostBtn.Name = "BoostButton"
 boostBtn.Text = "Boost: OFF"
 boostBtn.Size = UDim2.new(1, -20, 0, 36) 
@@ -407,13 +410,11 @@ boostBtn.MouseButton1Click:Connect(function()
 end)
 
 -- BOOST MOBILE GUI
-local boostMobileGui = Instance.new("ScreenGui")
 boostMobileGui.Name = "BoostMobileGUI"
 boostMobileGui.ResetOnSpawn = false
 boostMobileGui.Enabled = false
 boostMobileGui.Parent = player:WaitForChild("PlayerGui")
 
-local boostFrame = Instance.new("Frame")
 boostFrame.Size = UDim2.new(0, 180, 0, 60)
 boostFrame.Position = UDim2.new(0.5, -90, 0.7, 0)
 boostFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
@@ -422,10 +423,8 @@ boostFrame.Active = true
 boostFrame.Draggable = true
 boostFrame.ZIndex = 20
 boostFrame.Parent = boostMobileGui
-
 Instance.new("UICorner", boostFrame).CornerRadius = UDim.new(0, 10)
 
-local boostRGBStroke = Instance.new("UIStroke", boostFrame)
 boostRGBStroke.Thickness = 2
 boostRGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 boostRGBStroke.Color = Color3.fromRGB(255, 0, 0)
