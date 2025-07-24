@@ -351,7 +351,7 @@ function disableGodMode()
 	connections = {}
 end
 
--- main
+-----------MAIN---------
 gui.ResetOnSpawn = false
 gui.Name = "RGBTabGUI"
 gui.Parent = player:WaitForChild("PlayerGui")
@@ -400,8 +400,7 @@ titleLabel.TextSize = 14
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Top
 titleLabel.Parent = mainFrame
-
--- BOOST BUTONU
+-------------BOOST---------
 boostBtn.Name = "BoostButton"
 boostBtn.Text = "Boost: OFF"
 boostBtn.Size = UDim2.new(1, -20, 0, 36) 
@@ -428,7 +427,7 @@ boostBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- BOOST MOBILE GUI
+----------BOOST MOBILE GUI------------
 boostMobileGui.Name = "BoostMobileGUI"
 boostMobileGui.ResetOnSpawn = false
 boostMobileGui.Enabled = false
@@ -501,8 +500,7 @@ RunService.RenderStepped:Connect(function()
 		boostRGBStroke.Color = Color3.fromHSV(hue, 1, 1)
 	end
 end)
-
--- float
+-------------------FLOAT--------------
 floatBtn.Name = "FloatButton"
 floatBtn.Text = "Float: OFF"
 floatBtn.Size = UDim2.new(1, -20, 0, 36)
@@ -519,7 +517,6 @@ floatBtn.ZIndex = 10
 floatBtn.Parent = mainFrame
 Instance.new("UICorner", floatBtn).CornerRadius = UDim.new(0, 8)
 
--- float
 floatGuiBtn.Name = "FloatGUIOpener"
 floatGuiBtn.Text = "Float Mobile GUI"
 floatGuiBtn.Size = UDim2.new(1, -20, 0, 36)
@@ -533,8 +530,7 @@ floatGuiBtn.Visible = false
 floatGuiBtn.ZIndex = 10
 floatGuiBtn.Parent = mainFrame
 Instance.new("UICorner", floatGuiBtn).CornerRadius = UDim.new(0, 8)
-
--- FLOAT BUTTON
+-------------FLOAT MOBILE GUI----------
 floatGui.Name = "FloatMobileGUI"
 floatGui.ResetOnSpawn = false
 floatGui.Enabled = false
@@ -572,7 +568,7 @@ startBtn.Font = Enum.Font.GothamBold
 startBtn.TextSize = 12
 startBtn.ZIndex = 21
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 6)
-
+---------FLOAT FUNCTIONS---------
 local function stopFlight()
 	flying = false
 	disableGodMode()
