@@ -8,7 +8,6 @@ local player = Players.LocalPlayer
 local LocalPlayer = player
 
 -- flag
-boostBtn.Visible = false
 local boostEnabled = false
 local boostConns = {}
 local lastPart = nil
