@@ -349,6 +349,7 @@ floatGuiBtnStroke.Thickness = 2
 floatGuiBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 floatGuiBtnStroke.Color = Color3.fromRGB(255, 255, 255)
 floatGuiBtnStroke.Enabled = false
+local floatStroke = floatGuiBtnStroke
 
 -- FLOAT BUTTON (Boost'un hemen altına)
 -- DRAGGABLE FLOAT MOBILE GUI
