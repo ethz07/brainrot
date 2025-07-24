@@ -30,6 +30,7 @@ boostBtn.Position = UDim2.new(0.5, -50, 0, 70) -- Sekmelerin altına ortalı gib
 boostBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 boostBtn.Visible = false
 boostBtn.AutoButtonColor = false
+boostBtn.ZIndex = 5
 
 local corner = Instance.new("UICorner", boostBtn)
 corner.CornerRadius = UDim.new(0, 8)
