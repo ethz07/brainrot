@@ -619,6 +619,6 @@ selectedStroke.Enabled = true
 boostBtn.Visible = true
 floatBtn.Visible = true
 floatGuiBtn.Visible = true
-boostMiniBtn.Visible = true
+boostMobileGuiBtn.Visible = true
 
 print("RENZ SCRIPT.")
