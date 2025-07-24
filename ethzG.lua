@@ -336,8 +336,6 @@ toggleButton.TextSize = 12
 toggleButton.Font = Enum.Font.GothamBold
 toggleButton.AutoButtonColor = false
 toggleButton.Parent = toggleFrame
-toggleButton.Draggable = true
-toggleButton.Active = true
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 300, 0, 285)
