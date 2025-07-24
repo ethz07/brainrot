@@ -8,6 +8,7 @@ local player = Players.LocalPlayer
 local LocalPlayer = player
 
 -- flag
+boostBtn.Visible = false
 local boostEnabled = false
 local boostConns = {}
 local lastPart = nil
@@ -126,6 +127,7 @@ for i, name in ipairs(buttonNames) do
 			end
 		end
 		stroke.Enabled = true
+	        boostBtn.Visible = (name == "Main")
 	end)
 
 	buttons[i] = button
@@ -164,15 +166,19 @@ local boostEnabled = false -- Başta boost kapalı
 local hue = 0
 
 -- Boost butonu
-local boostBtn = Instance.new("TextButton", scrolling)
-boostBtn.Text = "Boost: ON" -- Başlangıç durumu
-boostBtn.Font = Enum.Font.FredokaOne
+local boostBtn = Instance.new("TextButton", mainFrame) -- scrolling değil mainFrame'e ekle
+boostBtn.Text = "Boost: ON"
+boostBtn.Font = Enum.Font.GothamBold
 boostBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostBtn.TextSize = 14
-boostBtn.Size = UDim2.new(0.9, 0, 0, 40)
-boostBtn.Position = UDim2.new(0.05, 0, 0, 25)
-boostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Instance.new("UICorner", boostBtn).CornerRadius = UDim.new(0, 6)
+boostBtn.Size = UDim2.new(0, 100, 0, 36)
+boostBtn.Position = UDim2.new(0.5, -50, 0, 70) -- Sekmelerin altına ortalı gibi
+boostBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+boostBtn.Visible = false
+boostBtn.AutoButtonColor = false
+
+local corner = Instance.new("UICorner", boostBtn)
+corner.CornerRadius = UDim.new(0, 8)
 
 -- RGB UIStroke sadece aktifken (yani Boost: OFF yazarken)
 local boostStroke = Instance.new("UIStroke", boostBtn)
