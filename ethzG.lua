@@ -279,6 +279,7 @@ boostBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
+-- BOOST MOBILE GUI
 local boostMobileGui = Instance.new("ScreenGui")
 boostMobileGui.Name = "BoostMobileGUI"
 boostMobileGui.ResetOnSpawn = false
@@ -303,23 +304,24 @@ boostRGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 boostRGBStroke.Color = Color3.fromRGB(255, 0, 0)
 
 local boostMiniBtn = Instance.new("TextButton", boostFrame)
-boostMiniBtn.Size = UDim2.new(0, 140, 0, 50)
+boostMiniBtn.Size = UDim2.new(0, 180, 0, 60)
 boostMiniBtn.Position = UDim2.new(0, 10, 0, 15)
 boostMiniBtn.Text = "Boost: OFF"
 boostMiniBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 boostMiniBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-boostMiniBtn.Font = Enum.Font.GothamBold
 boostMiniBtn.BackgroundTransparency = 1
+boostMiniBtn.Font = Enum.Font.GothamBold
 boostMiniBtn.TextSize = 14
 boostMiniBtn.ZIndex = 21
 
 Instance.new("UICorner", boostMiniBtn).CornerRadius = UDim.new(0, 6)
 
+-- Mobil GUI Açma Butonu (ana GUI'ye)
 local boostMobileGuiBtn = Instance.new("TextButton")
 boostMobileGuiBtn.Name = "BoostGUIOpener"
 boostMobileGuiBtn.Text = "Boost Mobile GUI"
 boostMobileGuiBtn.Size = UDim2.new(1, -20, 0, 36)
-boostMobileGuiBtn.Position = UDim2.new(0, 10, 0, 110)
+boostMobileGuiBtn.Position = UDim2.new(0, 10, 0, 110) -- Float GUI'nin altı
 boostMobileGuiBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 boostMobileGuiBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostMobileGuiBtn.Font = Enum.Font.GothamBold
@@ -335,6 +337,7 @@ boostMobileGuiBtn.MouseButton1Click:Connect(function()
 	boostMobileGui.Enabled = not boostMobileGui.Enabled
 end)
 
+-- Mini Boost buton tıklaması
 boostMiniBtn.MouseButton1Click:Connect(function()
 	boostEnabled = not boostEnabled
 	if boostEnabled then
@@ -348,10 +351,12 @@ boostMiniBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
+-- Ana Boost butonu değişince mini GUI'yi de güncelle
 boostBtn:GetPropertyChangedSignal("Text"):Connect(function()
 	boostMiniBtn.Text = boostBtn.Text
 end)
 
+-- RGB animasyonu boost mobile GUI'de de uygula
 RunService.RenderStepped:Connect(function()
 	if boostRGBStroke then
 		boostRGBStroke.Color = Color3.fromHSV(hue, 1, 1)
