@@ -1,8 +1,8 @@
+-- Servisler
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local TeleportService = game:GetService("TeleportService")
 local Workspace = game:GetService("Workspace")
 local SoundService = game:GetService("SoundService")
 local Camera = Workspace.CurrentCamera
@@ -10,27 +10,21 @@ local Camera = Workspace.CurrentCamera
 local player = Players.LocalPlayer
 local LocalPlayer = player
 
--- flag
+-- Flag'ler
 local boostEnabled = false
-local boostConns = {}
+local godModeEnabled = false
+local wasBoostEnabledBeforeFloat = false
+local boostConns, connections = {}, {}
 local lastPart = nil
-local nametagESPEnabled = false
-local bodyESPEnabled = false
-local highlights = {}
-local nametags = {}
-
-local boostEnabled = false -- Başta boost kapalı
+local highlights, nametags = {}, {}
 local hue = 0
 
+-- BOOST FONKSİYONLARI
 local function enableBoost()
-	local player = game.Players.LocalPlayer
 	local char = player.Character or player.CharacterAdded:Wait()
 	local hum = char:WaitForChild("Humanoid")
-
-	local DEFAULT_SPEED = 48
-	local DEFAULT_JUMP = 75
-	hum.WalkSpeed = DEFAULT_SPEED
-	hum.JumpPower = DEFAULT_JUMP
+	local DEFAULT_SPEED, DEFAULT_JUMP = 48, 75
+	hum.WalkSpeed, hum.JumpPower = DEFAULT_SPEED, DEFAULT_JUMP
 
 	table.insert(boostConns, RunService.RenderStepped:Connect(function()
 		if hum.WalkSpeed < DEFAULT_SPEED then hum.WalkSpeed = DEFAULT_SPEED end
@@ -70,39 +64,42 @@ local function enableBoost()
 	table.insert(boostConns, UserInputService.JumpRequest:Connect(function()
 		hum:ChangeState(Enum.HumanoidStateType.Jumping)
 	end))
+
 	table.insert(boostConns, UserInputService.InputBegan:Connect(function(input, gpe)
 		if not gpe and input.KeyCode == Enum.KeyCode.Space then
 			createJumpPart()
 		end
 	end))
+
 	table.insert(boostConns, hum.Jumping:Connect(function(isJumping)
 		if isJumping then createJumpPart() end
 	end))
 
-	local function protect()
-		table.insert(boostConns, RunService.Heartbeat:Connect(function()
-			if hum and hum.Health < hum.MaxHealth and hum.Health > 0 then
-				hum.Health = hum.MaxHealth
-			end
-		end))
-		table.insert(boostConns, hum:GetPropertyChangedSignal("Health"):Connect(function()
-			if hum.Health <= 0 then
-				hum.Health = hum.MaxHealth
-			end
-		end))
-		table.insert(boostConns, hum.Died:Connect(function()
-			task.wait()
+	-- Protect (boost içinde godmode)
+	table.insert(boostConns, RunService.Heartbeat:Connect(function()
+		if hum and hum.Health < hum.MaxHealth and hum.Health > 0 then
+			hum.Health = hum.MaxHealth
+		end
+	end))
+
+	table.insert(boostConns, hum:GetPropertyChangedSignal("Health"):Connect(function()
+		if hum.Health <= 0 then
+			hum.Health = hum.MaxHealth
+		end
+	end))
+
+	table.insert(boostConns, hum.Died:Connect(function()
+		task.wait()
+		hum.Health = hum.MaxHealth
+		hum:ChangeState(Enum.HumanoidStateType.Running)
+	end))
+
+	table.insert(boostConns, RunService.RenderStepped:Connect(function()
+		if hum and hum.Health <= 1 then
 			hum.Health = hum.MaxHealth
 			hum:ChangeState(Enum.HumanoidStateType.Running)
-		end))
-		table.insert(boostConns, RunService.RenderStepped:Connect(function()
-			if hum and hum.Health <= 1 then
-				hum.Health = hum.MaxHealth
-				hum:ChangeState(Enum.HumanoidStateType.Running)
-			end
-		end))
-	end
-	protect()
+		end
+	end))
 end
 
 local function disableBoost()
@@ -118,79 +115,64 @@ local function disableBoost()
 	end
 end
 
---[[ RGB animasyonu (sadece boost açıkken çalışır)
-RunService.RenderStepped:Connect(function()
-	if boostEnabled and boostStroke.Enabled then
-		hue = (hue + 0.01) % 1
-		boostStroke.Color = Color3.fromHSV(hue, 1, 1)
-	end
-end)
-]]--
-
-local connections = {}
-local godModeEnabled = false
-
+-- GODMODE
 local function protectHumanoid(humanoid)
-    table.insert(connections, RunService.Heartbeat:Connect(function()
-        if godModeEnabled and humanoid and humanoid.Health > 0 and humanoid.Health < humanoid.MaxHealth then
-            humanoid.Health = humanoid.MaxHealth
-        end
-    end))
+	table.insert(connections, RunService.Heartbeat:Connect(function()
+		if godModeEnabled and humanoid and humanoid.Health > 0 and humanoid.Health < humanoid.MaxHealth then
+			humanoid.Health = humanoid.MaxHealth
+		end
+	end))
 
-    table.insert(connections, humanoid:GetPropertyChangedSignal("Health"):Connect(function()
-        if godModeEnabled and humanoid.Health <= 0 then
-            humanoid.Health = humanoid.MaxHealth
-        end
-    end))
+	table.insert(connections, humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+		if godModeEnabled and humanoid.Health <= 0 then
+			humanoid.Health = humanoid.MaxHealth
+		end
+	end))
 
-    table.insert(connections, humanoid.Died:Connect(function()
-        if godModeEnabled then
-            task.wait()
-            humanoid.Health = humanoid.MaxHealth
-            humanoid:ChangeState(Enum.HumanoidStateType.Running)
-        end
-    end))
+	table.insert(connections, humanoid.Died:Connect(function()
+		if godModeEnabled then
+			task.wait()
+			humanoid.Health = humanoid.MaxHealth
+			humanoid:ChangeState(Enum.HumanoidStateType.Running)
+		end
+	end))
 
-    table.insert(connections, RunService.RenderStepped:Connect(function()
-        if godModeEnabled and humanoid and humanoid.Health <= 1 then
-            humanoid.Health = humanoid.MaxHealth
-            humanoid:ChangeState(Enum.HumanoidStateType.Running)
-        end
-    end))
+	table.insert(connections, RunService.RenderStepped:Connect(function()
+		if godModeEnabled and humanoid and humanoid.Health <= 1 then
+			humanoid.Health = humanoid.MaxHealth
+			humanoid:ChangeState(Enum.HumanoidStateType.Running)
+		end
+	end))
 end
 
-local characterAddedConn
 local function connectCharacter()
-    characterAddedConn = player.CharacterAdded:Connect(function(char)
-        local hum = char:WaitForChild("Humanoid")
-        protectHumanoid(hum)
-    end)
-    table.insert(connections, characterAddedConn)
+	local charConn = player.CharacterAdded:Connect(function(char)
+		local hum = char:WaitForChild("Humanoid")
+		protectHumanoid(hum)
+	end)
+	table.insert(connections, charConn)
 
-    if player.Character then
-        local hum = player.Character:FindFirstChild("Humanoid")
-        if hum then
-            protectHumanoid(hum)
-        end
-    end
+	if player.Character then
+		local hum = player.Character:FindFirstChild("Humanoid")
+		if hum then
+			protectHumanoid(hum)
+		end
+	end
 end
 
 function enableGodMode()
-    if godModeEnabled then return end
-    godModeEnabled = true
-    connectCharacter()
+	if godModeEnabled then return end
+	godModeEnabled = true
+	connectCharacter()
 end
 
 function disableGodMode()
-    if not godModeEnabled then return end
-    godModeEnabled = false
-
-    for _, conn in pairs(connections) do
-        if conn and conn.Disconnect then
-            conn:Disconnect()
-        end
-    end
-    connections = {}
+	if not godModeEnabled then return end
+	godModeEnabled = false
+	for _, conn in pairs(connections) do
+		if conn and conn.Disconnect then conn:Disconnect() end
+	end
+	connections = {}
 end
 
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
@@ -333,11 +315,17 @@ floatBtn.Parent = mainFrame
 
 Instance.new("UICorner", floatBtn).CornerRadius = UDim.new(0, 8)
 
-local floatStroke = Instance.new("UIStroke", floatBtn)
-floatStroke.Thickness = 2
-floatStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-floatStroke.Color = Color3.fromRGB(255, 0, 0)
-floatStroke.Enabled = false
+local floatGuiStroke = Instance.new("UIStroke")
+floatGuiStroke.Thickness = 2
+floatGuiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+floatGuiStroke.Color = Color3.new(1, 1, 1)
+floatGuiStroke.Parent = floatGui
+
+RunService.RenderStepped:Connect(function()
+	hue = (hue + 0.005) % 1
+	local color = Color3.fromHSV(hue, 1, 1)
+	floatGuiStroke.Color = color
+end)
 
 -- float
 local floatGuiBtn = Instance.new("TextButton")
@@ -503,7 +491,7 @@ local function startFlight()
 	timerConn = RunService.Heartbeat:Connect(function()
 		local remaining = flightEndTime - tick()
 		floatBtn.Text = string.format("Timer: %.1fs", math.max(0, remaining))
-		timerLabel = = string.format("Timer: %.1fs", math.max(0, remaining))
+		timerLabel.Text = string.format("Timer: %.1fs", math.max(0, remaining))
 		if remaining <= 0 then stopFlight() end
 	end)
 end
@@ -523,18 +511,6 @@ end)
 
 -- Karakter respawn olursa float durmalı
 player.CharacterAdded:Connect(stopFlight)
-
-local hue = 0
-
-RunService.RenderStepped:Connect(function()
-	hue = (hue + 0.005) % 1
-	local color = Color3.fromHSV(hue, 1, 1)
-
-	-- Diyelim ki GUI'nin etrafındaki çerçeve bu:
-	if floatGuiStroke then
-		floatGuiStroke.Color = color
-	end
-end)
 
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
