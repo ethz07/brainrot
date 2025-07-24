@@ -411,7 +411,7 @@ startBtn.ZIndex = 21
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 6)
 
 -- Float ayarları
-local FLIGHT_TIME = 15
+local FLIGHT_TIME = 20
 local FLIGHT_SPEED = 38
 local FLOAT_HEIGHT = 2.8
 
@@ -517,9 +517,17 @@ end)
 -- Karakter respawn olursa float durmalı
 player.CharacterAdded:Connect(stopFlight)
 
--- Başlangıç görünüm
-floatBtn.Text = "Float: ON"
-timerLabel.Text = string.format("Timer: %.1fs", FLIGHT_TIME)
+local hue = 0
+
+RunService.RenderStepped:Connect(function()
+	hue = (hue + 0.005) % 1
+	local color = Color3.fromHSV(hue, 1, 1)
+
+	-- Diyelim ki GUI'nin etrafındaki çerçeve bu:
+	if floatGuiStroke then
+		floatGuiStroke.Color = color
+	end
+end)
 
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
