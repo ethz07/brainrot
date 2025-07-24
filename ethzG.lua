@@ -16,6 +16,15 @@ local bodyESPEnabled = false
 local highlights = {}
 local nametags = {}
 
+-- Float sistem ortak değişkenleri
+local floatActive = false
+local floatTimeLeft = 0
+local floatTimerConn = nil
+local floatVelocityConn = nil
+local floatEndTime = 0
+local floatBodyPos = nil
+local floatStartY = nil
+
 local boostEnabled = false -- Başta boost kapalı
 local hue = 0
 
@@ -246,22 +255,44 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Float Durum Butonu
-local floatBtn = Instance.new("TextButton")
-floatBtn.Name = "FloatButton"
-floatBtn.Text = "Float: OFF"
-floatBtn.Size = UDim2.new(1, -20, 0, 36) -- Yanlardan boşluk
-floatBtn.Position = UDim2.new(0, 10, 0, 110) -- Boost’un altı
-floatBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-floatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-floatBtn.Font = Enum.Font.GothamBold
-floatBtn.TextSize = 14
-floatBtn.AutoButtonColor = false
-floatBtn.Visible = false
-floatBtn.ZIndex = 10
-floatBtn.Parent = mainFrame
+-- inf msg
+local function showFloatInfo()
+	local infoGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+	infoGui.Name = "FloatInfoGUI"
+	infoGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-Instance.new("UICorner", floatBtn).CornerRadius = UDim.new(0, 8)
+	local msg = Instance.new("TextLabel")
+	msg.Size = UDim2.new(0, 280, 0, 30)
+	msg.Position = UDim2.new(0.5, -140, 0.92, 0)
+	msg.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	msg.TextColor3 = Color3.fromRGB(0, 0, 0)
+	msg.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	msg.BorderSizePixel = 2
+	msg.Font = Enum.Font.GothamSemibold
+	msg.TextSize = 14
+	msg.Text = "inf: You cannot use buttons with the same feature at the same time."
+	msg.Parent = infoGui
+
+	task.delay(2.5, function()
+		if infoGui then infoGui:Destroy() end
+	end)
+end
+-- end
+
+-- float system..
+local floatBtn = Instance.new("TextButton", mainFrame)
+floatBtn.Text = "Float: ON"
+floatBtn.Font = Enum.Font.GothamBold
+floatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+floatBtn.TextSize = 14
+floatBtn.Size = UDim2.new(0.9, 0, 0, 36)
+floatBtn.Position = UDim2.new(0.05, 0, 0, 120)
+floatBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+floatBtn.Visible = false
+floatBtn.AutoButtonColor = false
+
+local floatCorner = Instance.new("UICorner", floatBtn)
+floatCorner.CornerRadius = UDim.new(0, 8)
 
 local floatStroke = Instance.new("UIStroke", floatBtn)
 floatStroke.Thickness = 2
@@ -269,171 +300,83 @@ floatStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 floatStroke.Color = Color3.fromRGB(255, 0, 0)
 floatStroke.Enabled = false
 
--- Float Mobile GUI Açma Butonu (Ana Frame'de)
-local floatGuiBtn = Instance.new("TextButton", mainFrame)
-floatGuiBtn.Text = "Float Mobile GUI"
-floatGuiBtn.Size = UDim2.new(1, -20, 0, 36)
-floatGuiBtn.Position = UDim2.new(0, 10, 0, 160)
-floatGuiBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-floatGuiBtn.TextColor3 = Color3.new(1, 1, 1)
-floatGuiBtn.Font = Enum.Font.GothamBold
-floatGuiBtn.TextSize = 14
-floatGuiBtn.AutoButtonColor = false
-floatGuiBtn.Visible = false
-
-Instance.new("UICorner", floatGuiBtn).CornerRadius = UDim.new(0, 8)
-
-floatGuiBtn.MouseButton1Click:Connect(function()
-	floatGui.Enabled = not floatGui.Enabled
-end)
-
-Instance.new("UICorner", floatGuiBtn).CornerRadius = UDim.new(0, 8)
-
-local floatGuiBtnStroke = Instance.new("UIStroke", floatGuiBtn)
-floatGuiBtnStroke.Thickness = 2
-floatGuiBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-floatGuiBtnStroke.Color = Color3.fromRGB(255, 255, 255)
-floatGuiBtnStroke.Enabled = false
-
--- === FLOAT AYARLARI === --
-local FLOAT_TIME = 20 -- Timer süresi (güncellendi)
-local FLOAT_SPEED = 38
-local FLOAT_HEIGHT = 2.8
-
--- === FLOAT STATE === --
+-- float variables etc.
 local floatActive = false
-local floatConn = nil
+local mobileFloatActive = false
+local floatHue = 0
+local floatFlightTime = 20
+local floatTimer = 0
 local floatTimerConn = nil
-local floatEndTime = 0
-local startY = nil
-local floatBody = nil
+local floatBodyPosition = nil
+local floatStartY = nil
+local floatConn = nil
+local floatRoot = nil
 
--- Float Mobile GUI
-local floatGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-floatGui.Name = "FloatMobileGui"
-floatGui.ResetOnSpawn = false
-floatGui.Enabled = false
-
--- Arka Plan Frame
-local floatFrame = Instance.new("Frame", floatGui)
-floatFrame.Size = UDim2.new(0, 180, 0, 80)
-floatFrame.Position = UDim2.new(0.5, -90, 0.8, 0)
-floatFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-floatFrame.BackgroundTransparency = 0.15
-floatFrame.Active = true
-floatFrame.Draggable = true
-
-Instance.new("UICorner", floatFrame).CornerRadius = UDim.new(0, 12)
-
-local floatStroke = Instance.new("UIStroke", floatFrame)
-floatStroke.Thickness = 2
-floatStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-floatStroke.Color = Color3.fromHSV(0, 1, 1)
-
--- Buton
-local floatGuiBtnMobile = Instance.new("TextButton", floatFrame)
-floatGuiBtnMobile.Size = UDim2.new(1, -10, 0, 36)
-floatGuiBtnMobile.Position = UDim2.new(0, 5, 0, 5)
-floatGuiBtnMobile.Text = "Float & Move Forward"
-floatGuiBtnMobile.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-floatGuiBtnMobile.TextColor3 = Color3.new(1, 1, 1)
-floatGuiBtnMobile.Font = Enum.Font.GothamBold
-floatGuiBtnMobile.TextSize = 14
-Instance.new("UICorner", floatGuiBtnMobile).CornerRadius = UDim.new(0, 8)
-
--- Timer label
-local floatTimerLabel = Instance.new("TextLabel", floatFrame)
-floatTimerLabel.Size = UDim2.new(1, -10, 0, 20)
-floatTimerLabel.Position = UDim2.new(0, 5, 0, 45)
-floatTimerLabel.BackgroundTransparency = 1
-floatTimerLabel.Text = "Timer: 20.0s"
-floatTimerLabel.TextColor3 = Color3.new(1, 1, 1)
-floatTimerLabel.Font = Enum.Font.Gotham
-floatTimerLabel.TextSize = 14
-floatTimerLabel.TextXAlignment = Enum.TextXAlignment.Center
-
--- Durumu RGB GUI’ye yansıt
-local function setFloatLabel(timeLeft)
-	floatTimerLabel.Text = string.format("Timer: %04.1fs", math.max(0, timeLeft))
-end
-
--- Float durdur
 local function stopFloat()
-	floatActive = false
-	floatBtn.Text = "Float: ON"
-	floatStroke.Enabled = false
-	floatGuiBtnMobile.Text = "Float & Move Forward"
-	setFloatLabel(FLOAT_TIME)
+    floatActive = false
+    if floatTimerConn then floatTimerConn:Disconnect() end
+    if floatConn then floatConn:Disconnect() end
+    floatTimerConn = nil
+    floatConn = nil
+    floatTimer = 0
 
-	if floatConn then floatConn:Disconnect() end
-	if floatTimerConn then floatTimerConn:Disconnect() end
-	floatConn, floatTimerConn = nil, nil
+    if floatBodyPosition then
+        floatBodyPosition:Destroy()
+        floatBodyPosition = nil
+    end
 
-	if floatBody then floatBody:Destroy() end
-	floatBody = nil
-
-	disableGodMode()
+    if typeof(disableGodMode) == "function" then
+        disableGodMode()
+    end
 end
 
--- Float başlat
 local function startFloat()
-	local char = player.Character or player.CharacterAdded:Wait()
-	local root = char:WaitForChild("HumanoidRootPart")
+    local character = player.Character or player.CharacterAdded:Wait()
+    local root = character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
 
-	if floatBody then floatBody:Destroy() end
-	floatBody = Instance.new("BodyPosition")
-	floatBody.MaxForce = Vector3.new(0, math.huge, 0)
-	floatBody.Position = root.Position + Vector3.new(0, FLOAT_HEIGHT, 0)
-	floatBody.P = 5000
-	floatBody.D = 500
-	floatBody.Parent = root
+    if floatBodyPosition then floatBodyPosition:Destroy() end
 
-	startY = root.Position.Y + FLOAT_HEIGHT
-	floatActive = true
-	floatBtn.Text = "Float: ..."
-	floatStroke.Enabled = true
-	floatGuiBtnMobile.Text = "Actived (click to stop)"
-	floatEndTime = tick() + FLOAT_TIME
+    floatBodyPosition = Instance.new("BodyPosition")
+    floatBodyPosition.MaxForce = Vector3.new(0, math.huge, 0)
+    floatBodyPosition.P = 5000
+    floatBodyPosition.D = 500
+    floatBodyPosition.Position = root.Position + Vector3.new(0, 2.8, 0)
+    floatBodyPosition.Parent = root
 
-	enableGodMode()
+    floatRoot = root
+    floatStartY = root.Position.Y + 2.8
+    floatActive = true
+    floatTimer = floatFlightTime
 
-	floatConn = RunService.Heartbeat:Connect(function()
-		local cam = workspace.CurrentCamera
-		local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-		if not root or not cam then return end
+    if typeof(enableGodMode) == "function" then
+        enableGodMode()
+    end
 
-		floatBody.Position = Vector3.new(root.Position.X, startY, root.Position.Z)
-		local look = cam.CFrame.LookVector
-		look = Vector3.new(look.X, 0, look.Z).Unit * FLOAT_SPEED
-		root.Velocity = Vector3.new(look.X, root.Velocity.Y, look.Z)
-		root.CFrame = CFrame.new(root.Position, root.Position + look)
-	end)
+    -- Timer bağlantısı
+    floatTimerConn = RunService.Heartbeat:Connect(function()
+        floatTimer = floatTimer - RunService.Heartbeat:Wait()
+        if floatTimer <= 0 then
+            stopFloat()
+        end
+    end)
 
-	floatTimerConn = RunService.Heartbeat:Connect(function()
-		local remaining = floatEndTime - tick()
-		setFloatLabel(remaining)
-		if remaining <= 0 then stopFloat() end
-	end)
+    -- Uçuş hareket bağlantısı
+    floatConn = RunService.Heartbeat:Connect(function()
+        if not floatRoot then return end
+
+        floatBodyPosition.Position = Vector3.new(
+            floatRoot.Position.X,
+            floatStartY,
+            floatRoot.Position.Z
+        )
+
+        local look = Camera.CFrame.LookVector
+        look = Vector3.new(look.X, 0, look.Z).Unit * 38
+        floatRoot.Velocity = Vector3.new(look.X, floatRoot.Velocity.Y, look.Z)
+        floatRoot.CFrame = CFrame.new(floatRoot.Position, floatRoot.Position + look)
+    end)
 end
-
--- Mobile GUI buton davranışı
-floatGuiBtnMobile.MouseButton1Click:Connect(function()
-	if floatActive then stopFloat() else startFloat() end
-end)
-
-player.CharacterAdded:Connect(stopFloat)
-
--- İlk durum
-floatGuiBtnMobile.Text = Ready to Float"
-setFloatLabel(FLOAT_TIME)
-
--- 🔄 RGB Border animasyonu
-RunService.RenderStepped:Connect(function()
-	if floatGui.Enabled then
-		local h = tick() * 0.5 % 1
-		floatStroke.Color = Color3.fromHSV(h, 1, 1)
-	end
-end)
 
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
