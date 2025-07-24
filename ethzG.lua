@@ -447,7 +447,7 @@ local function stopFlight()
 		bodyPosition = nil
 	end
 
-	floatBtn.Text = "Float: ON"
+	floatBtn.Text = "Float: OFF"
 	floatStroke.Enabled = false
 	startBtn.Text = "Start Float"
 end
@@ -497,6 +497,7 @@ local function startFlight()
 	timerConn = RunService.Heartbeat:Connect(function()
 		local remaining = flightEndTime - tick()
 		floatBtn.Text = string.format("Timer: %.1fs", math.max(0, remaining))
+		timerLabel = = string.format("Timer: %.1fs", math.max(0, remaining))
 		if remaining <= 0 then stopFlight() end
 	end)
 end
@@ -524,8 +525,8 @@ RunService.RenderStepped:Connect(function()
 	local color = Color3.fromHSV(hue, 1, 1)
 
 	-- Diyelim ki GUI'nin etrafındaki çerçeve bu:
-	if floatGuiStroke then
-		floatGuiStroke.Color = color
+	if floatRGB then
+		floatRGB.Color = color
 	end
 end)
 
