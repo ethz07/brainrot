@@ -99,7 +99,6 @@ function showNotification(message, duration)
 		}):Play()
 	end
 
-	-- Fade in
 	TweenService:Create(notifFrame, TweenInfo.new(0.3), { BackgroundTransparency = 0.1 }):Play()
 
 	local function removeNotification()
@@ -133,7 +132,6 @@ function showNotification(message, duration)
 	end)
 end
 
--- RGB renk güncelleme
 RunService.RenderStepped:Connect(function()
 	hue = (hue + 0.01) % 1
 	local color = Color3.fromHSV(hue, 1, 1)
@@ -154,7 +152,7 @@ local lastPart = nil
 local highlights, nametags = {}, {}
 local hue = 0
 
--- BOOST FONKSİYONLARI
+-- BOOST Func
 local function enableBoost()
 	local char = player.Character or player.CharacterAdded:Wait()
 	local hum = char:WaitForChild("Humanoid")
@@ -184,7 +182,7 @@ local function enableBoost()
 		part.Position = root.Position - Vector3.new(0, 3.1, 0)
 		part.Anchored = true
 		part.CanCollide = true
-		part.Transparency = 0.7
+		part.Transparency = 1
 		part.Color = Color3.new(0, 0, 0)
 		part.Material = Enum.Material.ForceField
 		part.Name = "JumpPad"
@@ -210,7 +208,6 @@ local function enableBoost()
 		if isJumping then createJumpPart() end
 	end))
 
-	-- Protect (boost içinde godmode)
 	table.insert(boostConns, RunService.Heartbeat:Connect(function()
 		if hum and hum.Health < hum.MaxHealth and hum.Health > 0 then
 			hum.Health = hum.MaxHealth
@@ -315,7 +312,6 @@ gui.ResetOnSpawn = false
 gui.Name = "RGBTabGUI"
 gui.Parent = player:WaitForChild("PlayerGui")
 
--- 🟦 Toggle Frame
 local toggleFrame = Instance.new("Frame")
 toggleFrame.Size = UDim2.new(0, 60, 0, 20)
 toggleFrame.Position = UDim2.new(0, 10, 0, 10)
@@ -331,7 +327,6 @@ local toggleStroke = Instance.new("UIStroke", toggleFrame)
 toggleStroke.Thickness = 2
 toggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
--- Toggle Butonu
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(1, 0, 1, 0)
 toggleButton.BackgroundTransparency = 1
@@ -342,7 +337,6 @@ toggleButton.Font = Enum.Font.GothamBold
 toggleButton.AutoButtonColor = false
 toggleButton.Parent = toggleFrame
 
--- 🟥 Ana Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 300, 0, 285)
 mainFrame.Position = UDim2.new(0.5, -150, 0.5, -140)
@@ -359,7 +353,6 @@ local mainStroke = Instance.new("UIStroke", mainFrame)
 mainStroke.Thickness = 3
 mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
--- Başlık
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -10, 0, 16)
 titleLabel.Position = UDim2.new(0, 5, 0, 2)
@@ -390,7 +383,7 @@ local boostBtn = Instance.new("TextButton")
 boostBtn.Name = "BoostButton"
 boostBtn.Text = "Boost: OFF"
 boostBtn.Size = UDim2.new(1, -20, 0, 36) 
-boostBtn.Position = UDim2.new(0, 10, 0, 70) -- 🔹 
+boostBtn.Position = UDim2.new(0, 10, 0, 70) 
 boostBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 boostBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostBtn.Font = Enum.Font.GothamBold
@@ -452,7 +445,6 @@ boostMiniBtn.TextYAlignment = Enum.TextYAlignment.Center
 
 Instance.new("UICorner", boostMiniBtn).CornerRadius = UDim.new(0, 6)
 
--- Mobil GUI Açma Butonu (ana GUI'ye)
 local boostMobileGuiBtn = Instance.new("TextButton")
 boostMobileGuiBtn.Name = "BoostGUIOpener"
 boostMobileGuiBtn.Text = "Boost Mobile GUI"
@@ -473,7 +465,6 @@ boostMobileGuiBtn.MouseButton1Click:Connect(function()
 	boostMobileGui.Enabled = not boostMobileGui.Enabled
 end)
 
--- Mini Boost buton tıklaması
 boostMiniBtn.MouseButton1Click:Connect(function()
 	boostEnabled = not boostEnabled
 	if boostEnabled then
@@ -487,12 +478,10 @@ boostMiniBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Ana Boost butonu değişince mini GUI'yi de güncelle
 boostBtn:GetPropertyChangedSignal("Text"):Connect(function()
 	boostMiniBtn.Text = boostBtn.Text
 end)
 
--- RGB animasyonu boost mobile GUI'de de uygula
 RunService.RenderStepped:Connect(function()
 	if boostRGBStroke then
 		boostRGBStroke.Color = Color3.fromHSV(hue, 1, 1)
@@ -503,8 +492,8 @@ end)
 local floatBtn = Instance.new("TextButton")
 floatBtn.Name = "FloatButton"
 floatBtn.Text = "Float: OFF"
-floatBtn.Size = UDim2.new(1, -20, 0, 36) -- Yanlardan boşluk
-floatBtn.Position = UDim2.new(0, 10, 0, 152) -- Boost’un altı
+floatBtn.Size = UDim2.new(1, -20, 0, 36)
+floatBtn.Position = UDim2.new(0, 10, 0, 152)
 floatBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 floatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 floatBtn.Font = Enum.Font.GothamBold
@@ -534,8 +523,7 @@ floatGuiBtn.Parent = mainFrame
 
 Instance.new("UICorner", floatGuiBtn).CornerRadius = UDim.new(0, 8)
 
--- FLOAT BUTTON (Boost'un hemen altına)
--- DRAGGABLE FLOAT MOBILE GUI
+-- FLOAT BUTTON
 local floatGui = Instance.new("ScreenGui")
 floatGui.Name = "FloatMobileGUI"
 floatGui.ResetOnSpawn = false
@@ -543,8 +531,8 @@ floatGui.Enabled = false
 floatGui.Parent = player:WaitForChild("PlayerGui")
 
 local floatFrame = Instance.new("Frame")
-floatFrame.Size = UDim2.new(0, 200, 0, 80)
-floatFrame.Position = UDim2.new(0.5, -100, 0.6, 0)
+floatFrame.Size = UDim2.new(0, 160, 0, 60)
+floatFrame.Position = UDim2.new(0.5, -80, 0.6, 0)
 floatFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 floatFrame.BackgroundTransparency = 0.15
 floatFrame.Active = true
@@ -560,34 +548,30 @@ floatRGB.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 floatRGB.Color = Color3.fromRGB(255, 0, 0)
 
 local timerLabel = Instance.new("TextLabel", floatFrame)
-timerLabel.Size = UDim2.new(1, 0, 0, 30)
+timerLabel.Size = UDim2.new(1, 0, 0, 20)
 timerLabel.Position = UDim2.new(0, 0, 0, 0)
 timerLabel.BackgroundTransparency = 1
 timerLabel.Text = "Timer: 20.0s"
 timerLabel.Font = Enum.Font.Gotham
 timerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-timerLabel.TextSize = 14
+timerLabel.TextSize = 12
 timerLabel.ZIndex = 21
-timerLabel.Parent = floatFrame
 
 local startBtn = Instance.new("TextButton", floatFrame)
-startBtn.Size = UDim2.new(1, -20, 0, 30)
-startBtn.Position = UDim2.new(0, 10, 0, 40)
-startBtn.Text = "Start Float"
+startBtn.Size = UDim2.new(1, -20, 0, 25)
+startBtn.Position = UDim2.new(0, 10, 0, 30)
+startBtn.Text = "Start"
 startBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
 startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 startBtn.Font = Enum.Font.GothamBold
-startBtn.TextSize = 14
+startBtn.TextSize = 12
 startBtn.ZIndex = 21
 
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 6)
 
--- Float ayarları
 local FLIGHT_TIME = 20
 local FLIGHT_SPEED = 38
 local FLOAT_HEIGHT = 2.8
-
--- Float değişkenleri
 local flying = false
 local flightConn = nil
 local timerConn = nil
@@ -595,7 +579,7 @@ local flightEndTime = 0
 local startY = nil
 local bodyPosition = nil
 
--- Boost durumu yedeklemek için
+-- yedekleme
 local wasBoostEnabledBeforeFloat = false
 
 local function stopFlight()
@@ -670,7 +654,6 @@ local function startFlight()
 	end)
 end
 
--- Float butonu bağlantısı
 startBtn.MouseButton1Click:Connect(function()
 	if flying then
 		stopFlight()
@@ -683,10 +666,9 @@ floatGuiBtn.MouseButton1Click:Connect(function()
 	floatGui.Enabled = not floatGui.Enabled
 end)
 
--- Karakter respawn olursa float durmalı
 player.CharacterAdded:Connect(stopFlight)
 
--- AUTO KICK BUTONU
+-- AUTO KICK
 local autoKickBtn = Instance.new("TextButton")
 autoKickBtn.Name = "AutoKickButton"
 autoKickBtn.Text = "Enable Auto Kick"
