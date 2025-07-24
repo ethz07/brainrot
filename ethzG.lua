@@ -132,6 +132,74 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
+local godModeEnabled = false
+local heartbeatConnection
+local renderConnection
+local diedConnection
+local healthChangedConnection
+
+local function protectHumanoid(humanoid)
+    -- Heartbeat ile sürekli sağlık kontrolü
+    heartbeatConnection = RunService.Heartbeat:Connect(function()
+        if godModeEnabled and humanoid and humanoid.Health > 0 and humanoid.Health < humanoid.MaxHealth then
+            humanoid.Health = humanoid.MaxHealth
+        end
+    end)
+
+    -- RenderStepped ile ekstra koruma
+    renderConnection = RunService.RenderStepped:Connect(function()
+        if godModeEnabled and humanoid and humanoid.Health <= 1 then
+            humanoid.Health = humanoid.MaxHealth
+            humanoid:ChangeState(Enum.HumanoidStateType.Running)
+        end
+    end)
+
+    -- Sağlık değişimini izleyip anında müdahale et
+    healthChangedConnection = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+        if godModeEnabled and humanoid.Health <= 0 then
+            humanoid.Health = humanoid.MaxHealth
+        end
+    end)
+
+    -- Ölüm olayını dinle
+    diedConnection = humanoid.Died:Connect(function()
+        if godModeEnabled then
+            task.wait()
+            humanoid.Health = humanoid.MaxHealth
+            humanoid:ChangeState(Enum.HumanoidStateType.Running)
+        end
+    end)
+end
+
+-- GodMode aç
+function enableGodMode()
+    godModeEnabled = true
+
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    protectHumanoid(humanoid)
+end
+
+-- GodMode kapat
+function disableGodMode()
+    godModeEnabled = false
+
+    if heartbeatConnection then heartbeatConnection:Disconnect() end
+    if renderConnection then renderConnection:Disconnect() end
+    if healthChangedConnection then healthChangedConnection:Disconnect() end
+    if diedConnection then diedConnection:Disconnect() end
+end
+
+-- Karakter değişirse GodMode tekrar aktif edilsin
+player.CharacterAdded:Connect(function(char)
+    if godModeEnabled then
+        local hum = char:WaitForChild("Humanoid")
+        protectHumanoid(hum)
+    end
+end)
+
+-- Başlangıçta istersen aktif et:
+-- enableGodMode()
 
 -- Ana GUI
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
