@@ -23,11 +23,30 @@ local boostBtn = Instance.new("TextButton")
 local boostMobileGui = Instance.new("ScreenGui")
 local boostFrame = Instance.new("Frame")
 local boostRGBStroke = Instance.new("UIStroke", boostFrame)
+local boostMiniBtn = Instance.new("TextButton", boostFrame)
+local boostMobileGuiBtn = Instance.new("TextButton")
+local floatBtn = Instance.new("TextButton")
+local floatGuiBtn = Instance.new("TextButton")
+local floatGui = Instance.new("ScreenGui")
+local floatFrame = Instance.new("Frame")
+local floatRGB = Instance.new("UIStroke", floatFrame)
+local timerLabel = Instance.new("TextLabel", floatFrame)
+local startBtn = Instance.new("TextButton", floatFrame)
 
 
 
 
 -- other
+local FLIGHT_TIME = 20
+local FLIGHT_SPEED = 38
+local FLOAT_HEIGHT = 2.8
+local flying = false
+local flightConn = nil
+local timerConn = nil
+local flightEndTime = 0
+local startY = nil
+local bodyPosition = nil
+local wasBoostEnabledBeforeFloat = false -- yedekleme
 local boostEnabled = false
 local godModeEnabled = false
 local wasBoostEnabledBeforeFloat = false
@@ -429,7 +448,6 @@ boostRGBStroke.Thickness = 2
 boostRGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 boostRGBStroke.Color = Color3.fromRGB(255, 0, 0)
 
-local boostMiniBtn = Instance.new("TextButton", boostFrame)
 boostMiniBtn.Size = UDim2.new(1, -20, 0, 30)
 boostMiniBtn.Position = UDim2.new(0, 10, 0, 15)
 boostMiniBtn.Text = "Boost: OFF"
@@ -441,10 +459,8 @@ boostMiniBtn.TextSize = 16
 boostMiniBtn.ZIndex = 21
 boostMiniBtn.TextXAlignment = Enum.TextXAlignment.Center
 boostMiniBtn.TextYAlignment = Enum.TextYAlignment.Center
-
 Instance.new("UICorner", boostMiniBtn).CornerRadius = UDim.new(0, 6)
 
-local boostMobileGuiBtn = Instance.new("TextButton")
 boostMobileGuiBtn.Name = "BoostGUIOpener"
 boostMobileGuiBtn.Text = "Boost Mobile GUI"
 boostMobileGuiBtn.Size = UDim2.new(1, -20, 0, 36)
@@ -457,7 +473,6 @@ boostMobileGuiBtn.AutoButtonColor = false
 boostMobileGuiBtn.Visible = false
 boostMobileGuiBtn.ZIndex = 10
 boostMobileGuiBtn.Parent = mainFrame
-
 Instance.new("UICorner", boostMobileGuiBtn).CornerRadius = UDim.new(0, 8)
 
 boostMobileGuiBtn.MouseButton1Click:Connect(function()
@@ -488,7 +503,6 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- float
-local floatBtn = Instance.new("TextButton")
 floatBtn.Name = "FloatButton"
 floatBtn.Text = "Float: OFF"
 floatBtn.Size = UDim2.new(1, -20, 0, 36)
@@ -506,7 +520,6 @@ floatBtn.Parent = mainFrame
 Instance.new("UICorner", floatBtn).CornerRadius = UDim.new(0, 8)
 
 -- float
-local floatGuiBtn = Instance.new("TextButton")
 floatGuiBtn.Name = "FloatGUIOpener"
 floatGuiBtn.Text = "Float Mobile GUI"
 floatGuiBtn.Size = UDim2.new(1, -20, 0, 36)
@@ -519,17 +532,14 @@ floatGuiBtn.AutoButtonColor = false
 floatGuiBtn.Visible = false
 floatGuiBtn.ZIndex = 10
 floatGuiBtn.Parent = mainFrame
-
 Instance.new("UICorner", floatGuiBtn).CornerRadius = UDim.new(0, 8)
 
 -- FLOAT BUTTON
-local floatGui = Instance.new("ScreenGui")
 floatGui.Name = "FloatMobileGUI"
 floatGui.ResetOnSpawn = false
 floatGui.Enabled = false
 floatGui.Parent = player:WaitForChild("PlayerGui")
 
-local floatFrame = Instance.new("Frame")
 floatFrame.Size = UDim2.new(0, 160, 0, 60)
 floatFrame.Position = UDim2.new(0.5, -80, 0.6, 0)
 floatFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
@@ -538,15 +548,12 @@ floatFrame.Active = true
 floatFrame.Draggable = true
 floatFrame.ZIndex = 20
 floatFrame.Parent = floatGui
-
 Instance.new("UICorner", floatFrame).CornerRadius = UDim.new(0, 10)
 
-local floatRGB = Instance.new("UIStroke", floatFrame)
 floatRGB.Thickness = 2
 floatRGB.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 floatRGB.Color = Color3.fromRGB(255, 0, 0)
 
-local timerLabel = Instance.new("TextLabel", floatFrame)
 timerLabel.Size = UDim2.new(1, 0, 0, 20)
 timerLabel.Position = UDim2.new(0, 0, 0, 0)
 timerLabel.BackgroundTransparency = 1
@@ -556,7 +563,6 @@ timerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 timerLabel.TextSize = 12
 timerLabel.ZIndex = 21
 
-local startBtn = Instance.new("TextButton", floatFrame)
 startBtn.Size = UDim2.new(1, -20, 0, 25)
 startBtn.Position = UDim2.new(0, 10, 0, 30)
 startBtn.Text = "Start"
@@ -565,21 +571,7 @@ startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 startBtn.Font = Enum.Font.GothamBold
 startBtn.TextSize = 12
 startBtn.ZIndex = 21
-
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 6)
-
-local FLIGHT_TIME = 20
-local FLIGHT_SPEED = 38
-local FLOAT_HEIGHT = 2.8
-local flying = false
-local flightConn = nil
-local timerConn = nil
-local flightEndTime = 0
-local startY = nil
-local bodyPosition = nil
-
--- yedekleme
-local wasBoostEnabledBeforeFloat = false
 
 local function stopFlight()
 	flying = false
