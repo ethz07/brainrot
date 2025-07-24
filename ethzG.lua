@@ -204,7 +204,7 @@ local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 -- BOOST BUTONU
 local boostBtn = Instance.new("TextButton")
 boostBtn.Name = "BoostButton"
-boostBtn.Text = "Boost: ON"
+boostBtn.Text = "Boost: OFF"
 boostBtn.Size = UDim2.new(1, -20, 0, 36) -- 🔹 Tam genişlik - 10px boşluk sağ & sol
 boostBtn.Position = UDim2.new(0, 10, 0, 70) -- 🔹 10px içten başlasın
 boostBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -228,11 +228,11 @@ local boostEnabled = false
 boostBtn.MouseButton1Click:Connect(function()
 	boostEnabled = not boostEnabled
 	if boostEnabled then
-		boostBtn.Text = "Boost: OFF"
+		boostBtn.Text = "Boost: ON"
 		boostStroke.Enabled = true
 		enableBoost()
 	else
-		boostBtn.Text = "Boost: ON"
+		boostBtn.Text = "Boost: OFF"
 		boostStroke.Enabled = false
 		disableBoost()
 	end
@@ -249,7 +249,7 @@ end)
 -- Float Durum Butonu
 local floatBtn = Instance.new("TextButton")
 floatBtn.Name = "FloatButton"
-floatBtn.Text = "Float: ON"
+floatBtn.Text = "Float: OFF"
 floatBtn.Size = UDim2.new(1, -20, 0, 36) -- Yanlardan boşluk
 floatBtn.Position = UDim2.new(0, 10, 0, 110) -- Boost’un altı
 floatBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
