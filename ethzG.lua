@@ -381,7 +381,6 @@ local function stopFlight()
 		boostEnabled = true
 		enableBoost()
 		boostBtn.Text = "Boost: ON"
-		boostStroke.Enabled = true
 	end
 
 	if flightConn then flightConn:Disconnect() end
@@ -394,7 +393,6 @@ local function stopFlight()
 	end
 
 	floatBtn.Text = "Float: OFF"
-	floatStroke.Enabled = false
 	startBtn.Text = "Start Float"
 end
 
@@ -406,7 +404,6 @@ local function startFlight()
 		wasBoostEnabledBeforeFloat = true
 		disableBoost()
 		boostBtn.Text = "Boost: OFF"
-		boostStroke.Enabled = false
 		boostEnabled = false
 	else
 		wasBoostEnabledBeforeFloat = false
@@ -426,7 +423,6 @@ local function startFlight()
 	flying = true
 	flightEndTime = tick() + FLIGHT_TIME
 	startBtn.Text = "Stop Float"
-	floatStroke.Enabled = true
 
 	flightConn = RunService.Heartbeat:Connect(function()
 		if not player.Character then return end
