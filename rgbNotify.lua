@@ -1,4 +1,4 @@
---🔄 NOTIFICATION SYSTEM - FULLY RGB INTEGRATED local TweenService = game:GetService("TweenService") local RunService = game:GetService("RunService") local Players = game:GetService("Players") local player = Players.LocalPlayer
+local TweenService = game:GetService("TweenService") local RunService = game:GetService("RunService") local Players = game:GetService("Players") local player = Players.LocalPlayer
 
 local hue = 0 local activeNotifications = {}
 
@@ -114,7 +114,7 @@ task.delay(duration, removeNotification)
 
 end
 
--- 🔁 RGB UPDATE DÖNGÜSÜNE EKLE: RunService.RenderStepped:Connect(function() hue = (hue + 0.01) % 1 local rgbColor = Color3.fromHSV(hue, 1, 1)
+RunService.RenderStepped:Connect(function() hue = (hue + 0.01) % 1 local rgbColor = Color3.fromHSV(hue, 1, 1)
 
 for _, notif in ipairs(activeNotifications) do
 	local stroke = notif:FindFirstChild("RGBStroke")
