@@ -24,7 +24,7 @@ notifFrame.Size = UDim2.new(0, 280, 0, 60)
 notifFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 notifFrame.BackgroundTransparency = 0.1
 notifFrame.AnchorPoint = Vector2.new(1, 0)
-notifFrame.Position = UDim2.new(1, 300, 0, 20)
+notifFrame.Position = UDim2.new(1, 60, 0, 20)
 notifFrame.ZIndex = 1000
 notifFrame.Parent = notifGui
 
