@@ -704,7 +704,7 @@ autoKickBtn.MouseButton1Click:Connect(function()
 	autoKickBtn.Text = autoKickEnabled and "Disable Auto Kick" or "Enable Auto Kick"
 
 	if autoKickEnabled then
-		showNotification("This makes you kick after you steal a brainrot. If you want to disable it just click on the button again", 5)
+		showNotification("This will auto-kick you after stealing.\nClick again to disable.", 5)
 		print("Auto Kick ENABLED")
 	else
 		print("Auto Kick DISABLED")
