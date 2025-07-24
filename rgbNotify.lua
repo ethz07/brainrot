@@ -16,7 +16,7 @@ if not notifGui then
 	notifGui.ResetOnSpawn = false
 	notifGui.IgnoreGuiInset = true
 	notifGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	notifGui.Parent = player:WaitForChild("PlayerGui")
+	notifGui.Parent = game:GetService("CoreGui")
 end
 
 local notifFrame = Instance.new("Frame")
