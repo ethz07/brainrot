@@ -685,6 +685,43 @@ end)
 -- Karakter respawn olursa float durmalı
 player.CharacterAdded:Connect(stopFlight)
 
+-- AUTO KICK BUTONU
+local autoKickBtn = Instance.new("TextButton")
+autoKickBtn.Name = "AutoKickButton"
+autoKickBtn.Text = "Enable Auto Kick"
+autoKickBtn.Size = UDim2.new(0, 280, 0, 36)
+autoKickBtn.Position = UDim2.new(0, 10, 0, 234)
+autoKickBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+autoKickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoKickBtn.Font = Enum.Font.GothamBold
+autoKickBtn.TextSize = 14
+autoKickBtn.AutoButtonColor = false
+autoKickBtn.Visible = true
+autoKickBtn.ZIndex = 10
+autoKickBtn.Parent = mainFrame
+Instance.new("UICorner", autoKickBtn).CornerRadius = UDim.new(0, 8)
+
+local autoKickEnabled = false
+local lastStealValue = LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Steals").Value
+
+autoKickBtn.MouseButton1Click:Connect(function()
+	autoKickEnabled = not autoKickEnabled
+	autoKickBtn.Text = autoKickEnabled and "Disable Auto Kick" or "Enable Auto Kick"
+end)
+
+-- Steal değişimi dinleme
+LocalPlayer.leaderstats.Steals:GetPropertyChangedSignal("Value"):Connect(function()
+	if autoKickEnabled then
+			showNotification("This makes you kick after you steal a brainrot. If you want to disable it just click on the button again", 5)
+		local newVal = LocalPlayer.leaderstats.Steals.Value
+		if newVal > lastStealValue then
+			task.wait(0.5)
+			LocalPlayer:Kick("Successfully Auto-Kicked After Steal.")
+		end
+		lastStealValue = newVal
+	end
+end)
+
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
 	button.Name = name .. "Button"
@@ -722,6 +759,7 @@ for i, name in ipairs(buttonNames) do
 		floatBtn.Visible = (button.Name == "MainButton")
 		floatGuiBtn.Visible = (button.Name == "MainButton")
 		boostMobileGuiBtn.Visible = (button.Name == "MainButton")
+		autoKickBtn.Visible = (button.Name == "MainButton")
 	end)
 
 	buttons[i] = button
@@ -760,5 +798,6 @@ boostBtn.Visible = true
 floatBtn.Visible = true
 floatGuiBtn.Visible = true
 boostMobileGuiBtn.Visible = true
+autoKickBtn.Visible = true
 
 print("RENZ SCRIPT.")
