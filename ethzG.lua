@@ -494,7 +494,7 @@ local function startMobileFloat()
 end
 
 -- Buton işlevi
-mobileFloatBtn.MouseButton1Click:Connect(function()
+floatMobileBtn.MouseButton1Click:Connect(function()
 	if mobileFloatActive then
 		stopMobileFloat()
 		disableGodMode()
