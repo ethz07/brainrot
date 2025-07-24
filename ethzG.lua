@@ -265,37 +265,19 @@ boostBtn.AutoButtonColor = false
 boostBtn.Visible = false -- 🔹 Başta görünmesin
 boostBtn.ZIndex = 10
 boostBtn.Parent = mainFrame
-
 Instance.new("UICorner", boostBtn).CornerRadius = UDim.new(0, 8)
-
-local boostStroke = Instance.new("UIStroke", boostBtn)
-boostStroke.Thickness = 2
-boostStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-boostStroke.Color = Color3.fromRGB(255, 0, 0)
-boostStroke.Enabled = false
 
 local boostEnabled = false
 boostBtn.MouseButton1Click:Connect(function()
 	boostEnabled = not boostEnabled
 	if boostEnabled then
 		boostBtn.Text = "Boost: ON"
-		boostStroke.Enabled = true
 		enableBoost()
 	else
 		boostBtn.Text = "Boost: OFF"
-		boostStroke.Enabled = false
 		disableBoost()
 	end
 end)
-
---[[ RGB
-RunService.RenderStepped:Connect(function()
-	if boostEnabled and boostStroke.Enabled then
-		hue = (hue + 0.01) % 1
-		boostStroke.Color = Color3.fromHSV(hue, 1, 1)
-	end
-end)
---]]
 
 local floatBtn = Instance.new("TextButton")
 floatBtn.Name = "FloatButton"
@@ -312,20 +294,7 @@ floatBtn.Active = false
 floatBtn.Selectable = false
 floatBtn.ZIndex = 10
 floatBtn.Parent = mainFrame
-
 Instance.new("UICorner", floatBtn).CornerRadius = UDim.new(0, 8)
-
-local floatGuiStroke = Instance.new("UIStroke")
-floatGuiStroke.Thickness = 2
-floatGuiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-floatGuiStroke.Color = Color3.new(1, 1, 1)
-floatGuiStroke.Parent = floatGui
-
-RunService.RenderStepped:Connect(function()
-	hue = (hue + 0.005) % 1
-	local color = Color3.fromHSV(hue, 1, 1)
-	floatGuiStroke.Color = color
-end)
 
 -- float
 local floatGuiBtn = Instance.new("TextButton")
@@ -343,13 +312,6 @@ floatGuiBtn.ZIndex = 10
 floatGuiBtn.Parent = mainFrame
 
 Instance.new("UICorner", floatGuiBtn).CornerRadius = UDim.new(0, 8)
-
-local floatGuiBtnStroke = Instance.new("UIStroke", floatGuiBtn)
-floatGuiBtnStroke.Thickness = 2
-floatGuiBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-floatGuiBtnStroke.Color = Color3.fromRGB(255, 255, 255)
-floatGuiBtnStroke.Enabled = false
-local floatStroke = floatGuiBtnStroke
 
 -- FLOAT BUTTON (Boost'un hemen altına)
 -- DRAGGABLE FLOAT MOBILE GUI
@@ -371,11 +333,6 @@ floatFrame.Parent = floatGui
 
 Instance.new("UICorner", floatFrame).CornerRadius = UDim.new(0, 10)
 
-local floatRGB = Instance.new("UIStroke", floatFrame)
-floatRGB.Thickness = 2
-floatRGB.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-floatRGB.Color = Color3.fromRGB(255, 0, 0)
-
 local timerLabel = Instance.new("TextLabel", floatFrame)
 timerLabel.Size = UDim2.new(1, 0, 0, 30)
 timerLabel.Position = UDim2.new(0, 0, 0, 0)
@@ -396,12 +353,6 @@ startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 startBtn.Font = Enum.Font.GothamBold
 startBtn.TextSize = 14
 startBtn.ZIndex = 21
-
-local stroke = Instance.new("UIStroke")
-stroke.Thickness = 2
-stroke.Name = "floatGuiStroke"
-stroke.Color = Color3.new(1, 1, 1) -- geçici
-stroke.Parent = floatGui -- bu senin Mobile GUI'nin frame’i
 
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 6)
 
