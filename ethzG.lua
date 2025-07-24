@@ -60,10 +60,6 @@ local buttonStrokes = {}
 local selectedButton = nil
 local selectedStroke = nil
 local hue = 0
-local buttonWidth = 80
-local buttonSpacing = 10
-local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
-local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 
 function showNotification(message, duration)
 	duration = duration or 4
@@ -361,6 +357,11 @@ toggleFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 toggleFrame.Active = true
 toggleFrame.Draggable = true
 toggleFrame.Parent = gui
+
+local buttonWidth = 80
+local buttonSpacing = 10
+local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
+local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 
 toggleUICorner.CornerRadius = UDim.new(0, 4)
 
