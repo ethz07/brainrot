@@ -408,6 +408,12 @@ startBtn.Font = Enum.Font.GothamBold
 startBtn.TextSize = 14
 startBtn.ZIndex = 21
 
+local stroke = Instance.new("UIStroke")
+stroke.Thickness = 2
+stroke.Name = "floatGuiStroke"
+stroke.Color = Color3.new(1, 1, 1) -- geçici
+stroke.Parent = floatGui -- bu senin Mobile GUI'nin frame’i
+
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 6)
 
 -- Float ayarları
@@ -525,8 +531,8 @@ RunService.RenderStepped:Connect(function()
 	local color = Color3.fromHSV(hue, 1, 1)
 
 	-- Diyelim ki GUI'nin etrafındaki çerçeve bu:
-	if floatRGB then
-		floatRGB.Color = color
+	if floatGuiStroke then
+		floatGuiStroke.Color = color
 	end
 end)
 
