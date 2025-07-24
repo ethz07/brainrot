@@ -201,6 +201,51 @@ local buttonSpacing = 10
 local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
 local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 
+-- BOOST BUTONU
+local boostBtn = Instance.new("TextButton")
+boostBtn.Name = "BoostButton"
+boostBtn.Text = "Boost: ON"
+boostBtn.Size = UDim2.new(1, -20, 0, 36) -- 🔹 Tam genişlik - 10px boşluk sağ & sol
+boostBtn.Position = UDim2.new(0, 10, 0, 70) -- 🔹 10px içten başlasın
+boostBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+boostBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+boostBtn.Font = Enum.Font.GothamBold
+boostBtn.TextSize = 14
+boostBtn.AutoButtonColor = false
+boostBtn.Visible = false -- 🔹 Başta görünmesin
+boostBtn.ZIndex = 10
+boostBtn.Parent = mainFrame
+
+Instance.new("UICorner", boostBtn).CornerRadius = UDim.new(0, 8)
+
+local boostStroke = Instance.new("UIStroke", boostBtn)
+boostStroke.Thickness = 2
+boostStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+boostStroke.Color = Color3.fromRGB(255, 0, 0)
+boostStroke.Enabled = false
+
+local boostEnabled = false
+boostBtn.MouseButton1Click:Connect(function()
+	boostEnabled = not boostEnabled
+	if boostEnabled then
+		boostBtn.Text = "Boost: OFF"
+		boostStroke.Enabled = true
+		enableBoost()
+	else
+		boostBtn.Text = "Boost: ON"
+		boostStroke.Enabled = false
+		disableBoost()
+	end
+end)
+
+-- RGB
+RunService.RenderStepped:Connect(function()
+	if boostEnabled and boostStroke.Enabled then
+		hue = (hue + 0.01) % 1
+		boostStroke.Color = Color3.fromHSV(hue, 1, 1)
+	end
+end)
+
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
 	button.Name = name .. "Button"
@@ -240,53 +285,6 @@ for i, name in ipairs(buttonNames) do
 	buttons[i] = button
 	buttonStrokes[button] = stroke
 end
-
--- BOOST BUTONU
-local boostBtn = Instance.new("TextButton")
-boostBtn.Name = "BoostButton"
-boostBtn.Text = "Boost: ON"
-boostBtn.Size = UDim2.new(0, 100, 0, 36)
-boostBtn.Position = UDim2.new(0.5, -50, 0, 70)
-boostBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-boostBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-boostBtn.Font = Enum.Font.GothamBold
-boostBtn.TextSize = 14
-boostBtn.AutoButtonColor = false
-boostBtn.Visible = true -- BAŞTA GÖRÜNÜR
-boostBtn.ZIndex = 10 -- HER ŞEYİN ÜSTÜNDE GÖZÜKSÜN
-boostBtn.Parent = mainFrame
-
-Instance.new("UICorner", boostBtn).CornerRadius = UDim.new(0, 8)
-
-local boostStroke = Instance.new("UIStroke", boostBtn)
-boostStroke.Thickness = 2
-boostStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-boostStroke.Color = Color3.fromRGB(255, 0, 0)
-boostStroke.Enabled = false
-
--- Boost kontrolü
-local boostEnabled = false
-boostBtn.MouseButton1Click:Connect(function()
-	boostEnabled = not boostEnabled
-	if boostEnabled then
-		boostBtn.Text = "Boost: OFF"
-		boostStroke.Enabled = true
-		enableBoost()
-	else
-		boostBtn.Text = "Boost: ON"
-		boostStroke.Enabled = false
-		disableBoost()
-	end
-end)
-
--- RGB Efekt
-local hue = 0
-RunService.RenderStepped:Connect(function()
-	if boostEnabled and boostStroke.Enabled then
-		hue = (hue + 0.01) % 1
-		boostStroke.Color = Color3.fromHSV(hue, 1, 1)
-	end
-end)
 
 -- Toggle Aç/Kapat
 toggleButton.MouseButton1Click:Connect(function()
