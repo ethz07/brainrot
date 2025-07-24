@@ -160,7 +160,7 @@ local hue = 0
 local function enableBoost()
 	local char = player.Character or player.CharacterAdded:Wait()
 	local hum = char:WaitForChild("Humanoid")
-	local DEFAULT_SPEED, DEFAULT_JUMP = 48, 75
+	local DEFAULT_SPEED, DEFAULT_JUMP = 48, 85
 	hum.WalkSpeed, hum.JumpPower = DEFAULT_SPEED, DEFAULT_JUMP
 
 	table.insert(boostConns, RunService.RenderStepped:Connect(function()
