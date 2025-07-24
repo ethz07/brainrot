@@ -256,7 +256,7 @@ local boostBtn = Instance.new("TextButton")
 boostBtn.Name = "BoostButton"
 boostBtn.Text = "Boost: OFF"
 boostBtn.Size = UDim2.new(1, -20, 0, 36) 
-boostBtn.Position = UDim2.new(0, 10, 0, 60) -- 🔹 
+boostBtn.Position = UDim2.new(0, 10, 0, 70) -- 🔹 
 boostBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 boostBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostBtn.Font = Enum.Font.GothamBold
@@ -303,12 +303,13 @@ boostRGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 boostRGBStroke.Color = Color3.fromRGB(255, 0, 0)
 
 local boostMiniBtn = Instance.new("TextButton", boostFrame)
-boostMiniBtn.Size = UDim2.new(1, -20, 0, 30)
+boostMiniBtn.Size = UDim2.new(0, 140, 0, 50)
 boostMiniBtn.Position = UDim2.new(0, 10, 0, 15)
 boostMiniBtn.Text = "Boost: OFF"
 boostMiniBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 boostMiniBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostMiniBtn.Font = Enum.Font.GothamBold
+boostMiniBtn.BackgroundTransparency = 1
 boostMiniBtn.TextSize = 14
 boostMiniBtn.ZIndex = 21
 
@@ -318,7 +319,7 @@ local boostMobileGuiBtn = Instance.new("TextButton")
 boostMobileGuiBtn.Name = "BoostGUIOpener"
 boostMobileGuiBtn.Text = "Boost Mobile GUI"
 boostMobileGuiBtn.Size = UDim2.new(1, -20, 0, 36)
-boostMobileGuiBtn.Position = UDim2.new(0, 10, 0, 100)
+boostMobileGuiBtn.Position = UDim2.new(0, 10, 0, 110)
 boostMobileGuiBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 boostMobileGuiBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostMobileGuiBtn.Font = Enum.Font.GothamBold
@@ -618,5 +619,6 @@ selectedStroke.Enabled = true
 boostBtn.Visible = true
 floatBtn.Visible = true
 floatGuiBtn.Visible = true
+boostMiniBtn.Visible = true
 
 print("RENZ SCRIPT.")
