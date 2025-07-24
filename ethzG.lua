@@ -539,4 +539,4 @@ boostBtn.Visible = true
 floatBtn.Visible = true
 floatGuiBtn.Visible = true
 
-print("yay")
+print("RENZ SCRIPT.")
