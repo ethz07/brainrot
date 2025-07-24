@@ -333,6 +333,11 @@ floatFrame.Parent = floatGui
 
 Instance.new("UICorner", floatFrame).CornerRadius = UDim.new(0, 10)
 
+local floatRGB = Instance.new("UIStroke", floatFrame)
+floatRGB.Thickness = 2
+floatRGB.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+floatRGB.Color = Color3.fromRGB(255, 0, 0)
+
 local timerLabel = Instance.new("TextLabel", floatFrame)
 timerLabel.Size = UDim2.new(1, 0, 0, 30)
 timerLabel.Position = UDim2.new(0, 0, 0, 0)
@@ -507,7 +512,6 @@ toggleButton.MouseButton1Click:Connect(function()
 	mainFrame.Visible = not mainFrame.Visible
 end)
 
--- 🔁 RGB Döngüsü
 RunService.RenderStepped:Connect(function()
 	hue = (hue + 0.01) % 1
 	local rgbColor = Color3.fromHSV(hue, 1, 1)
@@ -521,6 +525,10 @@ RunService.RenderStepped:Connect(function()
 
 	toggleButton.TextColor3 = rgbColor
 	toggleStroke.Color = rgbColor
+
+	if floatRGB then
+		floatRGB.Color = rgbColor
+	end
 end)
 
 -- Başlangıçta Main seçili
