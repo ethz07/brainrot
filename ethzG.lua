@@ -3,6 +3,9 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TeleportService = game:GetService("TeleportService")
+local Workspace = game:GetService("Workspace")
+local SoundService = game:GetService("SoundService")
+local Camera = Workspace.CurrentCamera
 
 local player = Players.LocalPlayer
 local LocalPlayer = player
@@ -405,76 +408,116 @@ startBtn.ZIndex = 21
 
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 6)
 
--- FLOAT LOGIC
-local flying = false
-local flightConn, timerConn
-local flightEnd = 0
-local flightTime = 20
-local bodyPos = nil
-local startY
+-- Float ayarları
+local FLIGHT_TIME = 15
+local FLIGHT_SPEED = 38
+local FLOAT_HEIGHT = 2.8
 
-local function updateFloatStateUI(active)
-	if active then
-		floatBtn.Text = "Float: ..."
-		floatStroke.Enabled = true
-		timerLabel.Text = "Timer: 20.0s"
-	else
-		floatBtn.Text = "Float: ON"
-		floatStroke.Enabled = false
-		timerLabel.Text = "Timer: 20.0s"
-	end
-end
+-- Float değişkenleri
+local flying = false
+local flightConn = nil
+local timerConn = nil
+local flightEndTime = 0
+local startY = nil
+local bodyPosition = nil
+
+-- Boost durumu yedeklemek için
+local wasBoostEnabledBeforeFloat = false
 
 local function stopFlight()
 	flying = false
+
+	-- GodMode kapat
+	disableGodMode()
+
+	-- Boost geri aç
+	if wasBoostEnabledBeforeFloat then
+		wasBoostEnabledBeforeFloat = false
+		boostEnabled = true
+		enableBoost()
+		boostBtn.Text = "Boost: ON"
+		boostStroke.Enabled = true
+	end
+
+	-- Bağlantıları temizle
 	if flightConn then flightConn:Disconnect() end
 	if timerConn then timerConn:Disconnect() end
-	if bodyPos then bodyPos:Destroy() end
-	flightConn, timerConn, bodyPos = nil, nil, nil
-	startBtn.Text = "Start Float"
-	updateFloatStateUI(false)
+	flightConn, timerConn = nil, nil
+
+	-- BodyPosition yok et
+	if bodyPosition then
+		bodyPosition:Destroy()
+		bodyPosition = nil
+	end
+
+	-- UI sıfırla
+	floatBtn.Text = "Float: ON"
+	floatStroke.Enabled = false
+	timerLabel.Text = string.format("Timer: %.1fs", FLIGHT_TIME)
 end
 
 local function startFlight()
-	local char = player.Character or player.CharacterAdded:Wait()
-	local root = char:WaitForChild("HumanoidRootPart")
+	local character = player.Character or player.CharacterAdded:Wait()
+	local root = character:WaitForChild("HumanoidRootPart")
 
-	bodyPos = Instance.new("BodyPosition")
-	bodyPos.MaxForce = Vector3.new(0, math.huge, 0)
-	bodyPos.Position = root.Position + Vector3.new(0, 2.8, 0)
-	bodyPos.P = 5000
-	bodyPos.D = 500
-	bodyPos.Parent = root
+	-- Aktif boost varsa durdur, durumu yedekle
+	if boostEnabled then
+		wasBoostEnabledBeforeFloat = true
+		disableBoost()
+		boostBtn.Text = "Boost: OFF"
+		boostStroke.Enabled = false
+		boostEnabled = false
+	else
+		wasBoostEnabledBeforeFloat = false
+	end
 
-	startY = root.Position.Y + 2.8
-	flightEnd = tick() + flightTime
+	-- GodMode aktif et
+	enableGodMode()
+
+	if bodyPosition then bodyPosition:Destroy() end
+	bodyPosition = Instance.new("BodyPosition")
+	bodyPosition.MaxForce = Vector3.new(0, math.huge, 0)
+	bodyPosition.Position = root.Position + Vector3.new(0, FLOAT_HEIGHT, 0)
+	bodyPosition.P = 5000
+	bodyPosition.D = 500
+	bodyPosition.Parent = root
+
+	startY = root.Position.Y + FLOAT_HEIGHT
 	flying = true
-	startBtn.Text = "Stop Float"
-	updateFloatStateUI(true)
+	floatBtn.Text = "Float: ..."
+	floatStroke.Enabled = true
+	flightEndTime = tick() + FLIGHT_TIME
 
 	flightConn = RunService.Heartbeat:Connect(function()
-		local look = Camera.CFrame.LookVector
-		look = Vector3.new(look.X, 0, look.Z).Unit * 38
+		if not player.Character then return end
+		local root = player.Character:FindFirstChild("HumanoidRootPart")
+		if not root or not workspace.CurrentCamera then return end
+
+		bodyPosition.Position = Vector3.new(root.Position.X, startY, root.Position.Z)
+		local look = workspace.CurrentCamera.CFrame.LookVector
+		look = Vector3.new(look.X, 0, look.Z).Unit * FLIGHT_SPEED
 		root.Velocity = Vector3.new(look.X, root.Velocity.Y, look.Z)
-		bodyPos.Position = Vector3.new(root.Position.X, startY, root.Position.Z)
+		root.CFrame = CFrame.new(root.Position, root.Position + look)
 	end)
 
 	timerConn = RunService.Heartbeat:Connect(function()
-		local remaining = flightEnd - tick()
-		timerLabel.Text = string.format("Timer: %04.1fs", math.max(0, remaining))
+		local remaining = flightEndTime - tick()
+		timerLabel.Text = string.format("Timer: %.1fs", math.max(0, remaining))
 		if remaining <= 0 then stopFlight() end
 	end)
 end
 
-startBtn.MouseButton1Click:Connect(function()
+-- Float butonu bağlantısı
+floatBtn.MouseButton1Click:Connect(function()
 	if flying then stopFlight() else startFlight() end
 end)
 
+-- Karakter respawn olursa float durmalı
 player.CharacterAdded:Connect(stopFlight)
 
-floatGuiBtn.MouseButton1Click:Connect(function()
-	floatGui.Enabled = not floatGui.Enabled
-end)
+-- Başlangıç görünüm
+floatBtn.Text = "Float: ON"
+timerLabel.Text = string.format("Timer: %.1fs", FLIGHT_TIME)
 
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
