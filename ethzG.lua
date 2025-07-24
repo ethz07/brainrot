@@ -1,6 +1,20 @@
-local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TeleportService = game:GetService("TeleportService")
+
 local player = Players.LocalPlayer
+local LocalPlayer = player
+
+-- flag
+local boostEnabled = false
+local boostConns = {}
+local lastPart = nil
+local nametagESPEnabled = false
+local bodyESPEnabled = false
+local highlights = {}
+local nametags = {}
 
 -- Ana GUI
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
@@ -166,6 +180,102 @@ boostStroke.Thickness = 2
 boostStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 boostStroke.Color = Color3.fromRGB(255, 0, 0)
 boostStroke.Enabled = false
+
+local function enableBoost()
+	local player = game.Players.LocalPlayer
+	local char = player.Character or player.CharacterAdded:Wait()
+	local hum = char:WaitForChild("Humanoid")
+
+	local DEFAULT_SPEED = 48
+	local DEFAULT_JUMP = 75
+	hum.WalkSpeed = DEFAULT_SPEED
+	hum.JumpPower = DEFAULT_JUMP
+
+	table.insert(boostConns, RunService.RenderStepped:Connect(function()
+		if hum.WalkSpeed < DEFAULT_SPEED then hum.WalkSpeed = DEFAULT_SPEED end
+		if hum.JumpPower < DEFAULT_JUMP then hum.JumpPower = DEFAULT_JUMP end
+	end))
+
+	table.insert(boostConns, hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+		if hum.WalkSpeed < DEFAULT_SPEED then hum.WalkSpeed = DEFAULT_SPEED end
+	end))
+
+	table.insert(boostConns, hum:GetPropertyChangedSignal("JumpPower"):Connect(function()
+		if hum.JumpPower < DEFAULT_JUMP then hum.JumpPower = DEFAULT_JUMP end
+	end))
+
+	local function createJumpPart()
+		local root = char:FindFirstChild("HumanoidRootPart")
+		if not root then return end
+		if lastPart and lastPart.Parent then lastPart:Destroy() end
+
+		local part = Instance.new("Part")
+		part.Size = Vector3.new(8, 1, 8)
+		part.Position = root.Position - Vector3.new(0, 3.1, 0)
+		part.Anchored = true
+		part.CanCollide = true
+		part.Transparency = 0.7
+		part.Color = Color3.new(0, 0, 0)
+		part.Material = Enum.Material.ForceField
+		part.Name = "JumpPad"
+		part.Parent = workspace
+
+		lastPart = part
+		delay(0.8, function()
+			if part and part.Parent then part:Destroy() end
+		end)
+	end
+
+	table.insert(boostConns, UserInputService.JumpRequest:Connect(function()
+		hum:ChangeState(Enum.HumanoidStateType.Jumping)
+	end))
+	table.insert(boostConns, UserInputService.InputBegan:Connect(function(input, gpe)
+		if not gpe and input.KeyCode == Enum.KeyCode.Space then
+			createJumpPart()
+		end
+	end))
+	table.insert(boostConns, hum.Jumping:Connect(function(isJumping)
+		if isJumping then createJumpPart() end
+	end))
+
+	local function protect()
+		table.insert(boostConns, RunService.Heartbeat:Connect(function()
+			if hum and hum.Health < hum.MaxHealth and hum.Health > 0 then
+				hum.Health = hum.MaxHealth
+			end
+		end))
+		table.insert(boostConns, hum:GetPropertyChangedSignal("Health"):Connect(function()
+			if hum.Health <= 0 then
+				hum.Health = hum.MaxHealth
+			end
+		end))
+		table.insert(boostConns, hum.Died:Connect(function()
+			task.wait()
+			hum.Health = hum.MaxHealth
+			hum:ChangeState(Enum.HumanoidStateType.Running)
+		end))
+		table.insert(boostConns, RunService.RenderStepped:Connect(function()
+			if hum and hum.Health <= 1 then
+				hum.Health = hum.MaxHealth
+				hum:ChangeState(Enum.HumanoidStateType.Running)
+			end
+		end))
+	end
+	protect()
+end
+
+local function disableBoost()
+	for _, conn in pairs(boostConns) do
+		if conn and typeof(conn) == "RBXScriptConnection" then
+			conn:Disconnect()
+		end
+	end
+	boostConns = {}
+	if lastPart and lastPart.Parent then
+		lastPart:Destroy()
+		lastPart = nil
+	end
+end
 
 -- Boost buton davranışı
 boostBtn.MouseButton1Click:Connect(function()
