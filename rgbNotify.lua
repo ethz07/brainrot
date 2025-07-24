@@ -1,8 +1,13 @@
-local TweenService = game:GetService("TweenService") local RunService = game:GetService("RunService") local Players = game:GetService("Players") local player = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService") 
+local Players = game:GetService("Players") 
+local player = Players.LocalPlayer
 
-local hue = 0 local activeNotifications = {}
+local hue = 0
+local activeNotifications = {}
 
-function showNotification(message, duration) duration = duration or 4
+function showNotification(message, duration) 
+	duration = duration or 4
 
 local notifGui = player:WaitForChild("PlayerGui"):FindFirstChild("AdvancedNotificationGui")
 if not notifGui then
