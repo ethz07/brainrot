@@ -452,6 +452,7 @@ for i, name in ipairs(buttonNames) do
 		stroke.Enabled = true
 	        boostBtn.Visible = (button.Name == "MainButton")
 		floatBtn.Visible = (button.Name == "MainButton")
+		floatGuiBtn.Visible = (button.Name == "MainButton")
 	end)
 
 	buttons[i] = button
@@ -485,3 +486,4 @@ selectedStroke = buttonStrokes[selectedButton]
 selectedStroke.Enabled = true
 boostBtn.Visible = true
 floatBtn.Visible = true
+floatGuiBtn.Visible = true
