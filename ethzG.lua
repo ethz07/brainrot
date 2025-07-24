@@ -303,18 +303,18 @@ boostBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- RGB
+--[[ RGB
 RunService.RenderStepped:Connect(function()
 	if boostEnabled and boostStroke.Enabled then
 		hue = (hue + 0.01) % 1
 		boostStroke.Color = Color3.fromHSV(hue, 1, 1)
 	end
 end)
+--]]
 
--- Float Durum Butonu
 local floatBtn = Instance.new("TextButton")
 floatBtn.Name = "FloatButton"
-floatBtn.Text = "Float: OFF"
+floatBtn.Text = "Float: ON"
 floatBtn.Size = UDim2.new(1, -20, 0, 36) -- Yanlardan boşluk
 floatBtn.Position = UDim2.new(0, 10, 0, 110) -- Boost’un altı
 floatBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -471,12 +471,6 @@ startBtn.MouseButton1Click:Connect(function()
 end)
 
 player.CharacterAdded:Connect(stopFlight)
-
--- RGB Border döngüsü
-RunService.RenderStepped:Connect(function()
-	hue = (hue + 0.01) % 1
-	floatRGB.Color = Color3.fromHSV(hue, 1, 1)
-end)
 
 floatGuiBtn.MouseButton1Click:Connect(function()
 	floatGui.Enabled = not floatGui.Enabled
