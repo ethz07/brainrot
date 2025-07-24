@@ -317,7 +317,7 @@ end)
 
 local floatBtn = Instance.new("TextButton")
 floatBtn.Name = "FloatButton"
-floatBtn.Text = "Float: ON"
+floatBtn.Text = "Float: Disabled"
 floatBtn.Size = UDim2.new(1, -20, 0, 36) -- Yanlardan boşluk
 floatBtn.Position = UDim2.new(0, 10, 0, 110) -- Boost’un altı
 floatBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -326,6 +326,8 @@ floatBtn.Font = Enum.Font.GothamBold
 floatBtn.TextSize = 14
 floatBtn.AutoButtonColor = false
 floatBtn.Visible = false
+floatBtn.Active = false
+floatBtn.Selectable = false
 floatBtn.ZIndex = 10
 floatBtn.Parent = mainFrame
 
