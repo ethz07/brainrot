@@ -1,5 +1,3 @@
--- 05.01 24 temmuz. boost yanlardan genisley ve sadece main de görünür yap
-
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
