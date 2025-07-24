@@ -54,12 +54,6 @@ local lastPart = nil
 local highlights, nametags = {}, {}
 local hue = 0
 local activeNotifications = {}
-local buttonNames = {"Main", "Visual", "Misc"}
-local buttons = {}
-local buttonStrokes = {}
-local selectedButton = nil
-local selectedStroke = nil
-local hue = 0
 
 function showNotification(message, duration)
 	duration = duration or 4
@@ -358,11 +352,6 @@ toggleFrame.Active = true
 toggleFrame.Draggable = true
 toggleFrame.Parent = gui
 
-local buttonWidth = 80
-local buttonSpacing = 10
-local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
-local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
-
 toggleUICorner.CornerRadius = UDim.new(0, 4)
 
 toggleStroke.Thickness = 2
@@ -400,6 +389,20 @@ titleLabel.TextSize = 14
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Top
 titleLabel.Parent = mainFrame
+
+local buttonNames = {"Main", "Visual", "Misc"}
+local buttons = {}
+local buttonStrokes = {}
+
+local selectedButton = nil
+local selectedStroke = nil
+local hue = 0
+
+local buttonWidth = 80
+local buttonSpacing = 10
+local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
+local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
+
 -------------BOOST---------
 boostBtn.Name = "BoostButton"
 boostBtn.Text = "Boost: OFF"
