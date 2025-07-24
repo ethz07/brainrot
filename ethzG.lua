@@ -269,20 +269,23 @@ floatStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 floatStroke.Color = Color3.fromRGB(255, 0, 0)
 floatStroke.Enabled = false
 
--- float
-local floatGuiBtn = Instance.new("TextButton")
-floatGuiBtn.Name = "FloatGUIOpener"
+-- Float Mobile GUI Açma Butonu (Ana Frame'de)
+local floatGuiBtn = Instance.new("TextButton", mainFrame)
 floatGuiBtn.Text = "Float Mobile GUI"
 floatGuiBtn.Size = UDim2.new(1, -20, 0, 36)
-floatGuiBtn.Position = UDim2.new(0, 10, 0, 150)
+floatGuiBtn.Position = UDim2.new(0, 10, 0, 160)
 floatGuiBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-floatGuiBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+floatGuiBtn.TextColor3 = Color3.new(1, 1, 1)
 floatGuiBtn.Font = Enum.Font.GothamBold
 floatGuiBtn.TextSize = 14
 floatGuiBtn.AutoButtonColor = false
 floatGuiBtn.Visible = false
-floatGuiBtn.ZIndex = 10
-floatGuiBtn.Parent = mainFrame
+
+Instance.new("UICorner", floatGuiBtn).CornerRadius = UDim.new(0, 8)
+
+floatGuiBtn.MouseButton1Click:Connect(function()
+	floatGui.Enabled = not floatGui.Enabled
+end)
 
 Instance.new("UICorner", floatGuiBtn).CornerRadius = UDim.new(0, 8)
 
@@ -292,129 +295,144 @@ floatGuiBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 floatGuiBtnStroke.Color = Color3.fromRGB(255, 255, 255)
 floatGuiBtnStroke.Enabled = false
 
--- FLOAT BUTTON (Boost'un hemen altına)
--- DRAGGABLE FLOAT MOBILE GUI
-local floatGui = Instance.new("ScreenGui")
-floatGui.Name = "FloatMobileGUI"
+-- === FLOAT AYARLARI === --
+local FLOAT_TIME = 20 -- Timer süresi (güncellendi)
+local FLOAT_SPEED = 38
+local FLOAT_HEIGHT = 2.8
+
+-- === FLOAT STATE === --
+local floatActive = false
+local floatConn = nil
+local floatTimerConn = nil
+local floatEndTime = 0
+local startY = nil
+local floatBody = nil
+
+-- Float Mobile GUI
+local floatGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+floatGui.Name = "FloatMobileGui"
 floatGui.ResetOnSpawn = false
 floatGui.Enabled = false
-floatGui.Parent = player:WaitForChild("PlayerGui")
 
-local floatFrame = Instance.new("Frame")
-floatFrame.Size = UDim2.new(0, 200, 0, 80)
-floatFrame.Position = UDim2.new(0.5, -100, 0.6, 0)
-floatFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+-- Arka Plan Frame
+local floatFrame = Instance.new("Frame", floatGui)
+floatFrame.Size = UDim2.new(0, 180, 0, 80)
+floatFrame.Position = UDim2.new(0.5, -90, 0.8, 0)
+floatFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 floatFrame.BackgroundTransparency = 0.15
 floatFrame.Active = true
 floatFrame.Draggable = true
-floatFrame.ZIndex = 20
-floatFrame.Parent = floatGui
 
-Instance.new("UICorner", floatFrame).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", floatFrame).CornerRadius = UDim.new(0, 12)
 
-local floatRGB = Instance.new("UIStroke", floatFrame)
-floatRGB.Thickness = 2
-floatRGB.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-floatRGB.Color = Color3.fromRGB(255, 0, 0)
+local floatStroke = Instance.new("UIStroke", floatFrame)
+floatStroke.Thickness = 2
+floatStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+floatStroke.Color = Color3.fromHSV(0, 1, 1)
 
-local timerLabel = Instance.new("TextLabel", floatFrame)
-timerLabel.Size = UDim2.new(1, 0, 0, 30)
-timerLabel.Position = UDim2.new(0, 0, 0, 0)
-timerLabel.BackgroundTransparency = 1
-timerLabel.Text = "Timer: 20.0s"
-timerLabel.Font = Enum.Font.Gotham
-timerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-timerLabel.TextSize = 14
-timerLabel.ZIndex = 21
-timerLabel.Parent = floatFrame
+-- Buton
+local floatGuiBtnMobile = Instance.new("TextButton", floatFrame)
+floatGuiBtnMobile.Size = UDim2.new(1, -10, 0, 36)
+floatGuiBtnMobile.Position = UDim2.new(0, 5, 0, 5)
+floatGuiBtnMobile.Text = "Float & Move Forward"
+floatGuiBtnMobile.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+floatGuiBtnMobile.TextColor3 = Color3.new(1, 1, 1)
+floatGuiBtnMobile.Font = Enum.Font.GothamBold
+floatGuiBtnMobile.TextSize = 14
+Instance.new("UICorner", floatGuiBtnMobile).CornerRadius = UDim.new(0, 8)
 
-local startBtn = Instance.new("TextButton", floatFrame)
-startBtn.Size = UDim2.new(1, -20, 0, 30)
-startBtn.Position = UDim2.new(0, 10, 0, 40)
-startBtn.Text = "Start Float"
-startBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-startBtn.Font = Enum.Font.GothamBold
-startBtn.TextSize = 14
-startBtn.ZIndex = 21
+-- Timer label
+local floatTimerLabel = Instance.new("TextLabel", floatFrame)
+floatTimerLabel.Size = UDim2.new(1, -10, 0, 20)
+floatTimerLabel.Position = UDim2.new(0, 5, 0, 45)
+floatTimerLabel.BackgroundTransparency = 1
+floatTimerLabel.Text = "Timer: 20.0s"
+floatTimerLabel.TextColor3 = Color3.new(1, 1, 1)
+floatTimerLabel.Font = Enum.Font.Gotham
+floatTimerLabel.TextSize = 14
+floatTimerLabel.TextXAlignment = Enum.TextXAlignment.Center
 
-Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 6)
-
--- FLOAT LOGIC
-local flying = false
-local flightConn, timerConn
-local flightEnd = 0
-local flightTime = 20
-local bodyPos = nil
-local startY
-
-local function updateFloatStateUI(active)
-	if active then
-		floatBtn.Text = "Float: ..."
-		floatStroke.Enabled = true
-		timerLabel.Text = "Timer: 20.0s"
-	else
-		floatBtn.Text = "Float: ON"
-		floatStroke.Enabled = false
-		timerLabel.Text = "Timer: 20.0s"
-	end
+-- Durumu RGB GUI’ye yansıt
+local function setFloatLabel(timeLeft)
+	floatTimerLabel.Text = string.format("Timer: %04.1fs", math.max(0, timeLeft))
 end
 
-local function stopFlight()
-	flying = false
-	if flightConn then flightConn:Disconnect() end
-	if timerConn then timerConn:Disconnect() end
-	if bodyPos then bodyPos:Destroy() end
-	flightConn, timerConn, bodyPos = nil, nil, nil
-	startBtn.Text = "Start Float"
-	updateFloatStateUI(false)
+-- Float durdur
+local function stopFloat()
+	floatActive = false
+	floatBtn.Text = "Float: ON"
+	floatStroke.Enabled = false
+	floatGuiBtnMobile.Text = "Float & Move Forward"
+	setFloatLabel(FLOAT_TIME)
+
+	if floatConn then floatConn:Disconnect() end
+	if floatTimerConn then floatTimerConn:Disconnect() end
+	floatConn, floatTimerConn = nil, nil
+
+	if floatBody then floatBody:Destroy() end
+	floatBody = nil
+
+	disableGodMode()
 end
 
-local function startFlight()
+-- Float başlat
+local function startFloat()
 	local char = player.Character or player.CharacterAdded:Wait()
 	local root = char:WaitForChild("HumanoidRootPart")
 
-	bodyPos = Instance.new("BodyPosition")
-	bodyPos.MaxForce = Vector3.new(0, math.huge, 0)
-	bodyPos.Position = root.Position + Vector3.new(0, 2.8, 0)
-	bodyPos.P = 5000
-	bodyPos.D = 500
-	bodyPos.Parent = root
+	if floatBody then floatBody:Destroy() end
+	floatBody = Instance.new("BodyPosition")
+	floatBody.MaxForce = Vector3.new(0, math.huge, 0)
+	floatBody.Position = root.Position + Vector3.new(0, FLOAT_HEIGHT, 0)
+	floatBody.P = 5000
+	floatBody.D = 500
+	floatBody.Parent = root
 
-	startY = root.Position.Y + 2.8
-	flightEnd = tick() + flightTime
-	flying = true
-	startBtn.Text = "Stop Float"
-	updateFloatStateUI(true)
+	startY = root.Position.Y + FLOAT_HEIGHT
+	floatActive = true
+	floatBtn.Text = "Float: ..."
+	floatStroke.Enabled = true
+	floatGuiBtnMobile.Text = "Actived (click to stop)"
+	floatEndTime = tick() + FLOAT_TIME
 
-	flightConn = RunService.Heartbeat:Connect(function()
-		local look = Camera.CFrame.LookVector
-		look = Vector3.new(look.X, 0, look.Z).Unit * 38
+	enableGodMode()
+
+	floatConn = RunService.Heartbeat:Connect(function()
+		local cam = workspace.CurrentCamera
+		local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+		if not root or not cam then return end
+
+		floatBody.Position = Vector3.new(root.Position.X, startY, root.Position.Z)
+		local look = cam.CFrame.LookVector
+		look = Vector3.new(look.X, 0, look.Z).Unit * FLOAT_SPEED
 		root.Velocity = Vector3.new(look.X, root.Velocity.Y, look.Z)
-		bodyPos.Position = Vector3.new(root.Position.X, startY, root.Position.Z)
+		root.CFrame = CFrame.new(root.Position, root.Position + look)
 	end)
 
-	timerConn = RunService.Heartbeat:Connect(function()
-		local remaining = flightEnd - tick()
-		timerLabel.Text = string.format("Timer: %04.1fs", math.max(0, remaining))
-		if remaining <= 0 then stopFlight() end
+	floatTimerConn = RunService.Heartbeat:Connect(function()
+		local remaining = floatEndTime - tick()
+		setFloatLabel(remaining)
+		if remaining <= 0 then stopFloat() end
 	end)
 end
 
-startBtn.MouseButton1Click:Connect(function()
-	if flying then stopFlight() else startFlight() end
+-- Mobile GUI buton davranışı
+floatGuiBtnMobile.MouseButton1Click:Connect(function()
+	if floatActive then stopFloat() else startFloat() end
 end)
 
-player.CharacterAdded:Connect(stopFlight)
+player.CharacterAdded:Connect(stopFloat)
 
--- RGB Border döngüsü
+-- İlk durum
+floatGuiBtnMobile.Text = Ready to Float"
+setFloatLabel(FLOAT_TIME)
+
+-- 🔄 RGB Border animasyonu
 RunService.RenderStepped:Connect(function()
-	hue = (hue + 0.01) % 1
-	floatRGB.Color = Color3.fromHSV(hue, 1, 1)
-end)
-
-floatGuiBtn.MouseButton1Click:Connect(function()
-	floatGui.Enabled = not floatGui.Enabled
+	if floatGui.Enabled then
+		local h = tick() * 0.5 % 1
+		floatStroke.Color = Color3.fromHSV(h, 1, 1)
+	end
 end)
 
 for i, name in ipairs(buttonNames) do
