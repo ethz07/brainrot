@@ -12,6 +12,142 @@ local LocalPlayer = player
 -- instance
 
 
+local function getNotificationGui()
+	local notifGui = player:WaitForChild("PlayerGui"):FindFirstChild("AdvancedNotificationGui")
+	if not notifGui then
+		notifGui = Instance.new("ScreenGui")
+		notifGui.Name = "AdvancedNotificationGui"
+		notifGui.ResetOnSpawn = false
+		notifGui.IgnoreGuiInset = true
+		notifGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		notifGui.Parent = player:WaitForChild("PlayerGui")
+	end
+	return notifGui
+end
+
+local activeNotifications = {}
+
+local function showNotification(message, duration)
+	duration = duration or 4
+	local notifGui = getNotificationGui()
+
+	local notifFrame = Instance.new("Frame")
+	notifFrame.Size = UDim2.new(0, 280, 0, 60)
+	notifFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+	notifFrame.BackgroundTransparency = 0.1
+	notifFrame.BorderSizePixel = 0
+	notifFrame.AnchorPoint = Vector2.new(1, 0)
+	notifFrame.Position = UDim2.new(1, 300, 0, 20)
+	notifFrame.ZIndex = 1000
+	notifFrame.Parent = notifGui
+
+	local corner = Instance.new("UICorner", notifFrame)
+	corner.CornerRadius = UDim.new(0, 14)
+
+	local shadow = Instance.new("ImageLabel", notifFrame)
+	shadow.BackgroundTransparency = 1
+	shadow.Size = UDim2.new(1, 10, 1, 10)
+	shadow.Position = UDim2.new(0, -5, 0, -5)
+	shadow.ZIndex = 999
+	shadow.Image = "rbxassetid://1316045217"
+	shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+	shadow.ImageTransparency = 0.7
+	shadow.ScaleType = Enum.ScaleType.Slice
+	shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+
+	local titleLabel = Instance.new("TextLabel", notifFrame)
+	titleLabel.Size = UDim2.new(0, 100, 0, 20)
+	titleLabel.Position = UDim2.new(0, 10, 0, 5)
+	titleLabel.BackgroundTransparency = 1
+	titleLabel.Text = "Renz Notify"
+	titleLabel.Font = Enum.Font.GothamBold
+	titleLabel.TextSize = 16
+	titleLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+	titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	titleLabel.ZIndex = 1001
+
+	local label = Instance.new("TextLabel", notifFrame)
+	label.Size = UDim2.new(1, -30, 0, 40)
+	label.Position = UDim2.new(0, 10, 0, 25)
+	label.BackgroundTransparency = 1
+	label.Text = message
+	label.Font = Enum.Font.GothamBold
+	label.TextSize = 14
+	label.TextColor3 = Color3.fromRGB(230, 230, 255)
+	label.TextWrapped = true
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.ZIndex = 1001
+
+	local closeBtn = Instance.new("TextButton", notifFrame)
+	closeBtn.Size = UDim2.new(0, 25, 0, 25)
+	closeBtn.Position = UDim2.new(1, -35, 0, 5)
+	closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+	closeBtn.Text = "×"
+	closeBtn.TextColor3 = Color3.new(1, 1, 1)
+	closeBtn.Font = Enum.Font.GothamBold
+	closeBtn.TextSize = 22
+	closeBtn.AutoButtonColor = true
+	closeBtn.ZIndex = 1002
+	local closeCorner = Instance.new("UICorner", closeBtn)
+	closeCorner.CornerRadius = UDim.new(0, 6)
+
+	closeBtn.MouseEnter:Connect(function()
+		closeBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+	end)
+	closeBtn.MouseLeave:Connect(function()
+		closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+	end)
+
+	local sound = Instance.new("Sound", notifFrame)
+	sound.SoundId = "rbxassetid://12221967"
+	sound.Volume = 0.7
+	sound:Play()
+
+	table.insert(activeNotifications, notifFrame)
+	for i, frame in ipairs(activeNotifications) do
+		local targetY = 20 + (i - 1) * (frame.Size.Y.Offset + 10)
+		TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+			Position = UDim2.new(1, -20, 0, targetY)
+		}):Play()
+	end
+
+	notifFrame.BackgroundTransparency = 1
+	notifFrame.Position = UDim2.new(1, 300, 0, 20 + (#activeNotifications - 1) * (notifFrame.Size.Y.Offset + 10))
+	TweenService:Create(notifFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+		BackgroundTransparency = 0.1,
+		Position = UDim2.new(1, -20, 0, 20 + (#activeNotifications - 1) * (notifFrame.Size.Y.Offset + 10))
+	}):Play()
+
+	local function removeNotification()
+		local tweenOut = TweenService:Create(notifFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+			BackgroundTransparency = 1,
+			Position = UDim2.new(1, 300, 0, notifFrame.Position.Y.Offset)
+		})
+		tweenOut:Play()
+		tweenOut.Completed:Wait()
+		notifFrame:Destroy()
+
+		for i, frame in ipairs(activeNotifications) do
+			if frame == notifFrame then
+				table.remove(activeNotifications, i)
+				break
+			end
+		end
+		for i, frame in ipairs(activeNotifications) do
+			local targetY = 20 + (i - 1) * (frame.Size.Y.Offset + 10)
+			TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+				Position = UDim2.new(1, -20, 0, targetY)
+			}):Play()
+		end
+	end
+
+	closeBtn.MouseButton1Click:Connect(removeNotification)
+
+	task.delay(duration, removeNotification)
+end
+
+-- how to use: showNotification("renz on top", 5)
+
 local boostEnabled = false
 local godModeEnabled = false
 local wasBoostEnabledBeforeFloat = false
@@ -629,66 +765,3 @@ floatGuiBtn.Visible = true
 boostMobileGuiBtn.Visible = true
 
 print("RENZ SCRIPT.")
-
--- 1) Bildirim fonksiyonunu güncelleyelim: içine ses oynatma ekliyoruz
-local function showNotification(message, duration)
-    duration = duration or 3
-
-    -- Frame oluştur
-    local notifFrame = Instance.new("Frame")
-    notifFrame.Size = UDim2.new(0, 250, 0, 50)
-    notifFrame.Position = UDim2.new(1, -270, 1, -80)
-    notifFrame.AnchorPoint = Vector2.new(1, 1)
-    notifFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    notifFrame.BackgroundTransparency = 0.2
-    notifFrame.ZIndex = 100
-    notifFrame.Parent = player:WaitForChild("PlayerGui")
-
-    -- Köşe ve çizgi
-    local corner = Instance.new("UICorner", notifFrame)
-    corner.CornerRadius = UDim.new(0, 10)
-    local stroke = Instance.new("UIStroke", notifFrame)
-    stroke.Thickness = 2
-    stroke.Color = Color3.fromRGB(255, 255, 255)
-    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-    -- Metin etiketi
-    local label = Instance.new("TextLabel", notifFrame)
-    label.Size = UDim2.new(1, -10, 1, -10)
-    label.Position = UDim2.new(0, 5, 0, 5)
-    label.BackgroundTransparency = 1
-    label.Text = message
-    label.Font = Enum.Font.Gotham
-    label.TextSize = 14
-    label.TextColor3 = Color3.new(1, 1, 1)
-    label.TextWrapped = true
-    label.ZIndex = 101
-
-    -- 2) Sesli uyarı: notifFrame içine bir Sound ekleyip oynatalım
-    local sound = Instance.new("Sound", notifFrame)
-    sound.SoundId = "rbxassetid://9118823103"   -- örnek uyarı sesi
-    sound.Volume = 1
-    sound.PlayOnRemove = true
-    -- PlayOnRemove kullandığımız için Destroy ile birlikte çalacak:
-    sound:Destroy()
-
-    -- Fade-in (istersen pozisyon animasyonu ekleyebilirsin)
-    local tweenIn = TweenService:Create(notifFrame, TweenInfo.new(0.3), {
-        BackgroundTransparency = 0.0
-    })
-    tweenIn:Play()
-
-    -- Süre sonunda fade-out ve destroy
-    task.delay(duration, function()
-        local tweenOut = TweenService:Create(notifFrame, TweenInfo.new(0.4), {
-            BackgroundTransparency = 1
-        })
-        tweenOut:Play()
-        tweenOut.Completed:Wait()
-        notifFrame:Destroy()
-    end)
-end
-
--- 3) Test etmek için basit bir çağrı:
---    Oynatıldığında ekranın sağ alt köşesinde 5 saniyelik bir bildirim + ses çalacak.
-showNotification("Bu bir test bildirimidir!", 5)
