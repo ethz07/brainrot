@@ -132,4 +132,4 @@ end)
 
 showNotification("🔥 Yeni Pet Geldi!", 4)
 
-print("11")
+print("111")
