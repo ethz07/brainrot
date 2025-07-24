@@ -313,7 +313,7 @@ gui.Name = "RGBTabGUI"
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local toggleFrame = Instance.new("Frame")
-toggleFrame.Size = UDim2.new(0, 60, 0, 20)
+toggleFrame.Size = UDim2.new(0, 60, 0, 60)
 toggleFrame.Position = UDim2.new(0, 10, 0, 10)
 toggleFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 toggleFrame.Active = true
@@ -336,6 +336,8 @@ toggleButton.TextSize = 12
 toggleButton.Font = Enum.Font.GothamBold
 toggleButton.AutoButtonColor = false
 toggleButton.Parent = toggleFrame
+toggleButton.Draggable = true
+toggleButton.Active = true
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 300, 0, 285)
