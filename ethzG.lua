@@ -255,14 +255,14 @@ local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 local boostBtn = Instance.new("TextButton")
 boostBtn.Name = "BoostButton"
 boostBtn.Text = "Boost: OFF"
-boostBtn.Size = UDim2.new(1, -20, 0, 36) -- 🔹 Tam genişlik - 10px boşluk sağ & sol
-boostBtn.Position = UDim2.new(0, 10, 0, 70) -- 🔹 10px içten başlasın
+boostBtn.Size = UDim2.new(1, -20, 0, 36) 
+boostBtn.Position = UDim2.new(0, 10, 0, 60) -- 🔹 
 boostBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 boostBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostBtn.Font = Enum.Font.GothamBold
 boostBtn.TextSize = 14
 boostBtn.AutoButtonColor = false
-boostBtn.Visible = false -- 🔹 Başta görünmesin
+boostBtn.Visible = false 
 boostBtn.ZIndex = 10
 boostBtn.Parent = mainFrame
 Instance.new("UICorner", boostBtn).CornerRadius = UDim.new(0, 8)
@@ -279,11 +279,90 @@ boostBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
+local boostMobileGui = Instance.new("ScreenGui")
+boostMobileGui.Name = "BoostMobileGUI"
+boostMobileGui.ResetOnSpawn = false
+boostMobileGui.Enabled = false
+boostMobileGui.Parent = player:WaitForChild("PlayerGui")
+
+local boostFrame = Instance.new("Frame")
+boostFrame.Size = UDim2.new(0, 180, 0, 60)
+boostFrame.Position = UDim2.new(0.5, -90, 0.7, 0)
+boostFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+boostFrame.BackgroundTransparency = 0.15
+boostFrame.Active = true
+boostFrame.Draggable = true
+boostFrame.ZIndex = 20
+boostFrame.Parent = boostMobileGui
+
+Instance.new("UICorner", boostFrame).CornerRadius = UDim.new(0, 10)
+
+local boostRGBStroke = Instance.new("UIStroke", boostFrame)
+boostRGBStroke.Thickness = 2
+boostRGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+boostRGBStroke.Color = Color3.fromRGB(255, 0, 0)
+
+local boostMiniBtn = Instance.new("TextButton", boostFrame)
+boostMiniBtn.Size = UDim2.new(1, -20, 0, 30)
+boostMiniBtn.Position = UDim2.new(0, 10, 0, 15)
+boostMiniBtn.Text = "Boost: OFF"
+boostMiniBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+boostMiniBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+boostMiniBtn.Font = Enum.Font.GothamBold
+boostMiniBtn.TextSize = 14
+boostMiniBtn.ZIndex = 21
+
+Instance.new("UICorner", boostMiniBtn).CornerRadius = UDim.new(0, 6)
+
+local boostMobileGuiBtn = Instance.new("TextButton")
+boostMobileGuiBtn.Name = "BoostGUIOpener"
+boostMobileGuiBtn.Text = "Boost Mobile GUI"
+boostMobileGuiBtn.Size = UDim2.new(1, -20, 0, 36)
+boostMobileGuiBtn.Position = UDim2.new(0, 10, 0, 100)
+boostMobileGuiBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+boostMobileGuiBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+boostMobileGuiBtn.Font = Enum.Font.GothamBold
+boostMobileGuiBtn.TextSize = 14
+boostMobileGuiBtn.AutoButtonColor = false
+boostMobileGuiBtn.Visible = false
+boostMobileGuiBtn.ZIndex = 10
+boostMobileGuiBtn.Parent = mainFrame
+
+Instance.new("UICorner", boostMobileGuiBtn).CornerRadius = UDim.new(0, 8)
+
+boostMobileGuiBtn.MouseButton1Click:Connect(function()
+	boostMobileGui.Enabled = not boostMobileGui.Enabled
+end)
+
+boostMiniBtn.MouseButton1Click:Connect(function()
+	boostEnabled = not boostEnabled
+	if boostEnabled then
+		boostBtn.Text = "Boost: ON"
+		boostMiniBtn.Text = "Boost: ON"
+		enableBoost()
+	else
+		boostBtn.Text = "Boost: OFF"
+		boostMiniBtn.Text = "Boost: OFF"
+		disableBoost()
+	end
+end)
+
+boostBtn:GetPropertyChangedSignal("Text"):Connect(function()
+	boostMiniBtn.Text = boostBtn.Text
+end)
+
+RunService.RenderStepped:Connect(function()
+	if boostRGBStroke then
+		boostRGBStroke.Color = Color3.fromHSV(hue, 1, 1)
+	end
+end)
+
+-- float
 local floatBtn = Instance.new("TextButton")
 floatBtn.Name = "FloatButton"
-floatBtn.Text = "Float: Disabled"
+floatBtn.Text = "Float: OFF"
 floatBtn.Size = UDim2.new(1, -20, 0, 36) -- Yanlardan boşluk
-floatBtn.Position = UDim2.new(0, 10, 0, 110) -- Boost’un altı
+floatBtn.Position = UDim2.new(0, 10, 0, 142) -- Boost’un altı
 floatBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 floatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 floatBtn.Font = Enum.Font.GothamBold
@@ -301,7 +380,7 @@ local floatGuiBtn = Instance.new("TextButton")
 floatGuiBtn.Name = "FloatGUIOpener"
 floatGuiBtn.Text = "Float Mobile GUI"
 floatGuiBtn.Size = UDim2.new(1, -20, 0, 36)
-floatGuiBtn.Position = UDim2.new(0, 10, 0, 150)
+floatGuiBtn.Position = UDim2.new(0, 10, 0, 182)
 floatGuiBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 floatGuiBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 floatGuiBtn.Font = Enum.Font.GothamBold
@@ -501,6 +580,7 @@ for i, name in ipairs(buttonNames) do
 	        boostBtn.Visible = (button.Name == "MainButton")
 		floatBtn.Visible = (button.Name == "MainButton")
 		floatGuiBtn.Visible = (button.Name == "MainButton")
+		boostMobileGuiBtn.Visible = (button.Name == "MainButton")
 	end)
 
 	buttons[i] = button
