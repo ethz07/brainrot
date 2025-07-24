@@ -143,3 +143,49 @@ end)
 selectedButton = buttons[1]
 selectedStroke = buttonStrokes[selectedButton]
 selectedStroke.Enabled = true
+
+-- boost
+
+local boostEnabled = false -- Başta boost kapalı
+local hue = 0
+
+-- Boost butonu
+local boostBtn = Instance.new("TextButton", scrolling)
+boostBtn.Text = "Boost: ON" -- Başlangıç durumu
+boostBtn.Font = Enum.Font.FredokaOne
+boostBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+boostBtn.TextSize = 14
+boostBtn.Size = UDim2.new(0.9, 0, 0, 40)
+boostBtn.Position = UDim2.new(0.05, 0, 0, 25)
+boostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Instance.new("UICorner", boostBtn).CornerRadius = UDim.new(0, 6)
+
+-- RGB UIStroke sadece aktifken (yani Boost: OFF yazarken)
+local boostStroke = Instance.new("UIStroke", boostBtn)
+boostStroke.Thickness = 2
+boostStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+boostStroke.Color = Color3.fromRGB(255, 0, 0)
+boostStroke.Enabled = false
+
+-- Boost buton davranışı
+boostBtn.MouseButton1Click:Connect(function()
+	boostEnabled = not boostEnabled
+
+	if boostEnabled then
+		boostBtn.Text = "Boost: OFF" -- Boost aktif
+		boostStroke.Enabled = true
+		enableBoost() -- Senin dosyandaki fonksiyon
+	else
+		boostBtn.Text = "Boost: ON" -- Boost kapalı
+		boostStroke.Enabled = false
+		disableBoost() -- Senin dosyandaki fonksiyon
+	end
+end)
+
+-- RGB animasyonu (sadece boost açıkken çalışır)
+RunService.RenderStepped:Connect(function()
+	if boostEnabled and boostStroke.Enabled then
+		hue = (hue + 0.01) % 1
+		boostStroke.Color = Color3.fromHSV(hue, 1, 1)
+	end
+end)
