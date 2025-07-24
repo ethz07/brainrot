@@ -706,11 +706,10 @@ local lastStealValue = LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Ste
 
 autoKickBtn.MouseButton1Click:Connect(function()
 	autoKickEnabled = not autoKickEnabled
-	autoKickBtn.Text = autoKickEnabled and "Disable Auto Kick" or "Enable Auto Kick"
+	autoKickBtn.Text = autoKickEnabled
 		if autoKickEnabled then
 			showNotification("This makes you kick after you steal a brainrot. If you want to disable it just click on the button again", 5)
 		end
-	end
 end)
 
 -- Steal değişimi dinleme
