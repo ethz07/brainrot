@@ -346,7 +346,7 @@ toggleButton.Parent = toggleFrame
 
 -- 🟥 Ana Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 295)
+mainFrame.Size = UDim2.new(0, 300, 0, 280)
 mainFrame.Position = UDim2.new(0.5, -150, 0.5, -140)
 mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 mainFrame.BackgroundTransparency = 0
