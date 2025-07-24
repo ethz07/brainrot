@@ -12,11 +12,6 @@ local LocalPlayer = player
 -- instance
 
 
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService") 
-local Players = game:GetService("Players") 
-local player = Players.LocalPlayer
-
 local hue = 0
 local activeNotifications = {}
 
