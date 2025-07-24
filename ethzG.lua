@@ -1,4 +1,3 @@
--- Servisler
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -10,7 +9,9 @@ local Camera = Workspace.CurrentCamera
 local player = Players.LocalPlayer
 local LocalPlayer = player
 
--- Flag'ler
+-- instance
+
+
 local boostEnabled = false
 local godModeEnabled = false
 local wasBoostEnabledBeforeFloat = false
@@ -237,7 +238,6 @@ titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Top
 titleLabel.Parent = mainFrame
 
--- Sekmeler (Ortalanmış ve eşit boyutta)
 local buttonNames = {"Main", "Visual", "Misc"}
 local buttons = {}
 local buttonStrokes = {}
@@ -304,15 +304,17 @@ boostRGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 boostRGBStroke.Color = Color3.fromRGB(255, 0, 0)
 
 local boostMiniBtn = Instance.new("TextButton", boostFrame)
-boostMiniBtn.Size = UDim2.new(0, 180, 0, 60)
+boostMiniBtn.Size = UDim2.new(1, -20, 0, 30)
 boostMiniBtn.Position = UDim2.new(0, 10, 0, 15)
 boostMiniBtn.Text = "Boost: OFF"
 boostMiniBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 boostMiniBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostMiniBtn.BackgroundTransparency = 1
 boostMiniBtn.Font = Enum.Font.GothamBold
-boostMiniBtn.TextSize = 14
+boostMiniBtn.TextSize = 16
 boostMiniBtn.ZIndex = 21
+boostMiniBtn.TextXAlignment = Enum.TextXAlignment.Center
+boostMiniBtn.TextYAlignment = Enum.TextYAlignment.Center
 
 Instance.new("UICorner", boostMiniBtn).CornerRadius = UDim.new(0, 6)
 
