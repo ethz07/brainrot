@@ -600,3 +600,5 @@ selectedStroke.Enabled = true
 boostBtn.Visible = true
 floatBtn.Visible = true
 floatGuiBtn.Visible = true
+
+print("yay")
