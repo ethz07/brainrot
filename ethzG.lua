@@ -246,6 +246,136 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
+-- float
+
+-- FLOAT BUTTON (Boost'un hemen altına)
+local floatBtn = Instance.new("TextButton")
+floatBtn.Name = "FloatButton"
+floatBtn.Text = "Float: ON"
+floatBtn.Size = UDim2.new(1, -20, 0, 36)
+floatBtn.Position = UDim2.new(0, 10, 0, 110) -- Boost'tan biraz aşağıda
+floatBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+floatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+floatBtn.Font = Enum.Font.GothamBold
+floatBtn.TextSize = 14
+floatBtn.AutoButtonColor = false
+floatBtn.Visible = false
+floatBtn.ZIndex = 10
+floatBtn.Parent = mainFrame
+
+Instance.new("UICorner", floatBtn).CornerRadius = UDim.new(0, 8)
+
+local floatStroke = Instance.new("UIStroke", floatBtn)
+floatStroke.Thickness = 2
+floatStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+floatStroke.Color = Color3.fromRGB(255, 255, 255)
+floatStroke.Enabled = false
+
+-- FLOAT MOBILE GUI (otomatik açılır)
+local floatGui = Instance.new("ScreenGui")
+floatGui.Name = "FloatMobileGUI"
+floatGui.ResetOnSpawn = false
+floatGui.Enabled = false
+floatGui.Parent = player:WaitForChild("PlayerGui")
+
+local floatFrame = Instance.new("Frame")
+floatFrame.Size = UDim2.new(0, 180, 0, 80)
+floatFrame.Position = UDim2.new(0.5, -90, 0.8, 0)
+floatFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+floatFrame.BackgroundTransparency = 0.15
+floatFrame.ZIndex = 20
+floatFrame.Parent = floatGui
+Instance.new("UICorner", floatFrame).CornerRadius = UDim.new(0, 10)
+
+local floatRGB = Instance.new("UIStroke", floatFrame)
+floatRGB.Thickness = 2
+floatRGB.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+floatRGB.Color = Color3.fromRGB(255, 0, 0)
+
+local floatTimer = Instance.new("TextLabel", floatFrame)
+floatTimer.Size = UDim2.new(1, 0, 1, 0)
+floatTimer.BackgroundTransparency = 1
+floatTimer.TextColor3 = Color3.fromRGB(255, 255, 255)
+floatTimer.Font = Enum.Font.GothamBold
+floatTimer.TextSize = 14
+floatTimer.Text = "Timer: 20.0s"
+
+-- FLOAT LOGIC
+local flightConn, timerConn = nil, nil
+local flying = false
+local flightEnd = 0
+local flightTime = 20
+local bodyPos = nil
+local startY
+
+local function setFloatTimer(t)
+	floatTimer.Text = string.format("Timer: %04.1fs", math.max(0, t))
+end
+
+local function stopFloat()
+	flying = false
+	floatGui.Enabled = false
+	floatBtn.Text = "Float: ON"
+	floatStroke.Enabled = false
+	if flightConn then flightConn:Disconnect() end
+	if timerConn then timerConn:Disconnect() end
+	if bodyPos then bodyPos:Destroy() end
+	flightConn, timerConn, bodyPos = nil, nil, nil
+end
+
+local function startFloat()
+	local char = player.Character or player.CharacterAdded:Wait()
+	local root = char:WaitForChild("HumanoidRootPart")
+
+	bodyPos = Instance.new("BodyPosition")
+	bodyPos.MaxForce = Vector3.new(0, math.huge, 0)
+	bodyPos.Position = root.Position + Vector3.new(0, 2.8, 0)
+	bodyPos.P = 5000
+	bodyPos.D = 500
+	bodyPos.Parent = root
+
+	startY = root.Position.Y + 2.8
+	flying = true
+	floatGui.Enabled = true
+	floatBtn.Text = "Float: ..."
+	floatStroke.Enabled = true
+	flightEnd = tick() + flightTime
+
+	flightConn = RunService.Heartbeat:Connect(function()
+		local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+		if not root or not Camera then return end
+		bodyPos.Position = Vector3.new(root.Position.X, startY, root.Position.Z)
+		local look = Camera.CFrame.LookVector
+		look = Vector3.new(look.X, 0, look.Z).Unit * 38
+		root.Velocity = Vector3.new(look.X, root.Velocity.Y, look.Z)
+		root.CFrame = CFrame.new(root.Position, root.Position + look)
+	end)
+
+	timerConn = RunService.Heartbeat:Connect(function()
+		local remaining = flightEnd - tick()
+		setFloatTimer(remaining)
+		if remaining <= 0 then stopFloat() end
+	end)
+end
+
+-- Ana GUI'deki FLOAT buton davranışı
+floatBtn.MouseButton1Click:Connect(function()
+	if flying then
+		stopFloat()
+	else
+		startFloat()
+	end
+end)
+
+player.CharacterAdded:Connect(stopFloat)
+
+setFloatTimer(flightTime)
+
+RunService.RenderStepped:Connect(function()
+	hue = (hue + 0.01) % 1
+	floatRGB.Color = Color3.fromHSV(hue, 1, 1)
+end)
+
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
 	button.Name = name .. "Button"
@@ -280,6 +410,7 @@ for i, name in ipairs(buttonNames) do
 		end
 		stroke.Enabled = true
 	        boostBtn.Visible = (button.Name == "MainButton")
+		floatBtn.Visible = (button.Name == "MainButton")
 	end)
 
 	buttons[i] = button
@@ -312,3 +443,4 @@ selectedButton = buttons[1]
 selectedStroke = buttonStrokes[selectedButton]
 selectedStroke.Enabled = true
 boostBtn.Visible = true
+floatBtn.Visible = true
