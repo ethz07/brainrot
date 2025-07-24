@@ -629,3 +629,66 @@ floatGuiBtn.Visible = true
 boostMobileGuiBtn.Visible = true
 
 print("RENZ SCRIPT.")
+
+-- 1) Bildirim fonksiyonunu güncelleyelim: içine ses oynatma ekliyoruz
+local function showNotification(message, duration)
+    duration = duration or 3
+
+    -- Frame oluştur
+    local notifFrame = Instance.new("Frame")
+    notifFrame.Size = UDim2.new(0, 250, 0, 50)
+    notifFrame.Position = UDim2.new(1, -270, 1, -80)
+    notifFrame.AnchorPoint = Vector2.new(1, 1)
+    notifFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    notifFrame.BackgroundTransparency = 0.2
+    notifFrame.ZIndex = 100
+    notifFrame.Parent = player:WaitForChild("PlayerGui")
+
+    -- Köşe ve çizgi
+    local corner = Instance.new("UICorner", notifFrame)
+    corner.CornerRadius = UDim.new(0, 10)
+    local stroke = Instance.new("UIStroke", notifFrame)
+    stroke.Thickness = 2
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+    -- Metin etiketi
+    local label = Instance.new("TextLabel", notifFrame)
+    label.Size = UDim2.new(1, -10, 1, -10)
+    label.Position = UDim2.new(0, 5, 0, 5)
+    label.BackgroundTransparency = 1
+    label.Text = message
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 14
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.TextWrapped = true
+    label.ZIndex = 101
+
+    -- 2) Sesli uyarı: notifFrame içine bir Sound ekleyip oynatalım
+    local sound = Instance.new("Sound", notifFrame)
+    sound.SoundId = "rbxassetid://9118823103"   -- örnek uyarı sesi
+    sound.Volume = 1
+    sound.PlayOnRemove = true
+    -- PlayOnRemove kullandığımız için Destroy ile birlikte çalacak:
+    sound:Destroy()
+
+    -- Fade-in (istersen pozisyon animasyonu ekleyebilirsin)
+    local tweenIn = TweenService:Create(notifFrame, TweenInfo.new(0.3), {
+        BackgroundTransparency = 0.0
+    })
+    tweenIn:Play()
+
+    -- Süre sonunda fade-out ve destroy
+    task.delay(duration, function()
+        local tweenOut = TweenService:Create(notifFrame, TweenInfo.new(0.4), {
+            BackgroundTransparency = 1
+        })
+        tweenOut:Play()
+        tweenOut.Completed:Wait()
+        notifFrame:Destroy()
+    end)
+end
+
+-- 3) Test etmek için basit bir çağrı:
+--    Oynatıldığında ekranın sağ alt köşesinde 5 saniyelik bir bildirim + ses çalacak.
+showNotification("Bu bir test bildirimidir!", 5)
