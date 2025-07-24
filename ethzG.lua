@@ -343,7 +343,7 @@ toggleButton.Parent = toggleFrame
 
 -- 🟥 Ana Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 280)
+mainFrame.Size = UDim2.new(0, 300, 0, 285)
 mainFrame.Position = UDim2.new(0.5, -150, 0.5, -140)
 mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 mainFrame.BackgroundTransparency = 0
@@ -707,12 +707,15 @@ local lastStealValue = LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Ste
 autoKickBtn.MouseButton1Click:Connect(function()
 	autoKickEnabled = not autoKickEnabled
 	autoKickBtn.Text = autoKickEnabled and "Disable Auto Kick" or "Enable Auto Kick"
+		if autoKickEnabled then
+			showNotification("This makes you kick after you steal a brainrot. If you want to disable it just click on the button again", 5)
+		end
+	end
 end)
 
 -- Steal değişimi dinleme
 LocalPlayer.leaderstats.Steals:GetPropertyChangedSignal("Value"):Connect(function()
 	if autoKickEnabled then
-			showNotification("This makes you kick after you steal a brainrot. If you want to disable it just click on the button again", 5)
 		local newVal = LocalPlayer.leaderstats.Steals.Value
 		if newVal > lastStealValue then
 			task.wait(0.5)
