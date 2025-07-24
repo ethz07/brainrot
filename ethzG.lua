@@ -132,82 +132,80 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
+-- godmode
+
+
+local connections = {}
 local godModeEnabled = false
-local heartbeatConnection
-local renderConnection
-local diedConnection
-local healthChangedConnection
 
 local function protectHumanoid(humanoid)
-    -- Heartbeat ile sürekli sağlık kontrolü
-    heartbeatConnection = RunService.Heartbeat:Connect(function()
+    table.insert(connections, RunService.Heartbeat:Connect(function()
         if godModeEnabled and humanoid and humanoid.Health > 0 and humanoid.Health < humanoid.MaxHealth then
             humanoid.Health = humanoid.MaxHealth
         end
-    end)
+    end))
 
-    -- RenderStepped ile ekstra koruma
-    renderConnection = RunService.RenderStepped:Connect(function()
-        if godModeEnabled and humanoid and humanoid.Health <= 1 then
-            humanoid.Health = humanoid.MaxHealth
-            humanoid:ChangeState(Enum.HumanoidStateType.Running)
-        end
-    end)
-
-    -- Sağlık değişimini izleyip anında müdahale et
-    healthChangedConnection = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+    table.insert(connections, humanoid:GetPropertyChangedSignal("Health"):Connect(function()
         if godModeEnabled and humanoid.Health <= 0 then
             humanoid.Health = humanoid.MaxHealth
         end
-    end)
+    end))
 
-    -- Ölüm olayını dinle
-    diedConnection = humanoid.Died:Connect(function()
+    table.insert(connections, humanoid.Died:Connect(function()
         if godModeEnabled then
             task.wait()
             humanoid.Health = humanoid.MaxHealth
             humanoid:ChangeState(Enum.HumanoidStateType.Running)
         end
-    end)
+    end))
+
+    table.insert(connections, RunService.RenderStepped:Connect(function()
+        if godModeEnabled and humanoid and humanoid.Health <= 1 then
+            humanoid.Health = humanoid.MaxHealth
+            humanoid:ChangeState(Enum.HumanoidStateType.Running)
+        end
+    end))
 end
 
--- GodMode aç
-function enableGodMode()
-    godModeEnabled = true
-
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:WaitForChild("Humanoid")
-    protectHumanoid(humanoid)
-end
-
--- GodMode kapat
-function disableGodMode()
-    godModeEnabled = false
-
-    if heartbeatConnection then heartbeatConnection:Disconnect() end
-    if renderConnection then renderConnection:Disconnect() end
-    if healthChangedConnection then healthChangedConnection:Disconnect() end
-    if diedConnection then diedConnection:Disconnect() end
-end
-
--- Karakter değişirse GodMode tekrar aktif edilsin
-player.CharacterAdded:Connect(function(char)
-    if godModeEnabled then
+local characterAddedConn
+local function connectCharacter()
+    characterAddedConn = player.CharacterAdded:Connect(function(char)
         local hum = char:WaitForChild("Humanoid")
         protectHumanoid(hum)
+    end)
+    table.insert(connections, characterAddedConn)
+
+    if player.Character then
+        local hum = player.Character:FindFirstChild("Humanoid")
+        if hum then
+            protectHumanoid(hum)
+        end
     end
-end)
+end
 
--- Başlangıçta istersen aktif et:
--- enableGodMode()
+function enableGodMode()
+    if godModeEnabled then return end
+    godModeEnabled = true
+    connectCharacter()
+end
 
--- Ana GUI
+function disableGodMode()
+    if not godModeEnabled then return end
+    godModeEnabled = false
+
+    for _, conn in pairs(connections) do
+        if conn and conn.Disconnect then
+            conn:Disconnect()
+        end
+    end
+    connections = {}
+end
+
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.ResetOnSpawn = false
 gui.Name = "RGBTabGUI"
 gui.Parent = player:WaitForChild("PlayerGui")
 
--- 🟦 Toggle Frame
 local toggleFrame = Instance.new("Frame")
 toggleFrame.Size = UDim2.new(0, 60, 0, 20)
 toggleFrame.Position = UDim2.new(0, 10, 0, 10)
@@ -234,7 +232,6 @@ toggleButton.Font = Enum.Font.GothamBold
 toggleButton.AutoButtonColor = false
 toggleButton.Parent = toggleFrame
 
--- 🟥 Ana Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 300, 0, 280)
 mainFrame.Position = UDim2.new(0.5, -150, 0.5, -140)
@@ -251,7 +248,6 @@ local mainStroke = Instance.new("UIStroke", mainFrame)
 mainStroke.Thickness = 3
 mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
--- Başlık
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -10, 0, 16)
 titleLabel.Position = UDim2.new(0, 5, 0, 2)
@@ -264,7 +260,6 @@ titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Top
 titleLabel.Parent = mainFrame
 
--- Sekmeler (Ortalanmış ve eşit boyutta)
 local buttonNames = {"Main", "Visual", "Misc"}
 local buttons = {}
 local buttonStrokes = {}
@@ -278,18 +273,18 @@ local buttonSpacing = 10
 local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
 local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 
--- BOOST BUTONU
+-- boost btn
 local boostBtn = Instance.new("TextButton")
 boostBtn.Name = "BoostButton"
 boostBtn.Text = "Boost: OFF"
-boostBtn.Size = UDim2.new(1, -20, 0, 36) -- 🔹 Tam genişlik - 10px boşluk sağ & sol
-boostBtn.Position = UDim2.new(0, 10, 0, 70) -- 🔹 10px içten başlasın
+boostBtn.Size = UDim2.new(1, -20, 0, 36)
+boostBtn.Position = UDim2.new(0, 10, 0, 70)
 boostBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 boostBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostBtn.Font = Enum.Font.GothamBold
 boostBtn.TextSize = 14
 boostBtn.AutoButtonColor = false
-boostBtn.Visible = false -- 🔹 Başta görünmesin
+boostBtn.Visible = false
 boostBtn.ZIndex = 10
 boostBtn.Parent = mainFrame
 
@@ -315,13 +310,14 @@ boostBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- RGB
+--[[
 RunService.RenderStepped:Connect(function()
 	if boostEnabled and boostStroke.Enabled then
 		hue = (hue + 0.01) % 1
 		boostStroke.Color = Color3.fromHSV(hue, 1, 1)
 	end
 end)
+]]--
 
 -- inf msg
 local function showFloatInfo()
