@@ -428,11 +428,8 @@ local wasBoostEnabledBeforeFloat = false
 
 local function stopFlight()
 	flying = false
-
-	-- GodMode kapat
 	disableGodMode()
 
-	-- Boost geri aç
 	if wasBoostEnabledBeforeFloat then
 		wasBoostEnabledBeforeFloat = false
 		boostEnabled = true
@@ -441,28 +438,24 @@ local function stopFlight()
 		boostStroke.Enabled = true
 	end
 
-	-- Bağlantıları temizle
 	if flightConn then flightConn:Disconnect() end
 	if timerConn then timerConn:Disconnect() end
 	flightConn, timerConn = nil, nil
 
-	-- BodyPosition yok et
 	if bodyPosition then
 		bodyPosition:Destroy()
 		bodyPosition = nil
 	end
 
-	-- UI sıfırla
 	floatBtn.Text = "Float: ON"
 	floatStroke.Enabled = false
-	timerLabel.Text = string.format("Timer: %.1fs", FLIGHT_TIME)
+	startBtn.Text = "Start Float"
 end
 
 local function startFlight()
 	local character = player.Character or player.CharacterAdded:Wait()
 	local root = character:WaitForChild("HumanoidRootPart")
 
-	-- Aktif boost varsa durdur, durumu yedekle
 	if boostEnabled then
 		wasBoostEnabledBeforeFloat = true
 		disableBoost()
@@ -473,7 +466,6 @@ local function startFlight()
 		wasBoostEnabledBeforeFloat = false
 	end
 
-	-- GodMode aktif et
 	enableGodMode()
 
 	if bodyPosition then bodyPosition:Destroy() end
@@ -486,9 +478,9 @@ local function startFlight()
 
 	startY = root.Position.Y + FLOAT_HEIGHT
 	flying = true
-	floatBtn.Text = "Float: ..."
-	floatStroke.Enabled = true
 	flightEndTime = tick() + FLIGHT_TIME
+	startBtn.Text = "Stop Float"
+	floatStroke.Enabled = true
 
 	flightConn = RunService.Heartbeat:Connect(function()
 		if not player.Character then return end
@@ -504,14 +496,22 @@ local function startFlight()
 
 	timerConn = RunService.Heartbeat:Connect(function()
 		local remaining = flightEndTime - tick()
-		timerLabel.Text = string.format("Timer: %.1fs", math.max(0, remaining))
+		floatBtn.Text = string.format("Timer: %.1fs", math.max(0, remaining))
 		if remaining <= 0 then stopFlight() end
 	end)
 end
 
 -- Float butonu bağlantısı
-floatBtn.MouseButton1Click:Connect(function()
-	if flying then stopFlight() else startFlight() end
+startBtn.MouseButton1Click:Connect(function()
+	if flying then
+		stopFlight()
+	else
+		startFlight()
+	end
+end)
+
+floatGuiBtn.MouseButton1Click:Connect(function()
+	floatGui.Enabled = not floatGui.Enabled
 end)
 
 -- Karakter respawn olursa float durmalı
