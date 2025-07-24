@@ -5,7 +5,6 @@ local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local SoundService = game:GetService("SoundService")
 local Camera = Workspace.CurrentCamera
-
 local player = Players.LocalPlayer
 local LocalPlayer = player
 
@@ -33,8 +32,6 @@ local floatRGB = Instance.new("UIStroke", floatFrame)
 local timerLabel = Instance.new("TextLabel", floatFrame)
 local startBtn = Instance.new("TextButton", floatFrame)
 local autoKickBtn = Instance.new("TextButton")
-
-
 
 -- other
 local lastStealValue = LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Steals").Value
