@@ -11,10 +11,6 @@ local LocalPlayer = player
 
 -- instance
 
-
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local player = game.Players.LocalPlayer
 local hue = 0
 local activeNotifications = {}
 
@@ -148,7 +144,7 @@ RunService.RenderStepped:Connect(function()
 		if title then title.TextColor3 = color end
 	end
 end)
--- how to use: showNotification("text here", duratiom here: 5)
+-- how to use: showNotification("text here", duration here: 5)
 
 local boostEnabled = false
 local godModeEnabled = false
