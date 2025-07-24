@@ -32,11 +32,13 @@ local floatFrame = Instance.new("Frame")
 local floatRGB = Instance.new("UIStroke", floatFrame)
 local timerLabel = Instance.new("TextLabel", floatFrame)
 local startBtn = Instance.new("TextButton", floatFrame)
-
+local autoKickBtn = Instance.new("TextButton")
 
 
 
 -- other
+local lastStealValue = LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Steals").Value
+local autoKickEnabled = false
 local FLIGHT_TIME = 20
 local FLIGHT_SPEED = 38
 local FLOAT_HEIGHT = 2.8
@@ -655,8 +657,7 @@ end)
 
 player.CharacterAdded:Connect(stopFlight)
 
--- AUTO KICK
-local autoKickBtn = Instance.new("TextButton")
+-----------AUTO KICK----------
 autoKickBtn.Name = "AutoKickButton"
 autoKickBtn.Text = "Enable Auto Kick"
 autoKickBtn.Size = UDim2.new(0, 280, 0, 36)
@@ -671,9 +672,6 @@ autoKickBtn.ZIndex = 10
 autoKickBtn.Parent = mainFrame
 Instance.new("UICorner", autoKickBtn).CornerRadius = UDim.new(0, 8)
 
-local autoKickEnabled = false
-local lastStealValue = LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Steals").Value
-
 autoKickBtn.MouseButton1Click:Connect(function()
 	autoKickEnabled = not autoKickEnabled
 	autoKickBtn.Text = autoKickEnabled and "Disable Auto Kick" or "Enable Auto Kick"
@@ -686,7 +684,6 @@ autoKickBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Steal değişimi dinleme
 LocalPlayer.leaderstats.Steals:GetPropertyChangedSignal("Value"):Connect(function()
 	if autoKickEnabled then
 		local newVal = LocalPlayer.leaderstats.Steals.Value
@@ -698,6 +695,7 @@ LocalPlayer.leaderstats.Steals:GetPropertyChangedSignal("Value"):Connect(functio
 	end
 end)
 
+-------------setUp-----------
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
 	button.Name = name .. "Button"
@@ -742,7 +740,6 @@ for i, name in ipairs(buttonNames) do
 	buttonStrokes[button] = stroke
 end
 
--- Toggle Aç/Kapat
 toggleButton.MouseButton1Click:Connect(function()
 	mainFrame.Visible = not mainFrame.Visible
 end)
@@ -766,7 +763,6 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Başlangıçta Main seçili
 selectedButton = buttons[1]
 selectedStroke = buttonStrokes[selectedButton]
 selectedStroke.Enabled = true
@@ -776,4 +772,4 @@ floatGuiBtn.Visible = true
 boostMobileGuiBtn.Visible = true
 autoKickBtn.Visible = true
 
-print("RENZ SCRIPT.")
+print("RENZ SCRIPT")
