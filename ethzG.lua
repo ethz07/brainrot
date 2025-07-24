@@ -271,7 +271,7 @@ for i, name in ipairs(buttonNames) do
 			end
 		end
 		stroke.Enabled = true
-	        boostBtn.Visible = (name == "Main")
+	        boostBtn.Visible = (button.Name == "MainButton") -- ✅ doğru
 	end)
 
 	buttons[i] = button
