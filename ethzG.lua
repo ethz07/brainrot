@@ -897,6 +897,29 @@ bodyEspBtn.MouseButton1Click:Connect(function()
 	updateAllESPs()
 end)
 
+--basetime
+local baseTimeESPBtn = Instance.new("TextButton")
+baseTimeESPBtn.Text = "Base Time ESP: OFF"
+baseTimeESPBtn.Size = UDim2.new(1, -20, 0, 36)
+baseTimeESPBtn.Position = UDim2.new(0, 10, 0, 150)
+baseTimeESPBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+baseTimeESPBtn.TextColor3 = Color3.new(1, 1, 1)
+baseTimeESPBtn.Font = Enum.Font.GothamBold
+baseTimeESPBtn.TextSize = 14
+baseTimeESPBtn.Visible = false
+baseTimeESPBtn.Parent = mainFrame
+Instance.new("UICorner", baseTimeESPBtn).CornerRadius = UDim.new(0, 8)
+
+baseTimeESPBtn.MouseButton1Click:Connect(function()
+	baseESPEnabled = not baseESPEnabled
+	baseTimeESPBtn.Text = baseESPEnabled and "Base Time ESP: ON" or "Base Time ESP: OFF"
+	if baseESPEnabled then
+		updateBaseESPs()
+	else
+		clearBaseESP()
+	end
+end)
+
 -------------setUp-----------
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
@@ -938,6 +961,7 @@ for i, name in ipairs(buttonNames) do
 		autoKickBtn.Visible = (button.Name == "MainButton")
 		nameEspBtn.Visible = (button.Name == "VisualButton")
                 bodyEspBtn.Visible = (button.Name == "VisualButton")
+		baseTimeESPBtn.Visible = (button.Name == "VisualButton")
 	end)
 
 	buttons[i] = button
