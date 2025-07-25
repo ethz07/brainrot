@@ -428,7 +428,7 @@ function SmartESP:Update()
 					label.Text = "UNLOCKED"
 					label.TextColor3 = self.settings.colors.unlocked
 				else
-					label.Text = "LOCKED: " .. timeLabel.Text
+					label.Text = timeLabel.Text
 					label.TextColor3 = self.settings.colors.locked
 				end
 			end
@@ -724,8 +724,8 @@ boostMobileGui.ResetOnSpawn = false
 boostMobileGui.Enabled = false
 boostMobileGui.Parent = player:WaitForChild("PlayerGui")
 
-boostFrame.Size = UDim2.new(0, 180, 0, 60)
-boostFrame.Position = UDim2.new(0.5, -90, 0.7, 0)
+boostFrame.Size = UDim2.new(0, 160, 0, 60)
+boostFrame.Position = UDim2.new(0.5, -80, 0.55, 0)
 boostFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 boostFrame.BackgroundTransparency = 0.15
 boostFrame.Active = true
@@ -738,32 +738,18 @@ boostRGBStroke.Thickness = 2
 boostRGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 boostRGBStroke.Color = Color3.fromRGB(255, 0, 0)
 
-boostMiniBtn.Size = UDim2.new(1, -20, 0, 30)
-boostMiniBtn.Position = UDim2.new(0, 10, 0, 15)
+boostMiniBtn.Size = UDim2.new(1, -20, 0, 25)
+boostMiniBtn.Position = UDim2.new(0, 10, 0, 18)
 boostMiniBtn.Text = "Boost: OFF"
 boostMiniBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 boostMiniBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 boostMiniBtn.BackgroundTransparency = 1
 boostMiniBtn.Font = Enum.Font.GothamBold
-boostMiniBtn.TextSize = 16
+boostMiniBtn.TextSize = 12
 boostMiniBtn.ZIndex = 21
 boostMiniBtn.TextXAlignment = Enum.TextXAlignment.Center
 boostMiniBtn.TextYAlignment = Enum.TextYAlignment.Center
 Instance.new("UICorner", boostMiniBtn).CornerRadius = UDim.new(0, 6)
-
-boostMobileGuiBtn.Name = "BoostGUIOpener"
-boostMobileGuiBtn.Text = "Boost Mobile GUI"
-boostMobileGuiBtn.Size = UDim2.new(1, -20, 0, 36)
-boostMobileGuiBtn.Position = UDim2.new(0, 10, 0, 110) -- Float GUI'nin altı
-boostMobileGuiBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-boostMobileGuiBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-boostMobileGuiBtn.Font = Enum.Font.GothamBold
-boostMobileGuiBtn.TextSize = 14
-boostMobileGuiBtn.AutoButtonColor = false
-boostMobileGuiBtn.Visible = false
-boostMobileGuiBtn.ZIndex = 10
-boostMobileGuiBtn.Parent = mainFrame
-Instance.new("UICorner", boostMobileGuiBtn).CornerRadius = UDim.new(0, 8)
 
 boostMobileGuiBtn.MouseButton1Click:Connect(function()
 	boostMobileGui.Enabled = not boostMobileGui.Enabled
