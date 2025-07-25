@@ -36,6 +36,7 @@ local nameEspBtn = Instance.new("TextButton")
 local bodyEspBtn = Instance.new("TextButton")
 local espBtn = Instance.new("TextButton")
 local brainrotBtn = Instance.new("TextButton")
+local RejoinBtn = Instance.new("TextButton")
 -- other
 local lastStealValue = LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Steals").Value
 local autoKickEnabled = false
@@ -1057,7 +1058,6 @@ end)
 
 -------------MISC-------------
 --Kick and rejoin
-local RejoinBtn = Instance.new("TextButton")
 RejoinBtn.Name = "RejoinButton"
 RejoinBtn.Text = "Rejoin"
 RejoinBtn.Size = UDim2.new(1, -20, 0, 36)
