@@ -1055,6 +1055,28 @@ brainrotBtn.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/ethz07/brainrot/refs/heads/main/ethzE.lua"))()
 end)
 
+-------------MISC-------------
+--Kick and rejoin
+local RejoinBtn = Instance.new("TextButton")
+RejoinBtn.Name = "RejoinButton"
+RejoinBtn.Text = "Rejoin"
+RejoinBtn.Size = UDim2.new(1, -20, 0, 36)
+RejoinBtn.Position = UDim2.new(0, 10, 0, 110)
+RejoinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+RejoinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+RejoinBtn.TextSize = 14
+RejoinBtn.Font = Enum.Font.GothamBold
+RejoinBtn.Visible = false
+RejoinBtn.Parent = mainFrame
+local UICornerRejoin = Instance.new("UICorner", RejoinBtn)
+UICornerRejoin.CornerRadius = UDim.new(0, 8)
+
+RejoinBtn.MouseButton1Click:Connect(function()
+	local placeId = game.PlaceId
+	local instanceId = game.JobId
+	TeleportService:TeleportToPlaceInstance(placeId, instanceId)
+end)
+
 -------------setUp-----------
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
@@ -1098,6 +1120,7 @@ for i, name in ipairs(buttonNames) do
                 bodyEspBtn.Visible = (button.Name == "VisualButton")
 		espBtn.Visible = (button.Name == "VisualButton")
 		brainrotBtn.Visible = (button.Name == "VisualButton")
+		RejoinBtn.Visible = (button.Name == "MiscButton")
 	end)
 
 	buttons[i] = button
