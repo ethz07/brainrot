@@ -281,68 +281,88 @@ for _, plr in ipairs(Players:GetPlayers()) do
 end
 -- BASE TIME ESP
 local baseESPEnabled = false
-local baseESPObjects = {}
+local baseESPLabels = {}
 
-local function clearBaseESP()
-	for _, obj in pairs(baseESPObjects) do
-		if obj and obj.Parent then obj:Destroy() end
+local function findTopBase(obj)
+	while obj and obj.Parent and obj.Parent ~= workspace do
+		obj = obj.Parent
 	end
-	table.clear(baseESPObjects)
+	return obj
 end
 
-local function createTimeLabel(adornee, text, color)
+local function findRedStructureBase(model)
+	for _, child in ipairs(model:GetDescendants()) do
+		if child:IsA("BasePart") and child.Name == "structure base home" then
+			local color = child.Color
+			if math.floor(color.R * 255) == 196 and math.floor(color.G * 255) == 40 and math.floor(color.B * 255) == 28 then
+				return child
+			end
+		end
+	end
+	return nil
+end
+
+local function createESP(part)
 	local gui = Instance.new("BillboardGui")
-	gui.Adornee = adornee
-	gui.Size = UDim2.new(0, 100, 0, 25)
-	gui.StudsOffset = Vector3.new(0, 3, 0)
-	gui.AlwaysOnTop = true
 	gui.Name = "BaseESP"
+	gui.Size = UDim2.new(0, 120, 0, 25)
+	gui.StudsOffset = Vector3.new(0, 4, 0)
+	gui.AlwaysOnTop = true
+	gui.Adornee = part
+	gui.Parent = part
 
 	local label = Instance.new("TextLabel")
 	label.Size = UDim2.new(1, 0, 1, 0)
 	label.BackgroundTransparency = 1
-	label.Text = text
-	label.TextColor3 = color
+	label.Text = "?"
+	label.TextColor3 = Color3.fromRGB(255, 0, 0)
 	label.Font = Enum.Font.GothamBold
 	label.TextScaled = true
 	label.Parent = gui
 
-	local stroke = Instance.new("UIStroke")
-	stroke.Thickness = 1.5
-	stroke.Color = Color3.new(0, 0, 0) -- siyah kenar
+	local stroke = Instance.new("UIStroke", label)
+	stroke.Color = Color3.new(0, 0, 0)
+	stroke.Thickness = 1.4
 	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-	stroke.Parent = label
 
-	gui.Parent = adornee
-	return gui
+	table.insert(baseESPLabels, gui)
+
+	return label
 end
 
-local function updateBaseESPs()
-	clearBaseESP()
-	for _, plot in pairs(workspace:WaitForChild("Plots"):GetChildren()) do
-		local rem = plot:FindFirstChild("RemainingTime")
-		if rem and rem:IsA("TextLabel") then
-			local adornee = rem.Parent:IsA("Model") and rem.Parent:FindFirstChild("Base") or rem
-			if adornee then
-				local gui = createTimeLabel(adornee, "", Color3.new(1, 0, 0))
-				table.insert(baseESPObjects, gui)
+local function clearBaseESPs()
+	for _, gui in ipairs(baseESPLabels) do
+		if gui and gui.Parent then gui:Destroy() end
+	end
+	table.clear(baseESPLabels)
+end
 
-				local con
-				con = RunService.RenderStepped:Connect(function()
-					if not baseESPEnabled then con:Disconnect() return end
-					if not rem or not rem:IsDescendantOf(game) then con:Disconnect() return end
+local function enableBaseESP()
+	for _, rem in ipairs(workspace:GetDescendants()) do
+		if rem:IsA("TextLabel") and rem.Name == "RemainingTime" then
+			local topBase = findTopBase(rem)
+			if topBase then
+				local model = topBase:FindFirstChild("Model")
+				if model then
+					local redPart = findRedStructureBase(model)
+					if redPart then
+						local label = createESP(redPart)
 
-					local txt = tostring(rem.Text or "")
-					if txt == "" or txt == "0s" then
-						gui.TextLabel.Text = "UNLOCKED"
-						gui.TextLabel.TextColor3 = Color3.new(0, 1, 0) -- yeşil
-						gui.TextLabel.TextScaled = true
-					else
-						local num = txt:match("(%d+)")
-						gui.TextLabel.Text = num or "?"
-						gui.TextLabel.TextColor3 = Color3.new(1, 0, 0) -- kırmızı
+						RunService.RenderStepped:Connect(function()
+							if not baseESPEnabled then return end
+							if not rem:IsDescendantOf(game) then return end
+							local txt = tostring(rem.Text or "")
+							if txt == "" or txt == "0s" then
+								label.Text = "UNLOCKED"
+								label.TextColor3 = Color3.fromRGB(0, 255, 0)
+							else
+								local num = txt:match("(%d+)")
+								label.Text = num or "?"
+								label.TextColor3 = Color3.fromRGB(255, 0, 0)
+							end
+						end)
 					end
-				end)
+				end
 			end
 		end
 	end
@@ -898,25 +918,26 @@ bodyEspBtn.MouseButton1Click:Connect(function()
 end)
 
 --basetime
-local baseTimeESPBtn = Instance.new("TextButton")
-baseTimeESPBtn.Text = "Base Time ESP: OFF"
-baseTimeESPBtn.Size = UDim2.new(1, -20, 0, 36)
-baseTimeESPBtn.Position = UDim2.new(0, 10, 0, 150)
-baseTimeESPBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-baseTimeESPBtn.TextColor3 = Color3.new(1, 1, 1)
-baseTimeESPBtn.Font = Enum.Font.GothamBold
-baseTimeESPBtn.TextSize = 14
-baseTimeESPBtn.Visible = false
-baseTimeESPBtn.Parent = mainFrame
-Instance.new("UICorner", baseTimeESPBtn).CornerRadius = UDim.new(0, 8)
+local baseESPBtn = Instance.new("TextButton")
+baseESPBtn.Text = "Base Time ESP: OFF"
+baseESPBtn.Size = UDim2.new(1, -20, 0, 36)
+baseESPBtn.Position = UDim2.new(0, 10, 0, 190)
+baseESPBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+baseESPBtn.TextColor3 = Color3.new(1, 1, 1)
+baseESPBtn.Font = Enum.Font.GothamBold
+baseESPBtn.TextSize = 14
+baseESPBtn.Visible = false
+baseESPBtn.Parent = mainFrame
+Instance.new("UICorner", baseESPBtn).CornerRadius = UDim.new(0, 8)
 
-baseTimeESPBtn.MouseButton1Click:Connect(function()
+baseESPBtn.MouseButton1Click:Connect(function()
 	baseESPEnabled = not baseESPEnabled
-	baseTimeESPBtn.Text = baseESPEnabled and "Base Time ESP: ON" or "Base Time ESP: OFF"
+	baseESPBtn.Text = baseESPEnabled and "Base Time ESP: ON" or "Base Time ESP: OFF"
+
 	if baseESPEnabled then
-		updateBaseESPs()
+		enableBaseESP()
 	else
-		clearBaseESP()
+		clearBaseESPs()
 	end
 end)
 
@@ -961,7 +982,7 @@ for i, name in ipairs(buttonNames) do
 		autoKickBtn.Visible = (button.Name == "MainButton")
 		nameEspBtn.Visible = (button.Name == "VisualButton")
                 bodyEspBtn.Visible = (button.Name == "VisualButton")
-		baseTimeESPBtn.Visible = (button.Name == "VisualButton")
+		baseESPBtn.Visible = (button.Name == "VisualButton")
 	end)
 
 	buttons[i] = button
