@@ -290,13 +290,17 @@ local function debugPrint(...)
 	end
 end
 
-local function findTopBase(obj)
-	local original = obj
-	while obj and obj.Parent and obj.Parent ~= workspace do
-		obj = obj.Parent
+local function getBaseFromRemainingTime(rem)
+	local current = rem
+	for i = 1, 6 do
+		if current and current.Parent then
+			current = current.Parent
+		else
+			return nil
+		end
 	end
-	debugPrint("En üst base bulundu:", obj and obj.Name or "nil", "←", original and original.Name or "nil")
-	return obj
+	debugPrint("6 kat yukarı çıkıldı, base bulundu:", current.Name)
+	return current
 end
 
 local function findRedStructureBase(model)
@@ -357,35 +361,40 @@ local function enableBaseESP()
 		if rem:IsA("TextLabel") and rem.Name == "RemainingTime" then
 			debugPrint("RemainingTime bulundu:", rem:GetFullName())
 
-			-- 1. En üst base nesnesine çık
-			local topBase = findTopBase(rem)
-			if not topBase then
-				debugPrint("Top base bulunamadı, atlanıyor.")
+			local base = getBaseFromRemainingTime(rem)
+			if not base then
+				debugPrint("Base çıkarımı başarısız, atlandı.")
 				continue
 			end
-			debugPrint("Top base bulundu:", topBase.Name)
+			debugPrint("Base bulundu:", base.Name)
 
-			-- 2. Model bul
-			local model = topBase:FindFirstChild("Model")
-			if not model then
-				debugPrint("Model bulunamadı:", topBase.Name)
-				continue
+			-- Birden fazla Model varsa hepsini kontrol et
+			local models = {}
+			for _, child in ipairs(base:GetChildren()) do
+				if child:IsA("Model") then
+					table.insert(models, child)
+				end
 			end
-			debugPrint("Model bulundu:", model.Name)
 
-			-- 3. Rengi kırmızı olan 'structure base home' partı bul
-			local redPart = findRedStructureBase(model)
+			local redPart = nil
+			for _, model in ipairs(models) do
+				local found = findRedStructureBase(model)
+				if found then
+					redPart = found
+					break
+				end
+			end
+
 			if not redPart then
-				debugPrint("Renkli base part bulunamadı:", model.Name)
+				debugPrint("Hiçbir Model'de kırmızı 'structure base home' bulunamadı:", base.Name)
 				continue
 			end
+
 			debugPrint("Kırmızı base part bulundu:", redPart:GetFullName())
 
-			-- 4. ESP yazısını oluştur
 			local label = createESP(redPart)
 			debugPrint("ESP yerleştirildi:", redPart:GetFullName())
 
-			-- 5. Yazıyı her karede güncelle
 			RunService.RenderStepped:Connect(function()
 				if not baseESPEnabled then return end
 				if not rem:IsDescendantOf(game) then return end
