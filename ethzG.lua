@@ -7,6 +7,7 @@ local SoundService = game:GetService("SoundService")
 local Camera = Workspace.CurrentCamera
 local player = Players.LocalPlayer
 local LocalPlayer = player
+local TeleportService = game:GetService("TeleportService")
 
 -- instances
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
@@ -191,6 +192,98 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 -- how to use: showNotification("text here", duration here: 5)
+
+-- are you sure? gui
+function ShowConfirmation(promptText, onConfirm)
+	local screenGui = player:WaitForChild("PlayerGui"):FindFirstChild("ConfirmationGui") or Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+	screenGui.Name = "ConfirmationGui"
+	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenGui.ResetOnSpawn = false
+	screenGui.Enabled = true
+	screenGui.IgnoreGuiInset = true
+	
+	-- GUI zaten varsa temizle
+	screenGui:ClearAllChildren()
+	
+	-- Dim arka plan
+	local dimBg = Instance.new("Frame")
+	dimBg.Size = UDim2.new(1, 0, 1, 0)
+	dimBg.BackgroundColor3 = Color3.new(0, 0, 0)
+	dimBg.BackgroundTransparency = 1
+	dimBg.ZIndex = 10
+	dimBg.Parent = screenGui
+
+	-- Ana pencere
+	local confirmGui = Instance.new("Frame")
+	confirmGui.Size = UDim2.new(0, 280, 0, 150)
+	confirmGui.Position = UDim2.new(0.5, -140, 0.5, -75)
+	confirmGui.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	confirmGui.BackgroundTransparency = 1
+	confirmGui.ZIndex = 11
+	confirmGui.Parent = screenGui
+	local corner = Instance.new("UICorner", confirmGui)
+	corner.CornerRadius = UDim.new(0, 12)
+
+	-- Soru yazısı
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, -20, 0, 50)
+	label.Position = UDim2.new(0, 10, 0, 15)
+	label.Text = promptText or "Are you sure?"
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.Font = Enum.Font.Gotham
+	label.TextSize = 16
+	label.BackgroundTransparency = 1
+	label.ZIndex = 12
+	label.TextWrapped = true
+	label.Parent = confirmGui
+
+	-- Yes butonu
+	local yesBtn = Instance.new("TextButton")
+	yesBtn.Size = UDim2.new(0.5, -15, 0, 36)
+	yesBtn.Position = UDim2.new(0, 10, 1, -50)
+	yesBtn.Text = "Yes"
+	yesBtn.TextSize = 14
+	yesBtn.Font = Enum.Font.GothamBold
+	yesBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 75)
+	yesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	yesBtn.ZIndex = 12
+	yesBtn.Parent = confirmGui
+	Instance.new("UICorner", yesBtn).CornerRadius = UDim.new(0, 8)
+
+	-- No butonu
+	local noBtn = Instance.new("TextButton")
+	noBtn.Size = UDim2.new(0.5, -15, 0, 36)
+	noBtn.Position = UDim2.new(0.5, 5, 1, -50)
+	noBtn.Text = "No"
+	noBtn.TextSize = 14
+	noBtn.Font = Enum.Font.GothamBold
+	noBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+	noBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	noBtn.ZIndex = 12
+	noBtn.Parent = confirmGui
+	Instance.new("UICorner", noBtn).CornerRadius = UDim.new(0, 8)
+
+	-- Göster animasyonu
+	TweenService:Create(dimBg, TweenInfo.new(0.3), {BackgroundTransparency = 0.85}):Play()
+	TweenService:Create(confirmGui, TweenInfo.new(0.3), {BackgroundTransparency = 0.15}):Play()
+
+	-- YES tıklandıysa
+	yesBtn.MouseButton1Click:Connect(function()
+		screenGui:Destroy()
+		if typeof(onConfirm) == "function" then
+			onConfirm()
+		end
+	end)
+
+	-- NO tıklandıysa
+	noBtn.MouseButton1Click:Connect(function()
+		TweenService:Create(dimBg, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+		TweenService:Create(confirmGui, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+		task.delay(0.3, function()
+			screenGui:Destroy()
+		end)
+	end)
+end
 
 -- player esp func
 local function applyESPToPlayer(plr)
