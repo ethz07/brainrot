@@ -32,6 +32,9 @@ local floatRGB = Instance.new("UIStroke", floatFrame)
 local timerLabel = Instance.new("TextLabel", floatFrame)
 local startBtn = Instance.new("TextButton", floatFrame)
 local autoKickBtn = Instance.new("TextButton")
+local nameEspBtn = Instance.new("TextButton")
+local bodyEspBtn = Instance.new("TextButton")
+local espBtn = Instance.new("TextButton")
 
 -- other
 local lastStealValue = LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Steals").Value
@@ -54,6 +57,9 @@ local lastPart = nil
 local highlights, nametags = {}, {}
 local hue = 0
 local activeNotifications = {}
+local espEnabled = false
+local nametagESPEnabled = false
+local bodyESPEnabled = false
 
 function showNotification(message, duration)
 	duration = duration or 4
@@ -185,12 +191,7 @@ RunService.RenderStepped:Connect(function()
 end)
 -- how to use: showNotification("text here", duration here: 5)
 
--- esp func
-local nametagESPEnabled = false
-local bodyESPEnabled = false
---local nametags = {}
---local highlights = {}
-
+-- player esp func
 local function applyESPToPlayer(plr)
 	if plr == LocalPlayer then return end
 	local char = plr.Character or plr.CharacterAdded:Wait()
@@ -297,8 +298,8 @@ function SmartESP:Initialize()
 		offset = Vector3.new(0, 4, 0),
 		colors = {
 			myPlot = Color3.fromRGB(0, 200, 255),
-			locked = Color3.fromRGB(255, 0, 0),      -- kırmızı
-			unlocked = Color3.fromRGB(0, 255, 0),    -- yeşil
+			locked = Color3.fromRGB(255, 140, 0), -- orange
+			unlocked = Color3.fromRGB(0, 255, 0), -- green
 			noOwner = Color3.fromRGB(150, 150, 150),
 			newOwner = Color3.fromRGB(200, 0, 200)
 		}
@@ -985,7 +986,6 @@ end)
 
 --------------------VISUAL------------------
 -------------------ESP-----------------------
-local nameEspBtn = Instance.new("TextButton")
 nameEspBtn.Text = "Nametag ESP: OFF"
 nameEspBtn.Size = UDim2.new(1, -20, 0, 36)
 nameEspBtn.Position = UDim2.new(0, 10, 0, 70)
@@ -997,7 +997,6 @@ nameEspBtn.Visible = false
 nameEspBtn.Parent = mainFrame
 Instance.new("UICorner", nameEspBtn).CornerRadius = UDim.new(0, 8)
 
-local bodyEspBtn = Instance.new("TextButton")
 bodyEspBtn.Text = "Highlight ESP: OFF"
 bodyEspBtn.Size = UDim2.new(1, -20, 0, 36)
 bodyEspBtn.Position = UDim2.new(0, 10, 0, 110)
@@ -1022,7 +1021,6 @@ bodyEspBtn.MouseButton1Click:Connect(function()
 end)
 
 --basetime
-local espBtn = Instance.new("TextButton")
 espBtn.Text = "Time ESP: OFF"
 espBtn.Size = UDim2.new(1, -20, 0, 36)
 espBtn.Position = UDim2.new(0, 10, 0, 150)
@@ -1035,7 +1033,6 @@ espBtn.Visible = true
 espBtn.Parent = mainFrame
 Instance.new("UICorner", espBtn).CornerRadius = UDim.new(0, 8)
 
-local espEnabled = false
 espBtn.MouseButton1Click:Connect(function()
 	espEnabled = not espEnabled
 	espSystem:Toggle()
