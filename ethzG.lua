@@ -1029,7 +1029,7 @@ espBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 espBtn.Font = Enum.Font.GothamBold
 espBtn.TextSize = 14
 espBtn.AutoButtonColor = false
-espBtn.Visible = true
+espBtn.Visible = false
 espBtn.Parent = mainFrame
 Instance.new("UICorner", espBtn).CornerRadius = UDim.new(0, 8)
 
@@ -1037,6 +1037,21 @@ espBtn.MouseButton1Click:Connect(function()
 	espEnabled = not espEnabled
 	espSystem:Toggle()
 	espBtn.Text = espEnabled and "Time ESP: ON" or "Time ESP: OFF"
+end)
+
+-- Brainrot ESP
+local brainrotBtn = Instance.new("TextButton", scrolling)
+brainrotBtn.Text = "Brainrot ESP"
+brainrotBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+brainrotBtn.Font = Enum.Font.GothamBold
+brainrotBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+brainrotBtn.TextSize = 14
+brainrotBtn.Size = UDim2.new(1, -20, 0, 36)
+brainrotBtn.Position = UDim2.new(0, 10, 0, 190)
+Instance.new("UICorner", brainrotBtn).CornerRadius = UDim.new(0, 8)
+
+brainrotBtn.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ethz07/brainrot/refs/heads/main/ethzE.lua"))()
 end)
 
 -------------setUp-----------
