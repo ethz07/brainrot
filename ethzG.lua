@@ -298,7 +298,7 @@ function SmartESP:Initialize()
 		offset = Vector3.new(0, 4, 0),
 		colors = {
 			myPlot = Color3.fromRGB(0, 200, 255),
-			locked = Color3.fromRGB(255, 140, 0), -- orange
+			locked = Color3.fromRGB(245, 205, 48), -- yellow
 			unlocked = Color3.fromRGB(0, 255, 0), -- green
 			noOwner = Color3.fromRGB(150, 150, 150),
 			newOwner = Color3.fromRGB(200, 0, 200)
@@ -1096,6 +1096,7 @@ for i, name in ipairs(buttonNames) do
 		nameEspBtn.Visible = (button.Name == "VisualButton")
                 bodyEspBtn.Visible = (button.Name == "VisualButton")
 		espBtn.Visible = (button.Name == "VisualButton")
+		brainrotBtn.Visible = (button.Name == "VisualButton")
 	end)
 
 	buttons[i] = button
