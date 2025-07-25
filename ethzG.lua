@@ -196,29 +196,32 @@ local function applyESPToPlayer(plr)
 	local char = plr.Character or plr.CharacterAdded:Wait()
 
 	if nametagESPEnabled then
-		local head = char:WaitForChild("Head", 2)
-		if head and not head:FindFirstChild("NameTagESP") then
-			local tag = Instance.new("BillboardGui")
-			tag.Name = "NameTagESP"
-			tag.Adornee = head
-			tag.Size = UDim2.new(0, 100, 0, 20)
-			tag.StudsOffset = Vector3.new(0, 2.5, 0)
-			tag.AlwaysOnTop = true
-			tag.Parent = head
+	local head = char:WaitForChild("Head", 2)
+	if head and not head:FindFirstChild("NameTagESP") then
+		local tag = Instance.new("BillboardGui")
+		tag.Name = "NameTagESP"
+		tag.Adornee = head
+		tag.Size = UDim2.new(0, 100, 0, 20)
+		tag.StudsOffset = Vector3.new(0, 2.5, 0)
+		tag.AlwaysOnTop = true
+		tag.Parent = head
 
-			local label = Instance.new("TextLabel")
-			label.Size = UDim2.new(1, 0, 1, 0)
-			label.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-			label.BackgroundTransparency = 0.4
-			label.BorderSizePixel = 1
-			label.BorderColor3 = Color3.new(0,0,0)
-			label.Text = plr.DisplayName
-			label.TextColor3 = Color3.new(1, 1, 1)
-			label.Font = Enum.Font.GothamBold
-			label.TextScaled = true
-			label.Parent = tag
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, 0, 1, 0)
+		label.BackgroundTransparency = 1
+		label.Text = plr.DisplayName
+		label.TextColor3 = Color3.new(1, 1, 1)
+		label.Font = Enum.Font.GothamBold
+		label.TextScaled = true
+		label.Parent = tag
 
-			nametags[plr] = tag
+		local stroke = Instance.new("UIStroke")
+		stroke.Thickness = 1.2
+		stroke.Color = Color3.fromRGB(170, 170, 170) -- açık gri kenar
+		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+		stroke.Parent = label
+
+		nametags[plr] = tag
 		end
 	end
 
