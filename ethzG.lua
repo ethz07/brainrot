@@ -188,63 +188,93 @@ end)
 -- esp func
 local nametagESPEnabled = false
 local bodyESPEnabled = false
+--local nametags = {}
+--local highlights = {}
 
-local function updateNameESP()
-	for _, tag in pairs(nametags) do tag:Destroy() end
-	table.clear(nametags)
+local function applyESPToPlayer(plr)
+	if plr == LocalPlayer then return end
+	local char = plr.Character or plr.CharacterAdded:Wait()
 
 	if nametagESPEnabled then
-		for _, plr in ipairs(Players:GetPlayers()) do
-			if plr ~= LocalPlayer then
-				local char = plr.Character
-				local head = char and char:FindFirstChild("Head")
-				if head then
-					local tag = Instance.new("BillboardGui")
-					tag.Name = "NameTagESP"
-					tag.Adornee = head
-					tag.Size = UDim2.new(0, 100, 0, 20)
-					tag.StudsOffset = Vector3.new(0, 2.5, 0)
-					tag.AlwaysOnTop = true
-					tag.Parent = head
+		local head = char:WaitForChild("Head", 2)
+		if head and not head:FindFirstChild("NameTagESP") then
+			local tag = Instance.new("BillboardGui")
+			tag.Name = "NameTagESP"
+			tag.Adornee = head
+			tag.Size = UDim2.new(0, 100, 0, 20)
+			tag.StudsOffset = Vector3.new(0, 2.5, 0)
+			tag.AlwaysOnTop = true
+			tag.Parent = head
 
-					local label = Instance.new("TextLabel", tag)
-					label.Size = UDim2.new(1, 0, 1, 0)
-					label.BackgroundTransparency = 1
-					label.Text = plr.DisplayName
-					label.TextColor3 = Color3.fromRGB(255, 255, 255)
-					label.Font = Enum.Font.GothamBold
-					label.TextScaled = true
+			local label = Instance.new("TextLabel")
+			label.Size = UDim2.new(1, 0, 1, 0)
+			label.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+			label.BackgroundTransparency = 0.4
+			label.BorderSizePixel = 1
+			label.BorderColor3 = Color3.new(0,0,0)
+			label.Text = plr.DisplayName
+			label.TextColor3 = Color3.new(1, 1, 1)
+			label.Font = Enum.Font.GothamBold
+			label.TextScaled = true
+			label.Parent = tag
 
-					nametags[plr] = tag
-				end
-			end
+			nametags[plr] = tag
+		end
+	end
+
+	if bodyESPEnabled then
+		if not char:FindFirstChild("BodyESP") then
+			local hl = Instance.new("Highlight")
+			hl.Name = "BodyESP"
+			hl.Adornee = char
+			hl.FillColor = Color3.fromHSV(hue, 1, 1)
+			hl.FillTransparency = 0.55
+			hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+			hl.OutlineTransparency = 0.4 -- daha ince görünüm
+			hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+			hl.Parent = char
+			highlights[plr] = hl
 		end
 	end
 end
 
-local function updateBodyESP()
-	for _, h in pairs(highlights) do h:Destroy() end
+local function clearESPs()
+	for _, tag in pairs(nametags) do if tag then tag:Destroy() end end
+	for _, h in pairs(highlights) do if h then h:Destroy() end end
+	table.clear(nametags)
 	table.clear(highlights)
+end
 
-	if bodyESPEnabled then
-		for _, plr in ipairs(Players:GetPlayers()) do
-			if plr ~= LocalPlayer then
-				local char = plr.Character
-				if char then
-					local hl = Instance.new("Highlight")
-					hl.Name = "BodyESP"
-					hl.Adornee = char
-					hl.FillColor = Color3.fromRGB(0, 32, 96)
-					hl.FillTransparency = 0.6
-					hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-					hl.OutlineTransparency = 0
-					hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-					hl.Parent = char
-					highlights[plr] = hl
-				end
-			end
+local function updateAllESPs()
+	clearESPs()
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= LocalPlayer then
+			applyESPToPlayer(plr)
 		end
 	end
+end
+
+RunService.RenderStepped:Connect(function()
+	hue = (hue + 0.005) % 1
+	for _, hl in pairs(highlights) do
+		if hl and hl:IsA("Highlight") then
+			hl.FillColor = Color3.fromHSV(hue, 1, 1)
+		end
+	end
+end)
+
+Players.PlayerAdded:Connect(function(plr)
+	plr.CharacterAdded:Connect(function()
+		task.wait(0.2)
+		applyESPToPlayer(plr)
+	end)
+end)
+
+for _, plr in ipairs(Players:GetPlayers()) do
+	plr.CharacterAdded:Connect(function()
+		task.wait(0.2)
+		applyESPToPlayer(plr)
+	end)
 end
 
 
@@ -774,7 +804,7 @@ nameEspBtn.Parent = mainFrame
 Instance.new("UICorner", nameEspBtn).CornerRadius = UDim.new(0, 8)
 
 local bodyEspBtn = Instance.new("TextButton")
-bodyEspBtn.Text = "Body ESP: OFF"
+bodyEspBtn.Text = "Highlight ESP: OFF"
 bodyEspBtn.Size = UDim2.new(1, -20, 0, 36)
 bodyEspBtn.Position = UDim2.new(0, 10, 0, 110)
 bodyEspBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -788,13 +818,13 @@ Instance.new("UICorner", bodyEspBtn).CornerRadius = UDim.new(0, 8)
 nameEspBtn.MouseButton1Click:Connect(function()
 	nametagESPEnabled = not nametagESPEnabled
 	nameEspBtn.Text = nametagESPEnabled and "Nametag ESP: ON" or "Nametag ESP: OFF"
-	updateNameESP()
+	updateAllESPs()
 end)
 
 bodyEspBtn.MouseButton1Click:Connect(function()
 	bodyESPEnabled = not bodyESPEnabled
-	bodyEspBtn.Text = bodyESPEnabled and "Body ESP: ON" or "Body ESP: OFF"
-	updateBodyESP()
+	bodyEspBtn.Text = bodyESPEnabled and "Highlight ESP: ON" or "Highlight ESP: OFF"
+	updateAllESPs()
 end)
 
 -------------setUp-----------
