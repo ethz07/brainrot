@@ -280,73 +280,204 @@ for _, plr in ipairs(Players:GetPlayers()) do
 	end)
 end
 -- BASE TIME ESP
-local baseESPEnabled = false
-local baseESPGuis = {}
-local smartESPEnabled = false
+-- SmartESP System
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local player = game.Players.LocalPlayer
 
-function SmartESP()
-	for i, v in next, workspace.Plots:GetChildren() do
-		local gui = v:FindFirstChild("Gui", true)
-		if gui then 
-			local txt = gui:FindFirstChild("RemainingTime", true)
-			if txt then
-				local b = v.Model:FindFirstChild("structure base home")
-				if b then
-					local bb = Instance.new("BillboardGui", b)
-					bb.Size = UDim2.new(0, 60, 0, 20)
-					bb.StudsOffset = Vector3.new(0, 4, 0)
-					bb.AlwaysOnTop = true
-					bb.Name = "BaseTimeESP"
+local SmartESP = {}
+SmartESP.__index = SmartESP
 
-					local text = Instance.new("TextLabel", bb)
-					text.Size = UDim2.new(1, 0, 1, 0)
-					text.BackgroundTransparency = 1
-					text.TextColor3 = Color3.new(1, 0, 0)
-					text.TextStrokeColor3 = Color3.new(0, 0, 0)
-					text.TextStrokeTransparency = 0
-					text.TextScaled = true
-					text.Font = Enum.Font.GothamBold
-
-					RunService.RenderStepped:Connect(function()
-						if txt and txt:IsDescendantOf(game) then
-							local t = txt.Text
-							if t ~= "0s" and t ~= "" then
-								text.TextColor3 = Color3.new(1, 0, 0)
-								text.Text = t:gsub("s", "")
-							else
-								text.TextColor3 = Color3.new(0, 1, 0)
-								text.Text = "UNLOCKED"
-							end
-						end
-					end)
-				end
-			end
-		end
-	end
-
-	-- Yeni plot gelince tekrar çalışsın
-	workspace.Plots.ChildAdded:Connect(function()
-		if smartESPEnabled then
-			task.wait(0.5)
-			SmartESP()
-		end
-	end)
+function SmartESP.new()
+	local self = setmetatable({}, SmartESP)
+	self:Initialize()
+	return self
 end
 
-local function clearBaseESPs()
-	for _, plot in ipairs(workspace.Plots:GetChildren()) do
-		local model = plot:FindFirstChild("Model")
-		if model then
-			local part = model:FindFirstChild("structure base home")
-			if part then
-				local esp = part:FindFirstChild("BaseTimeESP")
-				if esp then
-					esp:Destroy()
-				end
-			end
+function SmartESP:Initialize()
+	self.settings = {
+		maxDistance = 1000,
+		updateInterval = 0.3,
+		baseSize = UDim2.new(0, 150, 0, 30),
+		offset = Vector3.new(0, 4, 0),
+		colors = {
+			myPlot = Color3.fromRGB(0, 200, 255),
+			locked = Color3.fromRGB(255, 200, 0),
+			unlocked = Color3.fromRGB(255, 50, 50),
+			noOwner = Color3.fromRGB(150, 150, 150),
+			newOwner = Color3.fromRGB(200, 0, 200)
+		}
+	}
+
+	self.state = {
+		active = false,
+		instances = {},
+		connection = nil,
+		lastUpdate = 0,
+		plotsFolder = nil,
+		myPlot = nil,
+		previousOwners = {}
+	}
+
+	self:FindMyPlot()
+end
+
+function SmartESP:FindMyPlot()
+	local plotsFolder = self:FindPlotsFolder()
+	if not plotsFolder then return end
+	for _, plot in plotsFolder:GetChildren() do
+		local yourBase = plot:FindFirstChild("YourBase", true)
+		if yourBase and yourBase:IsA("BoolValue") and yourBase.Value then
+			self.state.myPlot = plot.Name
+			break
 		end
 	end
 end
+
+function SmartESP:FindPlotsFolder()
+	if not self.state.plotsFolder or not self.state.plotsFolder.Parent then
+		local possibleNames = {"Plots", "PlotSystem", "PlotsSystem", "Bases"}
+		for _, name in ipairs(possibleNames) do
+			local folder = workspace:FindFirstChild(name)
+			if folder then
+				self.state.plotsFolder = folder
+				break
+			end
+		end
+	end
+	return self.state.plotsFolder
+end
+
+function SmartESP:CreateESP(plot, mainPart)
+	if self.state.instances[plot.Name] then return self.state.instances[plot.Name] end
+	local billboard = Instance.new("BillboardGui")
+	billboard.Name = "ESP_" .. plot.Name
+	billboard.Size = self.settings.baseSize
+	billboard.StudsOffset = self.settings.offset
+	billboard.AlwaysOnTop = true
+	billboard.Adornee = mainPart
+	billboard.MaxDistance = self.settings.maxDistance
+	billboard.Parent = mainPart
+
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(1, 0, 1, 0)
+	frame.BackgroundTransparency = 0.85
+	frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+	frame.BorderSizePixel = 0
+
+	local label = Instance.new("TextLabel")
+	label.Name = "Label"
+	label.Size = UDim2.new(1, -8, 1, -8)
+	label.Position = UDim2.new(0, 4, 0, 4)
+	label.BackgroundTransparency = 1
+	label.TextScaled = false
+	label.TextSize = 12
+	label.Font = Enum.Font.GothamMedium
+	label.TextStrokeTransparency = 0.4
+	label.TextStrokeColor3 = Color3.new(0, 0, 0)
+	label.Parent = frame
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 5)
+	corner.Parent = frame
+	frame.Parent = billboard
+	self.state.instances[plot.Name] = billboard
+	return billboard
+end
+
+function SmartESP:UpdateOwnership(plot)
+	local ownerValue = plot:FindFirstChild("Owner", true)
+	local plotName = plot.Name
+	if ownerValue then
+		local currentOwner = tostring(ownerValue.Value)
+		local previousOwner = self.state.previousOwners[plotName]
+		if currentOwner ~= previousOwner then
+			if (previousOwner == nil or previousOwner == "") and currentOwner ~= "" then
+				self.state.previousOwners[plotName] = currentOwner
+				return "NEW OWNER"
+			end
+			self.state.previousOwners[plotName] = currentOwner
+		end
+		if currentOwner == "" or currentOwner == nil then
+			self.state.previousOwners[plotName] = nil
+		end
+	end
+	return nil
+end
+
+function SmartESP:Update()
+	if tick() - self.state.lastUpdate < self.settings.updateInterval then return end
+	self.state.lastUpdate = tick()
+	local plotsFolder = self:FindPlotsFolder()
+	if not plotsFolder then return end
+	self:FindMyPlot()
+
+	for _, plot in plotsFolder:GetChildren() do
+		local mainPart = plot:FindFirstChild("Main", true) or plot:FindFirstChild("BasePart", true)
+		local timeLabel = plot:FindFirstChild("RemainingTime", true)
+		local ownerValue = plot:FindFirstChild("Owner", true)
+
+		if mainPart then
+			local ownershipStatus = self:UpdateOwnership(plot)
+			local isMyPlot = plot.Name == self.state.myPlot
+
+			local billboard = self:CreateESP(plot, mainPart)
+
+			if isMyPlot then
+				billboard.Frame.Label.Text = "MY BASE"
+				billboard.Frame.Label.TextColor3 = self.settings.colors.myPlot
+			elseif ownershipStatus == "NEW OWNER" then
+				billboard.Frame.Label.Text = "CLAIMED"
+				billboard.Frame.Label.TextColor3 = self.settings.colors.newOwner
+			elseif ownerValue and (ownerValue.Value == nil or ownerValue.Value == "") then
+				billboard.Frame.Label.Text = "UNCLAIMED"
+				billboard.Frame.Label.TextColor3 = self.settings.colors.noOwner
+			elseif timeLabel then
+				local isUnlocked = (timeLabel.Text == "0s" or timeLabel.Text == "")
+				billboard.Frame.Label.Text = isUnlocked and "UNLOCKED" or ("LOCKED: " .. timeLabel.Text)
+				billboard.Frame.Label.TextColor3 = isUnlocked and self.settings.colors.unlocked or self.settings.colors.locked
+			end
+
+			local camera = workspace.CurrentCamera
+			if camera then
+				local distance = (camera.CFrame.Position - mainPart.Position).Magnitude
+				local scale = math.clamp(1.3 - (distance/self.settings.maxDistance), 0.7, 1.2)
+				billboard.Size = UDim2.new(0, self.settings.baseSize.X.Offset * scale, 0, self.settings.baseSize.Y.Offset * scale)
+			end
+		elseif self.state.instances[plot.Name] then
+			self.state.instances[plot.Name]:Destroy()
+			self.state.instances[plot.Name] = nil
+			self.state.previousOwners[plot.Name] = nil
+		end
+	end
+end
+
+function SmartESP:Toggle()
+	self.state.active = not self.state.active
+	if self.state.connection then
+		self.state.connection:Disconnect()
+		self.state.connection = nil
+	end
+	if self.state.active then
+		self.state.connection = RunService.Heartbeat:Connect(function()
+			self:Update()
+		end)
+		self:Update()
+	else
+		self:ClearAll()
+	end
+end
+
+function SmartESP:ClearAll()
+	for _, instance in pairs(self.state.instances) do
+		if instance then instance:Destroy() end
+	end
+	self.state.instances = {}
+	self.state.previousOwners = {}
+end
+
+local espSystem = SmartESP.new()
 
 -- BOOST Func
 local function enableBoost()
@@ -898,27 +1029,24 @@ bodyEspBtn.MouseButton1Click:Connect(function()
 end)
 
 --basetime
-local baseESPBtn = Instance.new("TextButton")
-baseESPBtn.Text = "Base Time ESP: OFF"
-baseESPBtn.Size = UDim2.new(1, -20, 0, 36)
-baseESPBtn.Position = UDim2.new(0, 10, 0, 150) -- uygun konuma göre değiştirilebilir
-baseESPBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-baseESPBtn.TextColor3 = Color3.new(1, 1, 1)
-baseESPBtn.Font = Enum.Font.GothamBold
-baseESPBtn.TextSize = 14
-baseESPBtn.Visible = false
-baseESPBtn.Parent = mainFrame
-Instance.new("UICorner", baseESPBtn).CornerRadius = UDim.new(0, 8)
+local espBtn = Instance.new("TextButton")
+espBtn.Text = "ESP: OFF"
+espBtn.Size = UDim2.new(1, -20, 0, 36)
+espBtn.Position = UDim2.new(0, 10, 0, 274)
+espBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+espBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+espBtn.Font = Enum.Font.GothamBold
+espBtn.TextSize = 14
+espBtn.AutoButtonColor = false
+espBtn.Visible = true
+espBtn.Parent = mainFrame
+Instance.new("UICorner", espBtn).CornerRadius = UDim.new(0, 8)
 
-baseESPBtn.MouseButton1Click:Connect(function()
-	smartESPEnabled = not smartESPEnabled
-	baseESPBtn.Text = smartESPEnabled and "Base Time ESP: ON" or "Base Time ESP: OFF"
-
-	if smartESPEnabled then
-		SmartESP()
-	else
-		clearBaseEsp() -- (İsteğe bağlı temizleme kodu buraya eklenebilir)
-	end
+local espEnabled = false
+espBtn.MouseButton1Click:Connect(function()
+	espEnabled = not espEnabled
+	espSystem:Toggle()
+	espBtn.Text = espEnabled and "ESP: ON" or "ESP: OFF"
 end)
 
 -------------setUp-----------
