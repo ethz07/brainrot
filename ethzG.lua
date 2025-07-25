@@ -280,12 +280,6 @@ for _, plr in ipairs(Players:GetPlayers()) do
 	end)
 end
 -- BASE TIME ESP
--- SmartESP System
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local Camera = workspace.CurrentCamera
-local player = game.Players.LocalPlayer
-
 local SmartESP = {}
 SmartESP.__index = SmartESP
 
@@ -303,8 +297,8 @@ function SmartESP:Initialize()
 		offset = Vector3.new(0, 4, 0),
 		colors = {
 			myPlot = Color3.fromRGB(0, 200, 255),
-			locked = Color3.fromRGB(255, 200, 0),
-			unlocked = Color3.fromRGB(255, 50, 50),
+			locked = Color3.fromRGB(255, 0, 0),      -- kırmızı
+			unlocked = Color3.fromRGB(0, 255, 0),    -- yeşil
 			noOwner = Color3.fromRGB(150, 150, 150),
 			newOwner = Color3.fromRGB(200, 0, 200)
 		}
@@ -351,6 +345,7 @@ end
 
 function SmartESP:CreateESP(plot, mainPart)
 	if self.state.instances[plot.Name] then return self.state.instances[plot.Name] end
+
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "ESP_" .. plot.Name
 	billboard.Size = self.settings.baseSize
@@ -360,28 +355,18 @@ function SmartESP:CreateESP(plot, mainPart)
 	billboard.MaxDistance = self.settings.maxDistance
 	billboard.Parent = mainPart
 
-	local frame = Instance.new("Frame")
-	frame.Size = UDim2.new(1, 0, 1, 0)
-	frame.BackgroundTransparency = 0.85
-	frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-	frame.BorderSizePixel = 0
-
 	local label = Instance.new("TextLabel")
 	label.Name = "Label"
-	label.Size = UDim2.new(1, -8, 1, -8)
-	label.Position = UDim2.new(0, 4, 0, 4)
+	label.Size = UDim2.new(1, 0, 1, 0)
 	label.BackgroundTransparency = 1
-	label.TextScaled = false
-	label.TextSize = 12
-	label.Font = Enum.Font.GothamMedium
-	label.TextStrokeTransparency = 0.4
-	label.TextStrokeColor3 = Color3.new(0, 0, 0)
-	label.Parent = frame
+	label.TextScaled = true
+	label.Font = Enum.Font.GothamBold
+	label.TextStrokeTransparency = 0.3
+	label.TextStrokeColor3 = Color3.new(0, 0, 0) -- siyah kenarlık
+	label.TextColor3 = Color3.fromRGB(255, 255, 255) -- geçici
+	label.Text = ""
+	label.Parent = billboard
 
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 5)
-	corner.Parent = frame
-	frame.Parent = billboard
 	self.state.instances[plot.Name] = billboard
 	return billboard
 end
@@ -423,22 +408,30 @@ function SmartESP:Update()
 			local isMyPlot = plot.Name == self.state.myPlot
 
 			local billboard = self:CreateESP(plot, mainPart)
+			local label = billboard:FindFirstChild("Label")
+
+			if not label then continue end
 
 			if isMyPlot then
-				billboard.Frame.Label.Text = "MY BASE"
-				billboard.Frame.Label.TextColor3 = self.settings.colors.myPlot
+				label.Text = "MY BASE"
+				label.TextColor3 = self.settings.colors.myPlot
 			elseif ownershipStatus == "NEW OWNER" then
-				billboard.Frame.Label.Text = "CLAIMED"
-				billboard.Frame.Label.TextColor3 = self.settings.colors.newOwner
+				label.Text = "CLAIMED"
+				label.TextColor3 = self.settings.colors.newOwner
 			elseif ownerValue and (ownerValue.Value == nil or ownerValue.Value == "") then
-				billboard.Frame.Label.Text = "UNCLAIMED"
-				billboard.Frame.Label.TextColor3 = self.settings.colors.noOwner
+				label.Text = "UNCLAIMED"
+				label.TextColor3 = self.settings.colors.noOwner
 			elseif timeLabel then
 				local isUnlocked = (timeLabel.Text == "0s" or timeLabel.Text == "")
-				billboard.Frame.Label.Text = isUnlocked and "UNLOCKED" or ("LOCKED: " .. timeLabel.Text)
-				billboard.Frame.Label.TextColor3 = isUnlocked and self.settings.colors.unlocked or self.settings.colors.locked
+				if isUnlocked then
+					label.Text = "UNLOCKED"
+					label.TextColor3 = self.settings.colors.unlocked
+				else
+					label.Text = "LOCKED: " .. timeLabel.Text
+					label.TextColor3 = self.settings.colors.locked
+				end
 			end
-
+			
 			local camera = workspace.CurrentCamera
 			if camera then
 				local distance = (camera.CFrame.Position - mainPart.Position).Magnitude
@@ -1030,9 +1023,9 @@ end)
 
 --basetime
 local espBtn = Instance.new("TextButton")
-espBtn.Text = "ESP: OFF"
+espBtn.Text = "Time ESP: OFF"
 espBtn.Size = UDim2.new(1, -20, 0, 36)
-espBtn.Position = UDim2.new(0, 10, 0, 274)
+espBtn.Position = UDim2.new(0, 10, 0, 150)
 espBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 espBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 espBtn.Font = Enum.Font.GothamBold
@@ -1046,7 +1039,7 @@ local espEnabled = false
 espBtn.MouseButton1Click:Connect(function()
 	espEnabled = not espEnabled
 	espSystem:Toggle()
-	espBtn.Text = espEnabled and "ESP: ON" or "ESP: OFF"
+	espBtn.Text = espEnabled and "Time ESP: ON" or "Time ESP: OFF"
 end)
 
 -------------setUp-----------
@@ -1090,7 +1083,7 @@ for i, name in ipairs(buttonNames) do
 		autoKickBtn.Visible = (button.Name == "MainButton")
 		nameEspBtn.Visible = (button.Name == "VisualButton")
                 bodyEspBtn.Visible = (button.Name == "VisualButton")
-		baseESPBtn.Visible = (button.Name == "VisualButton")
+		espBtn.Visible = (button.Name == "VisualButton")
 	end)
 
 	buttons[i] = button
