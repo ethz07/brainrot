@@ -279,7 +279,74 @@ for _, plr in ipairs(Players:GetPlayers()) do
 		applyESPToPlayer(plr)
 	end)
 end
+-- BASE TIME ESP
+local baseESPEnabled = false
+local baseESPObjects = {}
 
+local function clearBaseESP()
+	for _, obj in pairs(baseESPObjects) do
+		if obj and obj.Parent then obj:Destroy() end
+	end
+	table.clear(baseESPObjects)
+end
+
+local function createTimeLabel(adornee, text, color)
+	local gui = Instance.new("BillboardGui")
+	gui.Adornee = adornee
+	gui.Size = UDim2.new(0, 100, 0, 25)
+	gui.StudsOffset = Vector3.new(0, 3, 0)
+	gui.AlwaysOnTop = true
+	gui.Name = "BaseESP"
+
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = text
+	label.TextColor3 = color
+	label.Font = Enum.Font.GothamBold
+	label.TextScaled = true
+	label.Parent = gui
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 1.5
+	stroke.Color = Color3.new(0, 0, 0) -- siyah kenar
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+	stroke.Parent = label
+
+	gui.Parent = adornee
+	return gui
+end
+
+local function updateBaseESPs()
+	clearBaseESP()
+	for _, plot in pairs(workspace:WaitForChild("Plots"):GetChildren()) do
+		local rem = plot:FindFirstChild("RemainingTime")
+		if rem and rem:IsA("TextLabel") then
+			local adornee = rem.Parent:IsA("Model") and rem.Parent:FindFirstChild("Base") or rem
+			if adornee then
+				local gui = createTimeLabel(adornee, "", Color3.new(1, 0, 0))
+				table.insert(baseESPObjects, gui)
+
+				local con
+				con = RunService.RenderStepped:Connect(function()
+					if not baseESPEnabled then con:Disconnect() return end
+					if not rem or not rem:IsDescendantOf(game) then con:Disconnect() return end
+
+					local txt = tostring(rem.Text or "")
+					if txt == "" or txt == "0s" then
+						gui.TextLabel.Text = "UNLOCKED"
+						gui.TextLabel.TextColor3 = Color3.new(0, 1, 0) -- yeşil
+						gui.TextLabel.TextScaled = true
+					else
+						local num = txt:match("(%d+)")
+						gui.TextLabel.Text = num or "?"
+						gui.TextLabel.TextColor3 = Color3.new(1, 0, 0) -- kırmızı
+					end
+				end)
+			end
+		end
+	end
+end
 
 -- BOOST Func
 local function enableBoost()
