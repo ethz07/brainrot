@@ -281,83 +281,62 @@ for _, plr in ipairs(Players:GetPlayers()) do
 end
 -- BASE TIME ESP
 local baseESPEnabled = false
-local baseESPLabels = {}
+local baseESPGuis = {}
 
-local function createESP(part)
-	local gui = Instance.new("BillboardGui")
-	gui.Name = "BaseESP"
-	gui.Size = UDim2.new(0, 120, 0, 25)
-	gui.StudsOffset = Vector3.new(0, 4, 0)
-	gui.AlwaysOnTop = true
-	gui.Adornee = part
-	gui.Parent = part
+local function createBaseTimeESP(part, txtLabel)
+	local espGui = Instance.new("BillboardGui", part)
+	espGui.Name = "BaseTimeESP"
+	espGui.Size = UDim2.new(0, 100, 0, 24)
+	espGui.StudsOffset = Vector3.new(0, 3, 0)
+	espGui.AlwaysOnTop = true
 
-	local label = Instance.new("TextLabel")
+	local label = Instance.new("TextLabel", espGui)
 	label.Size = UDim2.new(1, 0, 1, 0)
 	label.BackgroundTransparency = 1
-	label.Text = "?"
-	label.TextColor3 = Color3.fromRGB(255, 0, 0)
 	label.Font = Enum.Font.GothamBold
 	label.TextScaled = true
-	label.Parent = gui
+	label.TextColor3 = Color3.fromRGB(255, 0, 0)
 
-	local stroke = Instance.new("UIStroke", label)
-	stroke.Color = Color3.new(0, 0, 0)
-	stroke.Thickness = 1.4
-	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+	table.insert(baseESPGuis, espGui)
 
-	table.insert(baseESPLabels, gui)
+	RunService.RenderStepped:Connect(function()
+		if not baseESPEnabled then return end
+		if not txtLabel:IsDescendantOf(game) then return end
 
-	return label
+		local v = txtLabel.Text or ""
+		if v == "" or v == "0s" then
+			label.Text = "UNLOCKED"
+			label.TextColor3 = Color3.fromRGB(0, 255, 0)
+		else
+			label.Text = v:match("(%d+)") or "?"
+			label.TextColor3 = Color3.fromRGB(255, 0, 0)
+		end
+	end)
 end
 
 local function clearBaseESPs()
-	for _, gui in ipairs(baseESPLabels) do
+	for _, gui in ipairs(baseESPGuis) do
 		if gui and gui.Parent then
 			gui:Destroy()
 		end
 	end
-	table.clear(baseESPLabels)
+	table.clear(baseESPGuis)
 end
 
-local function enableBaseESP()
+function enableBaseESP()
 	for _, plot in ipairs(workspace:WaitForChild("Plots"):GetChildren()) do
 		local gui = plot:FindFirstChild("Gui", true)
-		if gui then
-			local txt = gui:FindFirstChild("RemainingTime", true)
-			if txt and txt:IsA("TextLabel") then
-				local model = plot:FindFirstChild("Model")
-				if model then
-					for _, part in ipairs(model:GetDescendants()) do
-						if part:IsA("BasePart") and part.Name == "structure base home" then
-							local color = part.Color
-							local r = math.floor(color.R * 255)
-							local g = math.floor(color.G * 255)
-							local b = math.floor(color.B * 255)
-							if r == 196 and g == 40 and b == 28 then
-								local label = createESP(part)
-								table.insert(baseESPLabels, label.Parent)
+		if not gui then continue end
 
-								RunService.RenderStepped:Connect(function()
-									if not txt:IsDescendantOf(game) then return end
+		local txt = gui:FindFirstChild("RemainingTime", true)
+		if not (txt and txt:IsA("TextLabel")) then continue end
 
-									local val = tostring(txt.Text or "")
-									if val == "" or val == "0s" then
-										label.Text = "UNLOCKED"
-										label.TextColor3 = Color3.fromRGB(0, 255, 0)
-									else
-										local num = val:match("(%d+)")
-										label.Text = num or "?"
-										label.TextColor3 = Color3.fromRGB(255, 0, 0)
-									end
-								end)
+		local model = plot:FindFirstChild("Model")
+		if not model then continue end
 
-								break -- ilk uygun base parçasını al, diğerlerini atla
-							end
-						end
-					end
-				end
-			end
+		local homePart = model:FindFirstChild("structure base home")
+		if homePart and homePart:IsA("BasePart") then
+			createBaseTimeESP(homePart, txt)
 		end
 	end
 end
@@ -915,7 +894,7 @@ end)
 local baseESPBtn = Instance.new("TextButton")
 baseESPBtn.Text = "Base Time ESP: OFF"
 baseESPBtn.Size = UDim2.new(1, -20, 0, 36)
-baseESPBtn.Position = UDim2.new(0, 10, 0, 150)
+baseESPBtn.Position = UDim2.new(0, 10, 0, 190) -- uygun konuma göre değiştirilebilir
 baseESPBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 baseESPBtn.TextColor3 = Color3.new(1, 1, 1)
 baseESPBtn.Font = Enum.Font.GothamBold
