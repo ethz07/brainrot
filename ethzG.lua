@@ -35,7 +35,7 @@ local autoKickBtn = Instance.new("TextButton")
 local nameEspBtn = Instance.new("TextButton")
 local bodyEspBtn = Instance.new("TextButton")
 local espBtn = Instance.new("TextButton")
-
+local brainrotBtn = Instance.new("TextButton")
 -- other
 local lastStealValue = LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Steals").Value
 local autoKickEnabled = false
@@ -1026,7 +1026,6 @@ espBtn.MouseButton1Click:Connect(function()
 end)
 
 -- Brainrot ESP
-local brainrotBtn = Instance.new("TextButton", scrolling)
 brainrotBtn.Text = "Brainrot ESP"
 brainrotBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 brainrotBtn.Font = Enum.Font.GothamBold
@@ -1034,6 +1033,8 @@ brainrotBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 brainrotBtn.TextSize = 14
 brainrotBtn.Size = UDim2.new(1, -20, 0, 36)
 brainrotBtn.Position = UDim2.new(0, 10, 0, 190)
+brainrotBtn.Visible = false
+brainrotBtn.Parent = mainFrame
 Instance.new("UICorner", brainrotBtn).CornerRadius = UDim.new(0, 8)
 
 brainrotBtn.MouseButton1Click:Connect(function()
