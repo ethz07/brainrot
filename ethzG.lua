@@ -1166,7 +1166,8 @@ local UICornerKick = Instance.new("UICorner", KickBtn)
 UICornerKick.CornerRadius = UDim.new(0, 8)
 
 KickBtn.MouseButton1Click:Connect(function()
-	player:Kick("You Have Successfully Been Kicked By ethz Script")
+	ShowConfirmation("Are you sure?", function()
+	player:Kick("Kicked By Renz SCRIPT")
 end)
 
 RejoinBtn.Name = "RejoinButton"
