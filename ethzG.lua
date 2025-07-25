@@ -1151,7 +1151,7 @@ end)
 
 -------------MISC-------------
 --Kick and rejoin
-local KickBtn = Instance.new("TextButton", content2)
+local KickBtn = Instance.new("TextButton")
 KickBtn.Name = "KickButton"
 KickBtn.Text = "Kick"
 KickBtn.Size = UDim2.new(1, -20, 0, 36)
