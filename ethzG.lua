@@ -1071,4 +1071,4 @@ floatGuiBtn.Visible = true
 boostMobileGuiBtn.Visible = true
 autoKickBtn.Visible = true
 
-print("RENZ SCRIPT.")
+print("RENZ SCRIPT...")
