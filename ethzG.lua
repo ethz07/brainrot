@@ -436,7 +436,7 @@ function SmartESP:Update()
 			local camera = workspace.CurrentCamera
 			if camera then
 				local distance = (camera.CFrame.Position - mainPart.Position).Magnitude
-				local scale = math.clamp(1.3 - (distance/self.settings.maxDistance), 0.7, 1.2)
+				local scale = math.clamp(1.0 - (distance / self.settings.maxDistance), 0.4, 0.8)
 				billboard.Size = UDim2.new(0, self.settings.baseSize.X.Offset * scale, 0, self.settings.baseSize.Y.Offset * scale)
 			end
 		elseif self.state.instances[plot.Name] then
