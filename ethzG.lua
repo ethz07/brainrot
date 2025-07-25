@@ -1151,6 +1151,24 @@ end)
 
 -------------MISC-------------
 --Kick and rejoin
+local KickBtn = Instance.new("TextButton", content2)
+KickBtn.Name = "KickButton"
+KickBtn.Text = "Kick"
+KickBtn.Size = UDim2.new(1, -20, 0, 36)
+KickBtn.Position = UDim2.new(0, 10, 0, 70)
+KickBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+KickBtn.TextSize = 14
+KickBtn.Font = Enum.Font.GothamBold
+KickBtn.Visible = false
+KickBtn.Parent = mainFrame
+local UICornerKick = Instance.new("UICorner", KickBtn)
+UICornerKick.CornerRadius = UDim.new(0, 8)
+
+KickBtn.MouseButton1Click:Connect(function()
+	player:Kick("You Have Successfully Been Kicked By ethz Script")
+end)
+
 RejoinBtn.Name = "RejoinButton"
 RejoinBtn.Text = "Rejoin"
 RejoinBtn.Size = UDim2.new(1, -20, 0, 36)
@@ -1215,6 +1233,7 @@ for i, name in ipairs(buttonNames) do
 		espBtn.Visible = (button.Name == "VisualButton")
 		brainrotBtn.Visible = (button.Name == "VisualButton")
 		RejoinBtn.Visible = (button.Name == "MiscButton")
+		KickBtn.Visible = (button.Name == "MiscButton")
 	end)
 
 	buttons[i] = button
