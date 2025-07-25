@@ -282,11 +282,20 @@ end
 -- BASE TIME ESP
 local baseESPEnabled = false
 local baseESPLabels = {}
+local baseESPDebug = true -- debug aktif/pasif
+
+local function debugPrint(...)
+	if baseESPDebug then
+		print("[BaseESP DEBUG]", ...)
+	end
+end
 
 local function findTopBase(obj)
+	local original = obj
 	while obj and obj.Parent and obj.Parent ~= workspace do
 		obj = obj.Parent
 	end
+	debugPrint("En üst base bulundu:", obj and obj.Name or "nil", "←", original and original.Name or "nil")
 	return obj
 end
 
@@ -294,11 +303,15 @@ local function findRedStructureBase(model)
 	for _, child in ipairs(model:GetDescendants()) do
 		if child:IsA("BasePart") and child.Name == "structure base home" then
 			local color = child.Color
-			if math.floor(color.R * 255) == 196 and math.floor(color.G * 255) == 40 and math.floor(color.B * 255) == 28 then
+			local r, g, b = math.floor(color.R * 255), math.floor(color.G * 255), math.floor(color.B * 255)
+			debugPrint("Kontrol ediliyor:", child:GetFullName(), "R:", r, "G:", g, "B:", b)
+			if r == 196 and g == 40 and b == 28 then
+				debugPrint("Uygun kırmızı base bulundu:", child:GetFullName())
 				return child
 			end
 		end
 	end
+	debugPrint("Kırmızı structure base bulunamadı:", model.Name)
 	return nil
 end
 
@@ -338,34 +351,59 @@ local function clearBaseESPs()
 end
 
 local function enableBaseESP()
+	debugPrint("Base ESP etkinleştirildi. Tarama başlıyor...")
+
 	for _, rem in ipairs(workspace:GetDescendants()) do
 		if rem:IsA("TextLabel") and rem.Name == "RemainingTime" then
-			local topBase = findTopBase(rem)
-			if topBase then
-				local model = topBase:FindFirstChild("Model")
-				if model then
-					local redPart = findRedStructureBase(model)
-					if redPart then
-						local label = createESP(redPart)
+			debugPrint("RemainingTime bulundu:", rem:GetFullName())
 
-						RunService.RenderStepped:Connect(function()
-							if not baseESPEnabled then return end
-							if not rem:IsDescendantOf(game) then return end
-							local txt = tostring(rem.Text or "")
-							if txt == "" or txt == "0s" then
-								label.Text = "UNLOCKED"
-								label.TextColor3 = Color3.fromRGB(0, 255, 0)
-							else
-								local num = txt:match("(%d+)")
-								label.Text = num or "?"
-								label.TextColor3 = Color3.fromRGB(255, 0, 0)
-							end
-						end)
-					end
-				end
+			-- 1. En üst base nesnesine çık
+			local topBase = findTopBase(rem)
+			if not topBase then
+				debugPrint("Top base bulunamadı, atlanıyor.")
+				continue
 			end
+			debugPrint("Top base bulundu:", topBase.Name)
+
+			-- 2. Model bul
+			local model = topBase:FindFirstChild("Model")
+			if not model then
+				debugPrint("Model bulunamadı:", topBase.Name)
+				continue
+			end
+			debugPrint("Model bulundu:", model.Name)
+
+			-- 3. Rengi kırmızı olan 'structure base home' partı bul
+			local redPart = findRedStructureBase(model)
+			if not redPart then
+				debugPrint("Renkli base part bulunamadı:", model.Name)
+				continue
+			end
+			debugPrint("Kırmızı base part bulundu:", redPart:GetFullName())
+
+			-- 4. ESP yazısını oluştur
+			local label = createESP(redPart)
+			debugPrint("ESP yerleştirildi:", redPart:GetFullName())
+
+			-- 5. Yazıyı her karede güncelle
+			RunService.RenderStepped:Connect(function()
+				if not baseESPEnabled then return end
+				if not rem:IsDescendantOf(game) then return end
+
+				local txt = tostring(rem.Text or "")
+				if txt == "" or txt == "0s" then
+					label.Text = "UNLOCKED"
+					label.TextColor3 = Color3.fromRGB(0, 255, 0)
+				else
+					local num = txt:match("(%d+)")
+					label.Text = num or "?"
+					label.TextColor3 = Color3.fromRGB(255, 0, 0)
+				end
+			end)
 		end
 	end
+
+	debugPrint("Base ESP tarama tamamlandı.")
 end
 
 -- BOOST Func
