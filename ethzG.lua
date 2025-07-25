@@ -282,61 +282,66 @@ end
 -- BASE TIME ESP
 local baseESPEnabled = false
 local baseESPGuis = {}
+local smartESPEnabled = false
 
-local function createBaseTimeESP(part, txt)
-	local bb = Instance.new("BillboardGui", part)
-	bb.Name = "BaseTimeESP"
-	bb.Size = UDim2.new(0, 60, 0, 20)
-	bb.StudsOffset = Vector3.new(0, 4, 0)
-	bb.AlwaysOnTop = true
+function SmartESP()
+	for i, v in next, workspace.Plots:GetChildren() do
+		local gui = v:FindFirstChild("Gui", true)
+		if gui then 
+			local txt = gui:FindFirstChild("RemainingTime", true)
+			if txt then
+				local b = v.Model:FindFirstChild("structure base home")
+				if b then
+					local bb = Instance.new("BillboardGui", b)
+					bb.Size = UDim2.new(0, 60, 0, 20)
+					bb.StudsOffset = Vector3.new(0, 4, 0)
+					bb.AlwaysOnTop = true
+					bb.Name = "BaseTimeESP"
 
-	local text = Instance.new("TextLabel", bb)
-	text.Size = UDim2.new(1, 0, 1, 0)
-	text.BackgroundTransparency = 1
-	text.TextColor3 = Color3.new(1, 0, 0)
-	text.TextStrokeColor3 = Color3.new(0, 0, 0)
-	text.TextStrokeTransparency = 0
-	text.TextScaled = true
-	text.Font = Enum.Font.GothamBold
+					local text = Instance.new("TextLabel", bb)
+					text.Size = UDim2.new(1, 0, 1, 0)
+					text.BackgroundTransparency = 1
+					text.TextColor3 = Color3.new(1, 0, 0)
+					text.TextStrokeColor3 = Color3.new(0, 0, 0)
+					text.TextStrokeTransparency = 0
+					text.TextScaled = true
+					text.Font = Enum.Font.GothamBold
 
-	table.insert(baseESPGuis, bb)
-
-	RunService.RenderStepped:Connect(function()
-		if not baseESPEnabled then return end
-		if txt and txt:IsDescendantOf(game) then
-			local v = txt.Text
-			if v ~= "0s" and v ~= "" then
-				text.TextColor3 = Color3.new(1, 0, 0)
-				text.Text = v:gsub("s", "")
-			else
-				text.TextColor3 = Color3.new(0, 1, 0)
-				text.Text = "UNLOCKED"
+					RunService.RenderStepped:Connect(function()
+						if txt and txt:IsDescendantOf(game) then
+							local t = txt.Text
+							if t ~= "0s" and t ~= "" then
+								text.TextColor3 = Color3.new(1, 0, 0)
+								text.Text = t:gsub("s", "")
+							else
+								text.TextColor3 = Color3.new(0, 1, 0)
+								text.Text = "UNLOCKED"
+							end
+						end
+					end)
+				end
 			end
+		end
+	end
+
+	-- Yeni plot gelince tekrar çalışsın
+	workspace.Plots.ChildAdded:Connect(function()
+		if smartESPEnabled then
+			task.wait(0.5)
+			SmartESP()
 		end
 	end)
 end
 
 local function clearBaseESPs()
-	for _, gui in ipairs(baseESPGuis) do
-		if gui and gui.Parent then
-			gui:Destroy()
-		end
-	end
-	table.clear(baseESPGuis)
-end
-
-local function enableBaseESP()
-	for _, plot in ipairs(workspace:WaitForChild("Plots"):GetChildren()) do
-		local gui = plot:FindFirstChild("Gui", true)
-		if gui then
-			local txt = gui:FindFirstChild("RemainingTime", true)
-			if txt and txt:IsA("TextLabel") then
-				local model = plot:FindFirstChild("Model")
-				if model then
-					local part = model:FindFirstChild("structure base home")
-					if part and part:IsA("BasePart") then
-						createBaseTimeESP(part, txt)
-					end
+	for _, plot in ipairs(workspace.Plots:GetChildren()) do
+		local model = plot:FindFirstChild("Model")
+		if model then
+			local part = model:FindFirstChild("structure base home")
+			if part then
+				local esp = part:FindFirstChild("BaseTimeESP")
+				if esp then
+					esp:Destroy()
 				end
 			end
 		end
@@ -906,13 +911,13 @@ baseESPBtn.Parent = mainFrame
 Instance.new("UICorner", baseESPBtn).CornerRadius = UDim.new(0, 8)
 
 baseESPBtn.MouseButton1Click:Connect(function()
-	baseESPEnabled = not baseESPEnabled
-	baseESPBtn.Text = baseESPEnabled and "Base Time ESP: ON" or "Base Time ESP: OFF"
+	smartESPEnabled = not smartESPEnabled
+	baseESPBtn.Text = smartESPEnabled and "Base Time ESP: ON" or "Base Time ESP: OFF"
 
-	if baseESPEnabled then
-		enableBaseESP()
+	if smartESPEnabled then
+		SmartESP()
 	else
-		clearBaseESPs()
+		clearBaseEsp() -- (İsteğe bağlı temizleme kodu buraya eklenebilir)
 	end
 end)
 
