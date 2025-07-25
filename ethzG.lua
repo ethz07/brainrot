@@ -185,6 +185,69 @@ RunService.RenderStepped:Connect(function()
 end)
 -- how to use: showNotification("text here", duration here: 5)
 
+-- esp func
+local nametagESPEnabled = false
+local bodyESPEnabled = false
+
+local function updateNameESP()
+	for _, tag in pairs(nametags) do tag:Destroy() end
+	table.clear(nametags)
+
+	if nametagESPEnabled then
+		for _, plr in ipairs(Players:GetPlayers()) do
+			if plr ~= LocalPlayer then
+				local char = plr.Character
+				local head = char and char:FindFirstChild("Head")
+				if head then
+					local tag = Instance.new("BillboardGui")
+					tag.Name = "NameTagESP"
+					tag.Adornee = head
+					tag.Size = UDim2.new(0, 100, 0, 20)
+					tag.StudsOffset = Vector3.new(0, 2.5, 0)
+					tag.AlwaysOnTop = true
+					tag.Parent = head
+
+					local label = Instance.new("TextLabel", tag)
+					label.Size = UDim2.new(1, 0, 1, 0)
+					label.BackgroundTransparency = 1
+					label.Text = plr.DisplayName
+					label.TextColor3 = Color3.fromRGB(255, 255, 255)
+					label.Font = Enum.Font.GothamBold
+					label.TextScaled = true
+
+					nametags[plr] = tag
+				end
+			end
+		end
+	end
+end
+
+local function updateBodyESP()
+	for _, h in pairs(highlights) do h:Destroy() end
+	table.clear(highlights)
+
+	if bodyESPEnabled then
+		for _, plr in ipairs(Players:GetPlayers()) do
+			if plr ~= LocalPlayer then
+				local char = plr.Character
+				if char then
+					local hl = Instance.new("Highlight")
+					hl.Name = "BodyESP"
+					hl.Adornee = char
+					hl.FillColor = Color3.fromRGB(0, 32, 96)
+					hl.FillTransparency = 0.6
+					hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+					hl.OutlineTransparency = 0
+					hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+					hl.Parent = char
+					highlights[plr] = hl
+				end
+			end
+		end
+	end
+end
+
+
 -- BOOST Func
 local function enableBoost()
 	local char = player.Character or player.CharacterAdded:Wait()
@@ -696,6 +759,44 @@ LocalPlayer.leaderstats.Steals:GetPropertyChangedSignal("Value"):Connect(functio
 	end
 end)
 
+--------------------VISUAL------------------
+-------------------ESP-----------------------
+local nameEspBtn = Instance.new("TextButton")
+nameEspBtn.Text = "Nametag ESP: OFF"
+nameEspBtn.Size = UDim2.new(1, -20, 0, 36)
+nameEspBtn.Position = UDim2.new(0, 10, 0, 70)
+nameEspBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+nameEspBtn.TextColor3 = Color3.new(1,1,1)
+nameEspBtn.Font = Enum.Font.GothamBold
+nameEspBtn.TextSize = 14
+nameEspBtn.Visible = false
+nameEspBtn.Parent = mainFrame
+Instance.new("UICorner", nameEspBtn).CornerRadius = UDim.new(0, 8)
+
+local bodyEspBtn = Instance.new("TextButton")
+bodyEspBtn.Text = "Body ESP: OFF"
+bodyEspBtn.Size = UDim2.new(1, -20, 0, 36)
+bodyEspBtn.Position = UDim2.new(0, 10, 0, 110)
+bodyEspBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+bodyEspBtn.TextColor3 = Color3.new(1,1,1)
+bodyEspBtn.Font = Enum.Font.GothamBold
+bodyEspBtn.TextSize = 14
+bodyEspBtn.Visible = false
+bodyEspBtn.Parent = mainFrame
+Instance.new("UICorner", bodyEspBtn).CornerRadius = UDim.new(0, 8)
+
+nameEspBtn.MouseButton1Click:Connect(function()
+	nametagESPEnabled = not nametagESPEnabled
+	nameEspBtn.Text = nametagESPEnabled and "Nametag ESP: ON" or "Nametag ESP: OFF"
+	updateNameESP()
+end)
+
+bodyEspBtn.MouseButton1Click:Connect(function()
+	bodyESPEnabled = not bodyESPEnabled
+	bodyEspBtn.Text = bodyESPEnabled and "Body ESP: ON" or "Body ESP: OFF"
+	updateBodyESP()
+end)
+
 -------------setUp-----------
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
@@ -735,6 +836,8 @@ for i, name in ipairs(buttonNames) do
 		floatGuiBtn.Visible = (button.Name == "MainButton")
 		boostMobileGuiBtn.Visible = (button.Name == "MainButton")
 		autoKickBtn.Visible = (button.Name == "MainButton")
+		nameEspBtn.Visible = (button.Name == "VisualButton")
+                bodyEspBtn.Visible = (button.Name == "VisualButton")
 	end)
 
 	buttons[i] = button
