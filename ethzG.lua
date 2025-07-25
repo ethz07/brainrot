@@ -1165,6 +1165,7 @@ local UICornerRejoin = Instance.new("UICorner", RejoinBtn)
 UICornerRejoin.CornerRadius = UDim.new(0, 8)
 
 RejoinBtn.MouseButton1Click:Connect(function()
+	ShowConfirmation("Are you sure you want to rejoin?", function()
 	local placeId = game.PlaceId
 	local instanceId = game.JobId
 	TeleportService:TeleportToPlaceInstance(placeId, instanceId)
