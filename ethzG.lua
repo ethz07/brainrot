@@ -284,32 +284,34 @@ local baseESPEnabled = false
 local baseESPGuis = {}
 
 local function createBaseTimeESP(part, txtLabel)
-	local espGui = Instance.new("BillboardGui", part)
-	espGui.Name = "BaseTimeESP"
-	espGui.Size = UDim2.new(0, 100, 0, 24)
-	espGui.StudsOffset = Vector3.new(0, 3, 0)
-	espGui.AlwaysOnTop = true
+	local bb = Instance.new("BillboardGui", part)
+	bb.Name = "BaseTimeESP"
+	bb.Size = UDim2.new(0, 60, 0, 20)
+	bb.StudsOffset = Vector3.new(0, 4, 0)
+	bb.AlwaysOnTop = true
 
-	local label = Instance.new("TextLabel", espGui)
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.BackgroundTransparency = 1
-	label.Font = Enum.Font.GothamBold
-	label.TextScaled = true
-	label.TextColor3 = Color3.fromRGB(255, 0, 0)
+	local text = Instance.new("TextLabel", bb)
+	text.Size = UDim2.new(1, 0, 1, 0)
+	text.BackgroundTransparency = 1
+	text.TextColor3 = Color3.new(1, 0, 0)
+	text.TextStrokeColor3 = Color3.new(0, 0, 0)
+	text.TextStrokeTransparency = 0
+	text.TextScaled = true
+	text.Font = Enum.Font.GothamBold
 
-	table.insert(baseESPGuis, espGui)
+	table.insert(baseESPGuis, bb)
 
 	RunService.RenderStepped:Connect(function()
 		if not baseESPEnabled then return end
 		if not txtLabel:IsDescendantOf(game) then return end
 
-		local v = txtLabel.Text or ""
-		if v == "" or v == "0s" then
-			label.Text = "UNLOCKED"
-			label.TextColor3 = Color3.fromRGB(0, 255, 0)
+		local v = txtLabel.Text
+		if v ~= "0s" and v ~= "" then
+			text.TextColor3 = Color3.new(1, 0, 0)
+			text.Text = v:gsub("s", "")
 		else
-			label.Text = v:match("(%d+)") or "?"
-			label.TextColor3 = Color3.fromRGB(255, 0, 0)
+			text.TextColor3 = Color3.new(0, 1, 0)
+			text.Text = "UNLOCKED"
 		end
 	end)
 end
@@ -323,20 +325,20 @@ local function clearBaseESPs()
 	table.clear(baseESPGuis)
 end
 
-function enableBaseESP()
+local function enableBaseESP()
 	for _, plot in ipairs(workspace:WaitForChild("Plots"):GetChildren()) do
 		local gui = plot:FindFirstChild("Gui", true)
-		if not gui then continue end
-
-		local txt = gui:FindFirstChild("RemainingTime", true)
-		if not (txt and txt:IsA("TextLabel")) then continue end
-
-		local model = plot:FindFirstChild("Model")
-		if not model then continue end
-
-		local homePart = model:FindFirstChild("structure base home")
-		if homePart and homePart:IsA("BasePart") then
-			createBaseTimeESP(homePart, txt)
+		if gui then
+			local txt = gui:FindFirstChild("RemainingTime", true)
+			if txt and txt:IsA("TextLabel") then
+				local model = plot:FindFirstChild("Model")
+				if model then
+					local part = model:FindFirstChild("structure base home")
+					if part and part:IsA("BasePart") then
+						createBaseTimeESP(part, txt)
+					end
+				end
+			end
 		end
 	end
 end
@@ -894,7 +896,7 @@ end)
 local baseESPBtn = Instance.new("TextButton")
 baseESPBtn.Text = "Base Time ESP: OFF"
 baseESPBtn.Size = UDim2.new(1, -20, 0, 36)
-baseESPBtn.Position = UDim2.new(0, 10, 0, 190) -- uygun konuma göre değiştirilebilir
+baseESPBtn.Position = UDim2.new(0, 10, 0, 150) -- uygun konuma göre değiştirilebilir
 baseESPBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 baseESPBtn.TextColor3 = Color3.new(1, 1, 1)
 baseESPBtn.Font = Enum.Font.GothamBold
@@ -994,4 +996,4 @@ floatGuiBtn.Visible = true
 boostMobileGuiBtn.Visible = true
 autoKickBtn.Visible = true
 
-print("RENZ SCRIPT...")
+print("RENZ SCRIPT")
