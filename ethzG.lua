@@ -361,6 +361,7 @@ local function enableBaseESP()
 		if rem:IsA("TextLabel") and rem.Name == "RemainingTime" then
 			debugPrint("RemainingTime bulundu:", rem:GetFullName())
 
+			-- 6 parent yukarı çıkarak base'i bul
 			local base = getBaseFromRemainingTime(rem)
 			if not base then
 				debugPrint("Base çıkarımı başarısız, atlandı.")
@@ -368,7 +369,7 @@ local function enableBaseESP()
 			end
 			debugPrint("Base bulundu:", base.Name)
 
-			-- Birden fazla Model varsa hepsini kontrol et
+			-- Base içinde tüm Model'leri tara
 			local models = {}
 			for _, child in ipairs(base:GetChildren()) do
 				if child:IsA("Model") then
@@ -392,9 +393,11 @@ local function enableBaseESP()
 
 			debugPrint("Kırmızı base part bulundu:", redPart:GetFullName())
 
+			-- Her base için AYRI bir ESP yazısı oluştur
 			local label = createESP(redPart)
 			debugPrint("ESP yerleştirildi:", redPart:GetFullName())
 
+			-- Her label kendi rem.Text'ine göre güncellenir
 			RunService.RenderStepped:Connect(function()
 				if not baseESPEnabled then return end
 				if not rem:IsDescendantOf(game) then return end
@@ -968,7 +971,7 @@ end)
 local baseESPBtn = Instance.new("TextButton")
 baseESPBtn.Text = "Base Time ESP: OFF"
 baseESPBtn.Size = UDim2.new(1, -20, 0, 36)
-baseESPBtn.Position = UDim2.new(0, 10, 0, 190)
+baseESPBtn.Position = UDim2.new(0, 10, 0, 150)
 baseESPBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 baseESPBtn.TextColor3 = Color3.new(1, 1, 1)
 baseESPBtn.Font = Enum.Font.GothamBold
@@ -1068,4 +1071,4 @@ floatGuiBtn.Visible = true
 boostMobileGuiBtn.Visible = true
 autoKickBtn.Visible = true
 
-print("RENZ SCRIPT")
+print("RENZ SCRIPT.")
