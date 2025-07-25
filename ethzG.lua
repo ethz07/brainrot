@@ -283,7 +283,7 @@ end
 local baseESPEnabled = false
 local baseESPGuis = {}
 
-local function createBaseTimeESP(part, txtLabel)
+local function createBaseTimeESP(part, txt)
 	local bb = Instance.new("BillboardGui", part)
 	bb.Name = "BaseTimeESP"
 	bb.Size = UDim2.new(0, 60, 0, 20)
@@ -303,15 +303,15 @@ local function createBaseTimeESP(part, txtLabel)
 
 	RunService.RenderStepped:Connect(function()
 		if not baseESPEnabled then return end
-		if not txtLabel:IsDescendantOf(game) then return end
-
-		local v = txtLabel.Text
-		if v ~= "0s" and v ~= "" then
-			text.TextColor3 = Color3.new(1, 0, 0)
-			text.Text = v:gsub("s", "")
-		else
-			text.TextColor3 = Color3.new(0, 1, 0)
-			text.Text = "UNLOCKED"
+		if txt and txt:IsDescendantOf(game) then
+			local v = txt.Text
+			if v ~= "0s" and v ~= "" then
+				text.TextColor3 = Color3.new(1, 0, 0)
+				text.Text = v:gsub("s", "")
+			else
+				text.TextColor3 = Color3.new(0, 1, 0)
+				text.Text = "UNLOCKED"
+			end
 		end
 	end)
 end
