@@ -282,42 +282,6 @@ end
 -- BASE TIME ESP
 local baseESPEnabled = false
 local baseESPLabels = {}
-local baseESPDebug = true -- debug aktif/pasif
-
-local function debugPrint(...)
-	if baseESPDebug then
-		print("[BaseESP DEBUG]", ...)
-	end
-end
-
-local function getBaseFromRemainingTime(rem)
-	local current = rem
-	for i = 1, 6 do
-		if current and current.Parent then
-			current = current.Parent
-		else
-			return nil
-		end
-	end
-	debugPrint("6 kat yukarı çıkıldı, base bulundu:", current.Name)
-	return current
-end
-
-local function findRedStructureBase(model)
-	for _, child in ipairs(model:GetDescendants()) do
-		if child:IsA("BasePart") and child.Name == "structure base home" then
-			local color = child.Color
-			local r, g, b = math.floor(color.R * 255), math.floor(color.G * 255), math.floor(color.B * 255)
-			debugPrint("Kontrol ediliyor:", child:GetFullName(), "R:", r, "G:", g, "B:", b)
-			if r == 196 and g == 40 and b == 28 then
-				debugPrint("Uygun kırmızı base bulundu:", child:GetFullName())
-				return child
-			end
-		end
-	end
-	debugPrint("Kırmızı structure base bulunamadı:", model.Name)
-	return nil
-end
 
 local function createESP(part)
 	local gui = Instance.new("BillboardGui")
@@ -349,73 +313,53 @@ end
 
 local function clearBaseESPs()
 	for _, gui in ipairs(baseESPLabels) do
-		if gui and gui.Parent then gui:Destroy() end
+		if gui and gui.Parent then
+			gui:Destroy()
+		end
 	end
 	table.clear(baseESPLabels)
 end
 
 local function enableBaseESP()
-	debugPrint("Base ESP etkinleştirildi. Tarama başlıyor...")
+	for _, plot in ipairs(workspace:WaitForChild("Plots"):GetChildren()) do
+		local gui = plot:FindFirstChild("Gui", true)
+		if gui then
+			local txt = gui:FindFirstChild("RemainingTime", true)
+			if txt and txt:IsA("TextLabel") then
+				local model = plot:FindFirstChild("Model")
+				if model then
+					for _, part in ipairs(model:GetDescendants()) do
+						if part:IsA("BasePart") and part.Name == "structure base home" then
+							local color = part.Color
+							local r = math.floor(color.R * 255)
+							local g = math.floor(color.G * 255)
+							local b = math.floor(color.B * 255)
+							if r == 196 and g == 40 and b == 28 then
+								local label = createESP(part)
+								table.insert(baseESPLabels, label.Parent)
 
-	for _, rem in ipairs(workspace:GetDescendants()) do
-		if rem:IsA("TextLabel") and rem.Name == "RemainingTime" then
-			debugPrint("RemainingTime bulundu:", rem:GetFullName())
+								RunService.RenderStepped:Connect(function()
+									if not txt:IsDescendantOf(game) then return end
 
-			-- 6 parent yukarı çıkarak base'i bul
-			local base = getBaseFromRemainingTime(rem)
-			if not base then
-				debugPrint("Base çıkarımı başarısız, atlandı.")
-				continue
-			end
-			debugPrint("Base bulundu:", base.Name)
+									local val = tostring(txt.Text or "")
+									if val == "" or val == "0s" then
+										label.Text = "UNLOCKED"
+										label.TextColor3 = Color3.fromRGB(0, 255, 0)
+									else
+										local num = val:match("(%d+)")
+										label.Text = num or "?"
+										label.TextColor3 = Color3.fromRGB(255, 0, 0)
+									end
+								end)
 
-			-- Base içinde tüm Model'leri tara
-			local models = {}
-			for _, child in ipairs(base:GetChildren()) do
-				if child:IsA("Model") then
-					table.insert(models, child)
+								break -- ilk uygun base parçasını al, diğerlerini atla
+							end
+						end
+					end
 				end
 			end
-
-			local redPart = nil
-			for _, model in ipairs(models) do
-				local found = findRedStructureBase(model)
-				if found then
-					redPart = found
-					break
-				end
-			end
-
-			if not redPart then
-				debugPrint("Hiçbir Model'de kırmızı 'structure base home' bulunamadı:", base.Name)
-				continue
-			end
-
-			debugPrint("Kırmızı base part bulundu:", redPart:GetFullName())
-
-			-- Her base için AYRI bir ESP yazısı oluştur
-			local label = createESP(redPart)
-			debugPrint("ESP yerleştirildi:", redPart:GetFullName())
-
-			-- Her label kendi rem.Text'ine göre güncellenir
-			RunService.RenderStepped:Connect(function()
-				if not baseESPEnabled then return end
-				if not rem:IsDescendantOf(game) then return end
-
-				local txt = tostring(rem.Text or "")
-				if txt == "" or txt == "0s" then
-					label.Text = "UNLOCKED"
-					label.TextColor3 = Color3.fromRGB(0, 255, 0)
-				else
-					local num = txt:match("(%d+)")
-					label.Text = num or "?"
-					label.TextColor3 = Color3.fromRGB(255, 0, 0)
-				end
-			end)
 		end
 	end
-
-	debugPrint("Base ESP tarama tamamlandı.")
 end
 
 -- BOOST Func
