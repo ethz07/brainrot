@@ -14,7 +14,6 @@ local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 local toggleFrame = Instance.new("Frame")
 local toggleUICorner = Instance.new("UICorner", toggleFrame)
 local toggleStroke = Instance.new("UIStroke", toggleFrame)
-local toggleButton = Instance.new("TextButton")
 local mainFrame = Instance.new("Frame")
 local mainCorner = Instance.new("UICorner", mainFrame)
 local mainStroke = Instance.new("UIStroke", mainFrame)
@@ -739,12 +738,12 @@ toggleUICorner.CornerRadius = UDim.new(0, 4)
 toggleStroke.Thickness = 2
 toggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
+local toggleButton = Instance.new("ImageButton")
+toggleButton.Name = "toggleButton"  -- İsmi aynı kalıyor
 toggleButton.Size = UDim2.new(1, 0, 1, 0)
 toggleButton.BackgroundTransparency = 1
-toggleButton.Text = "Toggle"
-toggleButton.TextColor3 = Color3.new(1, 1, 1)
-toggleButton.TextSize = 5
-toggleButton.Font = Enum.Font.GothamBold
+toggleButton.Image = "rbxassetid://78811700685100"  -- Buraya istediğin görselin ID'sini koy
+toggleButton.ScaleType = Enum.ScaleType.Fit
 toggleButton.AutoButtonColor = false
 toggleButton.Parent = toggleFrame
 
