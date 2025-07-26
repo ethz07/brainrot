@@ -14,6 +14,7 @@ local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 local toggleFrame = Instance.new("Frame")
 local toggleUICorner = Instance.new("UICorner", toggleFrame)
 local toggleStroke = Instance.new("UIStroke", toggleFrame)
+local toggleButton = Instance.new("ImageButton")
 local mainFrame = Instance.new("Frame")
 local mainCorner = Instance.new("UICorner", mainFrame)
 local mainStroke = Instance.new("UIStroke", mainFrame)
@@ -726,23 +727,25 @@ gui.ResetOnSpawn = false
 gui.Name = "RGBTabGUI"
 gui.Parent = player:WaitForChild("PlayerGui")
 
-toggleFrame.Size = UDim2.new(0, 60, 0, 60)
+toggleFrame.Size = UDim2.new(0, 40, 0, 40)  -- Küçültüldü
 toggleFrame.Position = UDim2.new(0, 10, 0, 10)
 toggleFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 toggleFrame.Active = true
 toggleFrame.Draggable = true
 toggleFrame.Parent = gui
 
-toggleUICorner.CornerRadius = UDim.new(0, 4)
+toggleUICorner.CornerRadius = UDim.new(1, 0)  -- Tam daire
+toggleUICorner.Parent = toggleFrame
 
 toggleStroke.Thickness = 2
 toggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+toggleStroke.Parent = toggleFrame
 
-local toggleButton = Instance.new("ImageButton")
-toggleButton.Name = "toggleButton"  -- İsmi aynı kalıyor
-toggleButton.Size = UDim2.new(1, 0, 1, 0)
+toggleButton.Name = "toggleButton"
+toggleButton.Size = UDim2.new(0, 24, 0, 24)
+toggleButton.Position = UDim2.new(0.5, -12, 0.5, -12)
 toggleButton.BackgroundTransparency = 1
-toggleButton.Image = "rbxassetid://134279862113998"  -- Buraya istediğin görselin ID'sini koy
+toggleButton.Image = "rbxassetid://86820141352385"
 toggleButton.ScaleType = Enum.ScaleType.Fit
 toggleButton.AutoButtonColor = false
 toggleButton.Parent = toggleFrame
