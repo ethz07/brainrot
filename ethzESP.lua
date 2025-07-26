@@ -1,49 +1,18 @@
+--// 📦 Servisler
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 local hue = 0
--- brainrot
-local petButtons = {
-	["Brainrot God"] = {
-		"Brainrot God Lucky Block",
-		"Trenostruzzo Turbo 3000",
-		"Ballerino Lololo",
-		"Piccione Macchina",
-		"Orcalero Orcala",
-		"Statutino Libertino",
-		"Odin Din Din Dun",
-		"Espresso Signora",
-		"Tigroligre Frutonni",
-		"Tralalero Tralala",
-		"Matteo",
-		"Gattatino Neonino",
-		"Girafa Celestre",
-		"Cocofanto Elefanto"
-	},
-	["Secret"] = {
-		"Secret Lucky Block",
-		"Garama and Madundung",
-		"Nuclearo Dinossauro",
-		"La Grande Combinasion",
-		"Chicleteira Bicicleteira",
-		"Pot Hotspot",
-		"Graipuss Medussi",
-		"Las Vaquitas Saturnitas",
-		"Las Tralaleritas",
-		"Los Tralaleritos",
-		"Torrtuginni Dragonfrutini",
-		"Chimpanzini Spiderini",
-		"La Vacca Saturno Saturnita"
-	}
-}
 
+--// 🧱 Ana GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "RGBTabGUI"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
+--// 🔘 Toggle Butonu
 local toggleFrame = Instance.new("Frame")
 toggleFrame.Size = UDim2.new(0, 60, 0, 60)
 toggleFrame.Position = UDim2.new(0, 10, 0, 10)
@@ -52,8 +21,7 @@ toggleFrame.Active = true
 toggleFrame.Draggable = true
 toggleFrame.Parent = gui
 
-local toggleUICorner = Instance.new("UICorner", toggleFrame)
-toggleUICorner.CornerRadius = UDim.new(0, 4)
+Instance.new("UICorner", toggleFrame).CornerRadius = UDim.new(0, 4)
 
 local toggleStroke = Instance.new("UIStroke", toggleFrame)
 toggleStroke.Thickness = 2
@@ -69,22 +37,22 @@ toggleButton.Font = Enum.Font.GothamBold
 toggleButton.AutoButtonColor = false
 toggleButton.Parent = toggleFrame
 
+--// 🪟 Ana Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 285)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -140)
+mainFrame.Size = UDim2.new(0, 300, 0, 460)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -230)
 mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = gui
 
-local mainCorner = Instance.new("UICorner", mainFrame)
-mainCorner.CornerRadius = UDim.new(0, 16)
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 16)
 
 local mainStroke = Instance.new("UIStroke", mainFrame)
 mainStroke.Thickness = 3
 mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
--- Title Label
+--// Başlık
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -10, 0, 16)
 titleLabel.Position = UDim2.new(0, 5, 0, 2)
@@ -97,42 +65,15 @@ titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Top
 titleLabel.Parent = mainFrame
 
--- Toggle butonu, mainFrame'i göster/gizle
+--// Toggle Görünürlük
 toggleButton.MouseButton1Click:Connect(function()
 	mainFrame.Visible = not mainFrame.Visible
 end)
 
-local function createPetButtons(category)
-	for _, child in ipairs(mainFrame:GetChildren()) do
-		if child:IsA("TextButton") and not table.find(buttons, child) then
-			child:Destroy()
-		end
-	end
-
-	local startY = 70
-	for i, petName in ipairs(petButtons[category] or {}) do
-		local btn = Instance.new("TextButton")
-		btn.Text = petName
-		btn.Size = UDim2.new(1, -20, 0, 32)
-		btn.Position = UDim2.new(0, 10, 0, startY + (i - 1) * 38)
-		btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		btn.Font = Enum.Font.GothamBold
-		btn.TextSize = 13
-		btn.AutoButtonColor = true
-		btn.Parent = mainFrame
-		Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-
-		btn.MouseButton1Click:Connect(function()
-			print("Selected pet:", petName, "from", category)
-		end)
-	end
-end
-
+--// Sekmeler
 local buttonNames = {"Brainrot God", "Secret"}
 local buttons = {}
 local buttonStrokes = {}
-
 local selectedButton = nil
 local selectedStroke = nil
 
@@ -142,7 +83,7 @@ local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSp
 local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 
 for i, name in ipairs(buttonNames) do
-	local btnName = name -- closure yakalıyoruz
+	local btnName = name
 
 	local button = Instance.new("TextButton")
 	button.Name = name .. "Button"
@@ -175,32 +116,94 @@ for i, name in ipairs(buttonNames) do
 			end
 		end
 		stroke.Enabled = true
-
-		createPetButtons(btnName) -- burası fixlendi
+		createPetButtons(btnName)
 	end)
 
 	buttons[i] = button
 	buttonStrokes[button] = stroke
 end
 
+--// Pet Buton Listesi
+titlePadding = 70
+local petButtons = {
+	["Brainrot God"] = {
+		"Brainrot God Lucky Block",
+		"Orcalero Orcala",
+		"Trenostruzzo Turbo 3000",
+		"Ballerino Lololo",
+		"Piccione Macchina",
+		"Statutino Libertino",
+		"Odin Din Din Dun",
+		"Espresso Signora",
+		"Tigroligre Frutonni",
+		"Tralalero Tralala",
+		"Matteo",
+		"Gattatino Neonino",
+		"Girafa Celestre",
+		"Cocofanto Elefanto"
+	},
+	["Secret"] = {
+		"Secret Lucky Block",
+		"Garama and Madundung",
+		"Nuclearo Dinossauro",
+		"La Grande Combinasion",
+		"Chicleteira Bicicleteira",
+		"Pot Hotspot",
+		"Graipuss Medussi",
+		"Las Vaquitas Saturnitas",
+		"Las Tralaleritas",
+		"Los Tralaleritos",
+		"Torrtuginni Dragonfrutini",
+		"Chimpanzini Spiderini",
+		"La Vacca Saturno Saturnita"
+	}
+}
+
+local function createPetButtons(category)
+	-- Temizleme
+	for _, child in ipairs(mainFrame:GetChildren()) do
+		if child:IsA("TextButton") and not child.Name:match("Button$") then
+			child:Destroy()
+		end
+	end
+
+	-- Oluşturma
+	for i, petName in ipairs(petButtons[category] or {}) do
+		local btn = Instance.new("TextButton")
+		btn.Text = petName
+		btn.Size = UDim2.new(1, -20, 0, 32)
+		btn.Position = UDim2.new(0, 10, 0, titlePadding + (i - 1) * 38)
+		btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btn.Font = Enum.Font.GothamBold
+		btn.TextSize = 13
+		btn.AutoButtonColor = true
+		btn.Parent = mainFrame
+		Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+		btn.MouseButton1Click:Connect(function()
+			print("Selected pet:", petName, "from", category)
+		end)
+	end
+end
+
+-- Başlangıçta ilk sekme aktif
+selectedButton = buttons[1]
+selectedStroke = buttonStrokes[selectedButton]
+selectedStroke.Enabled = true
+createPetButtons(buttonNames[1])
+
+-- RGB Efekti
 RunService.RenderStepped:Connect(function()
 	hue = (hue + 0.01) % 1
 	local rgb = Color3.fromHSV(hue, 1, 1)
 
-	-- Ana UI RGB güncellemesi
 	mainStroke.Color = rgb
 	toggleStroke.Color = rgb
 	toggleButton.TextColor3 = rgb
 
-	-- Seçili buton varsa: yazısı ve çizgisi RGB olur
 	if selectedButton and selectedStroke then
 		selectedButton.TextColor3 = rgb
 		selectedStroke.Color = rgb
 	end
 end)
-
--- Başlangıçta ilk buton aktif ve pet listesi gösterilsin
-selectedButton = buttons[1]
-selectedStroke = buttonStrokes[selectedButton]
-selectedStroke.Enabled = true
-createPetButtons(buttonNames[1])
