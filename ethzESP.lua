@@ -4,13 +4,46 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 local hue = 0
+-- brainrot
+local petButtons = {
+	["Brainrot God"] = {
+		"Brainrot God Lucky Block",
+		"Trenostruzzo Turbo 3000",
+		"Ballerino Lololo",
+		"Piccione Macchina",
+		"Orcalero Orcala",
+		"Statutino Libertino",
+		"Odin Din Din Dun",
+		"Espresso Signora",
+		"Tigroligre Frutonni",
+		"Tralalero Tralala",
+		"Matteo",
+		"Gattatino Neonino",
+		"Girafa Celestre",
+		"Cocofanto Elefanto"
+	},
+	["Secret"] = {
+		"Secret Lucky Block",
+		"Garama and Madundung",
+		"Nuclearo Dinossauro",
+		"La Grande Combinasion",
+		"Chicleteira Bicicleteira",
+		"Pot Hotspot",
+		"Graipuss Medussi",
+		"Las Vaquitas Saturnitas",
+		"Las Tralaleritas",
+		"Los Tralaleritos",
+		"Torrtuginni Dragonfrutini",
+		"Chimpanzini Spiderini",
+		"La Vacca Saturno Saturnita"
+	}
+}
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "RGBTabGUI"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
--- Toggle Frame
 local toggleFrame = Instance.new("Frame")
 toggleFrame.Size = UDim2.new(0, 60, 0, 60)
 toggleFrame.Position = UDim2.new(0, 10, 0, 10)
@@ -36,7 +69,6 @@ toggleButton.Font = Enum.Font.GothamBold
 toggleButton.AutoButtonColor = false
 toggleButton.Parent = toggleFrame
 
--- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 300, 0, 285)
 mainFrame.Position = UDim2.new(0.5, -150, 0.5, -140)
@@ -70,7 +102,33 @@ toggleButton.MouseButton1Click:Connect(function()
 	mainFrame.Visible = not mainFrame.Visible
 end)
 
--- Sekme isimleri
+local function createPetButtons(category)
+	for _, child in ipairs(mainFrame:GetChildren()) do
+		if child:IsA("TextButton") and not table.find(buttons, child) then
+			child:Destroy()
+		end
+	end
+
+	local startY = 70
+	for i, petName in ipairs(petButtons[category] or {}) do
+		local btn = Instance.new("TextButton")
+		btn.Text = petName
+		btn.Size = UDim2.new(1, -20, 0, 32)
+		btn.Position = UDim2.new(0, 10, 0, startY + (i - 1) * 38)
+		btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btn.Font = Enum.Font.GothamBold
+		btn.TextSize = 13
+		btn.AutoButtonColor = true
+		btn.Parent = mainFrame
+		Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+		btn.MouseButton1Click:Connect(function()
+			print("Selected pet:", petName, "from", category)
+		end)
+	end
+end
+
 local buttonNames = {"Brainrot God", "Secret"}
 local buttons = {}
 local buttonStrokes = {}
