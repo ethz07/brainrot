@@ -39,8 +39,8 @@ toggleButton.Parent = toggleFrame
 
 --// 🪟 Ana Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 460)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -230)
+mainFrame.Size = UDim2.new(0, 300, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
 mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 mainFrame.Active = true
 mainFrame.Draggable = true
@@ -64,6 +64,16 @@ titleLabel.TextSize = 14
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Top
 titleLabel.Parent = mainFrame
+
+--// Scroll Alanı
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, -20, 1, -110)
+scrollFrame.Position = UDim2.new(0, 10, 0, 70)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.ScrollBarThickness = 6
+scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scrollFrame.Parent = mainFrame
 
 --// Toggle Görünürlük
 toggleButton.MouseButton1Click:Connect(function()
@@ -124,7 +134,6 @@ for i, name in ipairs(buttonNames) do
 end
 
 --// Pet Buton Listesi
-titlePadding = 70
 local petButtons = {
 	["Brainrot God"] = {
 		"Brainrot God Lucky Block",
@@ -160,25 +169,18 @@ local petButtons = {
 }
 
 local function createPetButtons(category)
-	-- Temizleme
-	for _, child in ipairs(mainFrame:GetChildren()) do
-		if child:IsA("TextButton") and not child.Name:match("Button$") then
-			child:Destroy()
-		end
-	end
-
-	-- Oluşturma
+	scrollFrame:ClearAllChildren()
 	for i, petName in ipairs(petButtons[category] or {}) do
 		local btn = Instance.new("TextButton")
 		btn.Text = petName
-		btn.Size = UDim2.new(1, -20, 0, 32)
-		btn.Position = UDim2.new(0, 10, 0, titlePadding + (i - 1) * 38)
+		btn.Size = UDim2.new(1, 0, 0, 32)
+		btn.Position = UDim2.new(0, 0, 0, (i - 1) * 36)
 		btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 		btn.Font = Enum.Font.GothamBold
 		btn.TextSize = 13
 		btn.AutoButtonColor = true
-		btn.Parent = mainFrame
+		btn.Parent = scrollFrame
 		Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
 		btn.MouseButton1Click:Connect(function()
@@ -207,3 +209,4 @@ RunService.RenderStepped:Connect(function()
 		selectedStroke.Color = rgb
 	end
 end)
+print("ss")
