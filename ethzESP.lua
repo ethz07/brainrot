@@ -166,20 +166,18 @@ for i, name in ipairs(buttonNames) do
 	stroke.Enabled = false
 
 	button.MouseButton1Click:Connect(function()
-		selectedButton = button
-		selectedStroke = stroke
-		for _, btn in ipairs(buttons) do
-			if btn ~= selectedButton then
-				btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				buttonStrokes[btn].Enabled = false
-			end
+	selectedButton = button
+	selectedStroke = stroke
+	for _, btn in ipairs(buttons) do
+		if btn ~= selectedButton then
+			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			buttonStrokes[btn].Enabled = false
 		end
-		stroke.Enabled = true
-	end)
+	end
+	stroke.Enabled = true
 
-	buttons[i] = button
-	buttonStrokes[button] = stroke
-end
+	createPetButtons(name)
+end)
 
 RunService.RenderStepped:Connect(function()
 	hue = (hue + 0.01) % 1
@@ -201,4 +199,4 @@ end)
 selectedButton = buttons[1]
 selectedStroke = buttonStrokes[selectedButton]
 selectedStroke.Enabled = true
-print("yes")
+print("yes no")
