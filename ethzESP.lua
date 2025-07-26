@@ -136,14 +136,14 @@ local buttonStrokes = {}
 local selectedButton = nil
 local selectedStroke = nil
 
--- Geniş ve ortalanmış butonlar
 local buttonWidth = 130
 local buttonSpacing = 20
 local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
 local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 
--- Butonları oluştur
 for i, name in ipairs(buttonNames) do
+	local btnName = name -- closure yakalıyoruz
+
 	local button = Instance.new("TextButton")
 	button.Name = name .. "Button"
 	button.Text = name
@@ -166,37 +166,25 @@ for i, name in ipairs(buttonNames) do
 	stroke.Enabled = false
 
 	button.MouseButton1Click:Connect(function()
-	selectedButton = button
-	selectedStroke = stroke
-	for _, btn in ipairs(buttons) do
-		if btn ~= selectedButton then
-			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-			buttonStrokes[btn].Enabled = false
+		selectedButton = button
+		selectedStroke = stroke
+		for _, btn in ipairs(buttons) do
+			if btn ~= selectedButton then
+				btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+				buttonStrokes[btn].Enabled = false
+			end
 		end
-	end
-	stroke.Enabled = true
+		stroke.Enabled = true
 
-	createPetButtons(name)
-end)
+		createPetButtons(btnName) -- burası fixlendi
+	end)
 
-RunService.RenderStepped:Connect(function()
-	hue = (hue + 0.01) % 1
-	local rgb = Color3.fromHSV(hue, 1, 1)
+	buttons[i] = button
+	buttonStrokes[button] = stroke
+end
 
-	-- Ana GUI renkleri
-	mainStroke.Color = rgb
-	toggleStroke.Color = rgb
-	toggleButton.TextColor3 = rgb
-
-	-- Seçilen butona RGB renk uygula
-	if selectedButton and selectedStroke then
-		selectedButton.TextColor3 = rgb
-		selectedStroke.Color = rgb
-	end
-end)
-
--- İlk buton seçili olarak başlat
+-- Başlangıçta ilk buton aktif ve pet listesi gösterilsin
 selectedButton = buttons[1]
 selectedStroke = buttonStrokes[selectedButton]
 selectedStroke.Enabled = true
-print("yes no")
+createPetButtons(buttonNames[1])
