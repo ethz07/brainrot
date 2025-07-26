@@ -4,6 +4,8 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 local hue = 0
+local selectedPetNames = {} -- tıklanan pet isimleri buraya yazılacak
+local currentESPInstances = {} -- mevcut gösterilen ESP'leri takip eder
 
 local petButtons = {
 	["Brainrot God"] = {
@@ -38,6 +40,82 @@ local petButtons = {
 		"La Vacca Saturno Saturnita"
 	}
 }
+
+local function createAnimalESP(spawnPart, displayNameText, generationText, rarityText)
+	local existing = spawnPart:FindFirstChild("AnimalESP")
+	if existing then existing:Destroy() end
+
+	local billboard = Instance.new("BillboardGui")
+	billboard.Name = "AnimalESP"
+	billboard.Adornee = spawnPart
+	billboard.Size = UDim2.new(0, 200, 0, 80)
+	billboard.StudsOffset = Vector3.new(0, 4, 0)
+	billboard.AlwaysOnTop = true
+	billboard.Parent = spawnPart
+
+	local function createLabel(text, yOffset)
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, 0, 0.33, 0)
+		label.Position = UDim2.new(0, 0, yOffset, 0)
+		label.BackgroundTransparency = 1
+		label.Text = text
+		label.TextScaled = true
+		label.Font = Enum.Font.GothamBold
+		label.TextColor3 = Color3.new(1, 1, 1)
+		label.TextStrokeTransparency = 0.4
+		label.TextStrokeColor3 = Color3.new(0, 0, 0)
+		label.Parent = billboard
+	end
+
+	createLabel(displayNameText, 0)
+	createLabel(generationText, 0.33)
+	createLabel(rarityText, 0.66)
+
+	table.insert(currentESPInstances, billboard)
+end
+
+local function clearAllAnimalESP()
+	for _, gui in pairs(currentESPInstances) do
+		if gui and gui.Parent then gui:Destroy() end
+	end
+	table.clear(currentESPInstances)
+end
+
+local function scanAllBases()
+	clearAllAnimalESP()
+
+	local plotsFolder = workspace:FindFirstChild("Plots") or workspace:FindFirstChild("PlotSystem") or workspace:FindFirstChild("Bases")
+	if not plotsFolder then return end
+
+	for _, base in pairs(plotsFolder:GetChildren()) do
+		local podiums = base:FindFirstChild("AnimalPodiums")
+		if podiums then
+			for _, podium in pairs(podiums:GetChildren()) do
+				local basePart = podium:FindFirstChild("Base")
+				if basePart then
+					local spawn = basePart:FindFirstChild("Spawn")
+					if spawn then
+						local attachment = spawn:FindFirstChild("Attachment")
+						local overhead = attachment and attachment:FindFirstChild("AnimalOverHead")
+						if overhead then
+							local displayName = overhead:FindFirstChild("DisplayName")
+							local generation = overhead:FindFirstChild("Generation")
+							local rarity = overhead:FindFirstChild("Rarity")
+
+							if displayName and generation and rarity then
+								if table.find(selectedPetNames, displayName.Text) then
+									createAnimalESP(spawn, displayName.Text, generation.Text, rarity.Text)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+scanAllBases()
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "RGBTabGUI"
@@ -127,9 +205,14 @@ local function createPetButtons(category)
 
 		btn.MouseButton1Click:Connect(function()
 			print("Selected pet:", petName, "from", category)
+			table.clear(selectedPetNames)
+table.insert(selectedPetNames, petName)
+scanAllBases()
 		end)
 	end
 end
+
+-- func
 
 local buttonNames = {"Brainrot God", "Secret"}
 local buttons = {}
