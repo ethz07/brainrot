@@ -4,154 +4,40 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 local hue = 0
-local selectedPetNames = {} -- tıklanan pet isimleri buraya yazılacak
-local currentESPInstances = {} -- mevcut gösterilen ESP'leri takip eder
 
 local petButtons = {
-	["Brainrot God"] = {
-		"Brainrot God Lucky Block",
-		"Piccione Macchina",
-		"Ballerino Lololo",
-		"Trenostruzzo Turbo 3000",
-		"Orcalero Orcala",
-		"Statutino Libertino",
-		"Odin Din Din Dun",
-		"Espresso Signora",
-		"Tigroligre Frutonni",
-		"Tralalero Tralala",
-		"Matteo",
-		"Gattatino Neonino",
-		"Girafa Celestre",
-		"Cocofanto Elefanto"
-	},
-	["Secret"] = {
-		"Secret Lucky Block",
-		"Garama and Madundung",
-		"Nuclearo Dinossauro",
-		"La Grande Combinasion",
-		"Chicleteira Bicicleteira",
-		"Pot Hotspot",
-		"Graipuss Medussi",
-		"Las Vaquitas Saturnitas",
-		"Las Tralaleritas",
-		"Los Tralaleritos",
-		"Torrtuginni Dragonfrutini",
-		"Chimpanzini Spiderini",
-		"La Vacca Saturno Saturnita"
-	}
+["Brainrot God"] = {
+"Brainrot God Lucky Block",
+"Piccione Macchina",
+"Ballerino Lololo",
+"Trenostruzzo Turbo 3000",
+"Orcalero Orcala",
+"Statutino Libertino",
+"Odin Din Din Dun",
+"Espresso Signora",
+"Tigroligre Frutonni",
+"Tralalero Tralala",
+"Matteo",
+"Gattatino Neonino",
+"Girafa Celestre",
+"Cocofanto Elefanto"
+},
+["Secret"] = {
+"Secret Lucky Block",
+"Garama and Madundung",
+"Nuclearo Dinossauro",
+"La Grande Combinasion",
+"Chicleteira Bicicleteira",
+"Pot Hotspot",
+"Graipuss Medussi",
+"Las Vaquitas Saturnitas",
+"Las Tralaleritas",
+"Los Tralaleritos",
+"Torrtuginni Dragonfrutini",
+"Chimpanzini Spiderini",
+"La Vacca Saturno Saturnita"
 }
-
--- Bu fonksiyon, belirtilen parent içindeki child gelene kadar bekler (timeout: 5 saniye)
-local function waitForChildRecursive(parent, childName, timeout)
-	local found = parent:FindFirstChild(childName)
-	if found then return found end
-
-	local elapsed = 0
-	while elapsed < timeout do
-		found = parent:FindFirstChild(childName)
-		if found then return found end
-		task.wait(0.2)
-		elapsed += 0.2
-	end
-	return nil
-end
-
-local function createAnimalESP(baseModel, displayNameText, generationText, rarityText)
-	local decoPart = baseModel:FindFirstChild("Decorations", true)
-	local targetPart = decoPart and decoPart:FindFirstChild("Part")
-
-	if not targetPart then
-		warn("❌ Decorations/Part bulunamadı, ESP yerleştirilemedi! ->", baseModel:GetFullName())
-		return
-	end
-
-	local existing = targetPart:FindFirstChild("AnimalESP")
-	if existing then existing:Destroy() end
-
-	print("✅ ESP oluşturuluyor:", displayNameText, "->", targetPart:GetFullName())
-
-	local billboard = Instance.new("BillboardGui")
-	billboard.Name = "AnimalESP"
-	billboard.Adornee = targetPart
-	billboard.Size = UDim2.new(0, 200, 0, 80)
-	billboard.StudsOffset = Vector3.new(0, 5, 0) -- üstte gözüksün diye
-	billboard.AlwaysOnTop = true
-	billboard.Parent = targetPart
-
-	local function createLabel(text, yOffset)
-		local label = Instance.new("TextLabel")
-		label.Size = UDim2.new(1, 0, 0.33, 0)
-		label.Position = UDim2.new(0, 0, yOffset, 0)
-		label.BackgroundTransparency = 1
-		label.Text = text
-		label.TextScaled = true
-		label.Font = Enum.Font.GothamBold
-		label.TextColor3 = Color3.new(1, 1, 1)
-		label.TextStrokeTransparency = 0.4
-		label.TextStrokeColor3 = Color3.new(0, 0, 0)
-		label.Parent = billboard
-	end
-
-	createLabel(displayNameText, 0)
-	createLabel(generationText, 0.33)
-	createLabel(rarityText, 0.66)
-
-	table.insert(currentESPInstances, billboard)
-end
-
-local function clearAllAnimalESP()
-	for _, gui in pairs(currentESPInstances) do
-		if gui and gui.Parent then gui:Destroy() end
-	end
-	table.clear(currentESPInstances)
-end
-
-local function scanAllBases()
-	clearAllAnimalESP()
-
-	local plotsFolder = workspace:FindFirstChild("Plots") or workspace:FindFirstChild("PlotSystem") or workspace:FindFirstChild("Bases")
-	if not plotsFolder then
-		warn("❌ Plots klasörü bulunamadı!")
-		return
-	end
-
-	for _, base in pairs(plotsFolder:GetChildren()) do
-		local podiums = base:FindFirstChild("AnimalPodiums")
-		if podiums then
-			for _, podium in pairs(podiums:GetChildren()) do
-				local basePart = podium:FindFirstChild("Base")
-				if basePart then
-					local spawnPart = basePart:FindFirstChild("Spawn")
-					if spawnPart then
-						local attachment = spawnPart:FindFirstChild("Attachment") or spawnPart:WaitForChild("Attachment", 5)
-						local overhead = attachment and attachment:FindFirstChild("AnimalOverHead")
-						if overhead then
-							local displayName = overhead:FindFirstChild("DisplayName")
-							local generation = overhead:FindFirstChild("Generation")
-							local rarity = overhead:FindFirstChild("Rarity")
-
-							if displayName and generation and rarity then
-								if table.find(selectedPetNames, displayName.Text) then
-									createAnimalESP(base, displayName.Text, generation.Text, rarity.Text)
-								else
-									print("⏩", displayName.Text, "eşleşmedi, ESP gösterilmiyor.")
-								end
-							else
-								warn("❌ TextLabel'lerden biri eksik!", base:GetFullName())
-							end
-						else
-							warn("❌ AnimalOverHead bulunamadı!", base:GetFullName())
-						end
-					end
-				end
-			end
-		else
-			print("ℹ️ Base'de AnimalPodiums yok:", base.Name)
-		end
-	end
-end
-
-scanAllBases()
+}
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "RGBTabGUI"
@@ -219,36 +105,32 @@ scrollFrame.Visible = true
 scrollFrame.Parent = mainFrame
 
 local function createPetButtons(category)
-	for _, child in ipairs(scrollFrame:GetChildren()) do
-		if child:IsA("TextButton") then
-			child:Destroy()
-		end
-	end
-
-	for i, petName in ipairs(petButtons[category] or {}) do
-		local btn = Instance.new("TextButton")
-		btn.Text = petName
-		btn.Size = UDim2.new(1, 0, 0, 32)
-		btn.Position = UDim2.new(0, 0, 0, (i - 1) * 36)
-		btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		btn.Font = Enum.Font.GothamBold
-		btn.TextSize = 13
-		btn.AutoButtonColor = true
-		btn.Parent = scrollFrame
-		btn.Visible = true
-		Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-
-		btn.MouseButton1Click:Connect(function()
-			print("Selected pet:", petName, "from", category)
-			table.clear(selectedPetNames)
-table.insert(selectedPetNames, petName)
-scanAllBases()
-		end)
-	end
+for _, child in ipairs(scrollFrame:GetChildren()) do
+if child:IsA("TextButton") then
+child:Destroy()
+end
 end
 
--- func
+for i, petName in ipairs(petButtons[category] or {}) do  
+	local btn = Instance.new("TextButton")  
+	btn.Text = petName  
+	btn.Size = UDim2.new(1, 0, 0, 32)  
+	btn.Position = UDim2.new(0, 0, 0, (i - 1) * 36)  
+	btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)  
+	btn.Font = Enum.Font.GothamBold  
+	btn.TextSize = 13  
+	btn.AutoButtonColor = true  
+	btn.Parent = scrollFrame  
+	btn.Visible = true  
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)  
+
+	btn.MouseButton1Click:Connect(function()  
+		print("Selected pet:", petName, "from", category)  
+	end)  
+end
+
+end
 
 local buttonNames = {"Brainrot God", "Secret"}
 local buttons = {}
@@ -262,45 +144,46 @@ local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSp
 local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 
 for i, name in ipairs(buttonNames) do
-	local btnName = name
-	local button = Instance.new("TextButton")
-	button.Name = name .. "Button"
-	button.Text = name
-	button.Size = UDim2.new(0, buttonWidth, 0, 36)
-	button.Position = UDim2.new(0, startX + (i - 1) * (buttonWidth + buttonSpacing), 0, 20)
-	button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	button.TextColor3 = Color3.fromRGB(255, 255, 255)
-	button.Font = Enum.Font.GothamBold
-	button.TextSize = 14
-	button.AutoButtonColor = false
-	button.Parent = mainFrame
+local btnName = name
+local button = Instance.new("TextButton")
+button.Name = name .. "Button"
+button.Text = name
+button.Size = UDim2.new(0, buttonWidth, 0, 36)
+button.Position = UDim2.new(0, startX + (i - 1) * (buttonWidth + buttonSpacing), 0, 20)
+button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.Font = Enum.Font.GothamBold
+button.TextSize = 14
+button.AutoButtonColor = false
+button.Parent = mainFrame
 
-	Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)  
 
-	local stroke = Instance.new("UIStroke")
-	stroke.Thickness = 2
-	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	stroke.Color = Color3.fromRGB(255, 255, 255)
-	stroke.Parent = button
-	stroke.Enabled = false
+local stroke = Instance.new("UIStroke")  
+stroke.Thickness = 2  
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border  
+stroke.Color = Color3.fromRGB(255, 255, 255)  
+stroke.Parent = button  
+stroke.Enabled = false  
 
-	button.MouseButton1Click:Connect(function()
-		selectedButton = button
-		selectedStroke = stroke
+button.MouseButton1Click:Connect(function()  
+	selectedButton = button  
+	selectedStroke = stroke  
 
-		for _, btn in ipairs(buttons) do
-			if btn ~= selectedButton then
-				btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				buttonStrokes[btn].Enabled = false
-			end
-		end
+	for _, btn in ipairs(buttons) do  
+		if btn ~= selectedButton then  
+			btn.TextColor3 = Color3.fromRGB(255, 255, 255)  
+			buttonStrokes[btn].Enabled = false  
+		end  
+	end  
 
-		stroke.Enabled = true
-		createPetButtons(btnName)
-	end)
+	stroke.Enabled = true  
+	createPetButtons(btnName)  
+end)  
 
-	buttons[i] = button
-	buttonStrokes[button] = stroke
+buttons[i] = button  
+buttonStrokes[button] = stroke
+
 end
 
 selectedButton = buttons[1]
@@ -309,21 +192,22 @@ selectedStroke.Enabled = true
 createPetButtons(buttonNames[1])
 
 RunService.RenderStepped:Connect(function()
-	hue = (hue + 0.01) % 1
-	local rgb = Color3.fromHSV(hue, 1, 1)
+hue = (hue + 0.01) % 1
+local rgb = Color3.fromHSV(hue, 1, 1)
 
-	mainStroke.Color = rgb
-	toggleStroke.Color = rgb
-	toggleButton.TextColor3 = rgb
+mainStroke.Color = rgb  
+toggleStroke.Color = rgb  
+toggleButton.TextColor3 = rgb  
 
-	if selectedButton and selectedStroke then
-		selectedButton.TextColor3 = rgb
-		selectedStroke.Color = rgb
-	end
+if selectedButton and selectedStroke then  
+	selectedButton.TextColor3 = rgb  
+	selectedStroke.Color = rgb  
+end
+
 end)
 
 toggleButton.MouseButton1Click:Connect(function()
-	mainFrame.Visible = not mainFrame.Visible
+mainFrame.Visible = not mainFrame.Visible
 end)
 
-print("loaded!")
+print("sss")
