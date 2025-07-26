@@ -311,4 +311,4 @@ toggleButton.MouseButton1Click:Connect(function()
 	mainFrame.Visible = not mainFrame.Visible
 end)
 
-print("sss")
+print("loaded!")
