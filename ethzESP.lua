@@ -3,6 +3,8 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
+local hue = 0
+
 local gui = Instance.new("ScreenGui")
 gui.Name = "RGBTabGUI"
 gui.ResetOnSpawn = false
@@ -63,24 +65,6 @@ titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Top
 titleLabel.Parent = mainFrame
 
--- RGB Animasyon
-local hue = 0
-RunService.RenderStepped:Connect(function()
-	hue = (hue + 0.01) % 1
-	local rgb = Color3.fromHSV(hue, 1, 1)
-
-	-- Ana GUI renkleri
-	mainStroke.Color = rgb
-	toggleStroke.Color = rgb
-	toggleButton.TextColor3 = rgb
-
-	-- Seçilen butona RGB renk uygula
-	if selectedButton and selectedStroke then
-		selectedButton.TextColor3 = rgb
-		selectedStroke.Color = rgb
-	end
-end)
-
 -- Toggle butonu, mainFrame'i göster/gizle
 toggleButton.MouseButton1Click:Connect(function()
 	mainFrame.Visible = not mainFrame.Visible
@@ -138,6 +122,22 @@ for i, name in ipairs(buttonNames) do
 	buttons[i] = button
 	buttonStrokes[button] = stroke
 end
+
+RunService.RenderStepped:Connect(function()
+	hue = (hue + 0.01) % 1
+	local rgb = Color3.fromHSV(hue, 1, 1)
+
+	-- Ana GUI renkleri
+	mainStroke.Color = rgb
+	toggleStroke.Color = rgb
+	toggleButton.TextColor3 = rgb
+
+	-- Seçilen butona RGB renk uygula
+	if selectedButton and selectedStroke then
+		selectedButton.TextColor3 = rgb
+		selectedStroke.Color = rgb
+	end
+end)
 
 -- İlk buton seçili olarak başlat
 selectedButton = buttons[1]
