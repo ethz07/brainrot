@@ -41,6 +41,21 @@ local petButtons = {
 	}
 }
 
+-- Bu fonksiyon, belirtilen parent içindeki child gelene kadar bekler (timeout: 5 saniye)
+local function waitForChildRecursive(parent, childName, timeout)
+	local found = parent:FindFirstChild(childName)
+	if found then return found end
+
+	local elapsed = 0
+	while elapsed < timeout do
+		found = parent:FindFirstChild(childName)
+		if found then return found end
+		task.wait(0.2)
+		elapsed += 0.2
+	end
+	return nil
+end
+
 local function createAnimalESP(baseModel, displayNameText, generationText, rarityText)
 	local decoPart = baseModel:FindFirstChild("Decorations", true)
 	local targetPart = decoPart and decoPart:FindFirstChild("Part")
@@ -106,9 +121,9 @@ local function scanAllBases()
 			for _, podium in pairs(podiums:GetChildren()) do
 				local basePart = podium:FindFirstChild("Base")
 				if basePart then
-					local spawn = basePart:FindFirstChild("Spawn")
-					if spawn then
-						local attachment = spawn:FindFirstChild("Attachment")
+					local spawnPart = basePart:FindFirstChild("Spawn")
+					if spawnPart then
+						local attachment = spawnPart:FindFirstChild("Attachment") or spawnPart:WaitForChild("Attachment", 5)
 						local overhead = attachment and attachment:FindFirstChild("AnimalOverHead")
 						if overhead then
 							local displayName = overhead:FindFirstChild("DisplayName")
