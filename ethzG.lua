@@ -1257,7 +1257,6 @@ RunService.RenderStepped:Connect(function()
 		selectedStroke.Color = rgbColor
 	end
 
-	toggleButton.TextColor3 = rgbColor
 	toggleStroke.Color = rgbColor
 
 	if floatRGB then
