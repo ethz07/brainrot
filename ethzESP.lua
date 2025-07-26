@@ -95,7 +95,7 @@ titleLabel.TextYAlignment = Enum.TextYAlignment.Top
 titleLabel.Parent = mainFrame
 
 local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(1, -20, 1, -110)
+scrollFrame.Size = UDim2.new(1, -20, 1, -95)
 scrollFrame.Position = UDim2.new(0, 10, 0, 70)
 scrollFrame.BackgroundTransparency = 1
 scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
