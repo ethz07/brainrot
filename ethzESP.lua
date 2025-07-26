@@ -143,3 +143,4 @@ end)
 selectedButton = buttons[1]
 selectedStroke = buttonStrokes[selectedButton]
 selectedStroke.Enabled = true
+print("yes")
