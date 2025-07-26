@@ -68,9 +68,17 @@ local hue = 0
 RunService.RenderStepped:Connect(function()
 	hue = (hue + 0.01) % 1
 	local rgb = Color3.fromHSV(hue, 1, 1)
+
+	-- Ana GUI renkleri
 	mainStroke.Color = rgb
-	toggleButton.TextColor3 = rgb
 	toggleStroke.Color = rgb
+	toggleButton.TextColor3 = rgb
+
+	-- Seçilen butona RGB renk uygula
+	if selectedButton and selectedStroke then
+		selectedButton.TextColor3 = rgb
+		selectedStroke.Color = rgb
+	end
 end)
 
 -- Toggle butonu, mainFrame'i göster/gizle
@@ -78,22 +86,21 @@ toggleButton.MouseButton1Click:Connect(function()
 	mainFrame.Visible = not mainFrame.Visible
 end)
 
--- Yeni sekme isimleri
+-- Sekme isimleri
 local buttonNames = {"Brainrot God", "Secret"}
 local buttons = {}
 local buttonStrokes = {}
 
 local selectedButton = nil
 local selectedStroke = nil
-local hue = 0
 
--- Geniş butonlar için ayarlama
-local buttonWidth = 120
-local buttonSpacing = 15
+-- Geniş ve ortalanmış butonlar
+local buttonWidth = 130
+local buttonSpacing = 20
 local totalWidth = (#buttonNames * buttonWidth) + ((#buttonNames - 1) * buttonSpacing)
 local startX = (mainFrame.Size.X.Offset - totalWidth) / 2
 
--- Sekmeleri oluştur
+-- Butonları oluştur
 for i, name in ipairs(buttonNames) do
 	local button = Instance.new("TextButton")
 	button.Name = name .. "Button"
@@ -107,8 +114,7 @@ for i, name in ipairs(buttonNames) do
 	button.AutoButtonColor = false
 	button.Parent = mainFrame
 
-	local uicorner = Instance.new("UICorner", button)
-	uicorner.CornerRadius = UDim.new(0, 8)
+	Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
 
 	local stroke = Instance.new("UIStroke")
 	stroke.Thickness = 2
@@ -133,7 +139,7 @@ for i, name in ipairs(buttonNames) do
 	buttonStrokes[button] = stroke
 end
 
--- Başlangıçta ilk buton seçili görünsün
+-- İlk buton seçili olarak başlat
 selectedButton = buttons[1]
 selectedStroke = buttonStrokes[selectedButton]
 selectedStroke.Enabled = true
