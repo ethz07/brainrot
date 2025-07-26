@@ -1166,7 +1166,7 @@ local UICornerKick = Instance.new("UICorner", KickBtn)
 UICornerKick.CornerRadius = UDim.new(0, 8)
 
 KickBtn.MouseButton1Click:Connect(function()
-	ShowConfirmation("Are you sure?", function()
+	ShowConfirmation("Are you absolutely sure you want to kick yourself from this experience?", function()
 		player:Kick("Kicked By Renz SCRIPT")
 	end)
 end)
@@ -1185,7 +1185,7 @@ local UICornerRejoin = Instance.new("UICorner", RejoinBtn)
 UICornerRejoin.CornerRadius = UDim.new(0, 8)
 
 RejoinBtn.MouseButton1Click:Connect(function()
-	ShowConfirmation("Are you sure you want to rejoin?", function()
+	ShowConfirmation("This will teleport you back to this server. Useful if things broke. Rejoin?", function()
 		local placeId = game.PlaceId
 		local instanceId = game.JobId
 		TeleportService:TeleportToPlaceInstance(placeId, instanceId)
