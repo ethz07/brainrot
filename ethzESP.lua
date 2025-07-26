@@ -8,10 +8,10 @@ local hue = 0
 local petButtons = {
 	["Brainrot God"] = {
 		"Brainrot God Lucky Block",
-		"Orcalero Orcala",
-		"Trenostruzzo Turbo 3000",
-		"Ballerino Lololo",
 		"Piccione Macchina",
+		"Ballerino Lololo",
+		"Trenostruzzo Turbo 3000",
+		"Orcalero Orcala",
 		"Statutino Libertino",
 		"Odin Din Din Dun",
 		"Espresso Signora",
