@@ -41,17 +41,27 @@ local petButtons = {
 	}
 }
 
-local function createAnimalESP(spawnPart, displayNameText, generationText, rarityText)
-	local existing = spawnPart:FindFirstChild("AnimalESP")
+local function createAnimalESP(baseModel, displayNameText, generationText, rarityText)
+	local decoPart = baseModel:FindFirstChild("Decorations", true)
+	local targetPart = decoPart and decoPart:FindFirstChild("Part")
+
+	if not targetPart then
+		warn("❌ Decorations/Part bulunamadı, ESP yerleştirilemedi! ->", baseModel:GetFullName())
+		return
+	end
+
+	local existing = targetPart:FindFirstChild("AnimalESP")
 	if existing then existing:Destroy() end
+
+	print("✅ ESP oluşturuluyor:", displayNameText, "->", targetPart:GetFullName())
 
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "AnimalESP"
-	billboard.Adornee = spawnPart
+	billboard.Adornee = targetPart
 	billboard.Size = UDim2.new(0, 200, 0, 80)
-	billboard.StudsOffset = Vector3.new(0, 4, 0)
+	billboard.StudsOffset = Vector3.new(0, 5, 0) -- üstte gözüksün diye
 	billboard.AlwaysOnTop = true
-	billboard.Parent = spawnPart
+	billboard.Parent = targetPart
 
 	local function createLabel(text, yOffset)
 		local label = Instance.new("TextLabel")
@@ -85,7 +95,10 @@ local function scanAllBases()
 	clearAllAnimalESP()
 
 	local plotsFolder = workspace:FindFirstChild("Plots") or workspace:FindFirstChild("PlotSystem") or workspace:FindFirstChild("Bases")
-	if not plotsFolder then return end
+	if not plotsFolder then
+		warn("❌ Plots klasörü bulunamadı!")
+		return
+	end
 
 	for _, base in pairs(plotsFolder:GetChildren()) do
 		local podiums = base:FindFirstChild("AnimalPodiums")
@@ -104,13 +117,21 @@ local function scanAllBases()
 
 							if displayName and generation and rarity then
 								if table.find(selectedPetNames, displayName.Text) then
-									createAnimalESP(spawn, displayName.Text, generation.Text, rarity.Text)
+									createAnimalESP(base, displayName.Text, generation.Text, rarity.Text)
+								else
+									print("⏩", displayName.Text, "eşleşmedi, ESP gösterilmiyor.")
 								end
+							else
+								warn("❌ TextLabel'lerden biri eksik!", base:GetFullName())
 							end
+						else
+							warn("❌ AnimalOverHead bulunamadı!", base:GetFullName())
 						end
 					end
 				end
 			end
+		else
+			print("ℹ️ Base'de AnimalPodiums yok:", base.Name)
 		end
 	end
 end
