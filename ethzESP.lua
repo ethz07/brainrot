@@ -183,6 +183,22 @@ for i, name in ipairs(buttonNames) do
 	buttonStrokes[button] = stroke
 end
 
+RunService.RenderStepped:Connect(function()
+	hue = (hue + 0.01) % 1
+	local rgb = Color3.fromHSV(hue, 1, 1)
+
+	-- Ana UI RGB güncellemesi
+	mainStroke.Color = rgb
+	toggleStroke.Color = rgb
+	toggleButton.TextColor3 = rgb
+
+	-- Seçili buton varsa: yazısı ve çizgisi RGB olur
+	if selectedButton and selectedStroke then
+		selectedButton.TextColor3 = rgb
+		selectedStroke.Color = rgb
+	end
+end)
+
 -- Başlangıçta ilk buton aktif ve pet listesi gösterilsin
 selectedButton = buttons[1]
 selectedStroke = buttonStrokes[selectedButton]
